@@ -118,6 +118,9 @@ svg.ic{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-wid
 .icon-group{display:inline-flex;border:1px solid var(--line);border-radius:6px;background:var(--surface);overflow:hidden}
 .icon-group .icon-btn{border-radius:0;width:36px;height:34px}
 .icon-group .icon-btn + .icon-btn{border-left:1px solid var(--line)}
+.dev-switch{display:inline-flex;align-items:center;gap:8px}
+.dev-group .icon-btn[aria-pressed="true"]{background:var(--accent-weak);color:var(--accent)}
+.dev-label{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:64px;white-space:nowrap}
 .switch{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--fg-2);cursor:pointer;white-space:nowrap;user-select:none}
 .reset-wrap{display:inline-flex;gap:6px;align-items:center}
 .reset-wrap small{color:var(--muted)}
@@ -279,6 +282,9 @@ input[type=color]{width:36px;height:36px;padding:3px;border:1px solid var(--line
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
   <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-desktop" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="12.5" rx="1.8"/><path d="M8.5 20h7M12 16.5V20"/></symbol>
+  <symbol id="i-tablet" viewBox="0 0 24 24"><rect x="5" y="2.5" width="14" height="19" rx="2.2"/><path d="M11 18.2h2"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="7.5" y="2.5" width="9" height="19" rx="2"/><path d="M11 18.5h2"/></symbol>
 </svg>
 
 <div class="app" id="app">
@@ -305,10 +311,13 @@ input[type=color]{width:36px;height:36px;padding:3px;border:1px solid var(--line
         <div class="title-row"><h1 id="page-title">페이지</h1><span id="brand-sub"></span></div>
       </div>
       <div class="actions">
-        <div class="tabs" id="dev" role="group" aria-label="미리보기 화면 크기">
-          <button type="button" data-dev="1920x1080" aria-pressed="true">PC</button>
-          <button type="button" data-dev="768x1024" aria-pressed="false">태블릿</button>
-          <button type="button" data-dev="390x844" aria-pressed="false">모바일</button>
+        <div class="dev-switch">
+          <div class="icon-group dev-group" id="dev" role="group" aria-label="미리보기 화면 크기">
+            <button type="button" class="icon-btn" data-dev="1920x1080" aria-pressed="true" aria-label="PC 1920×1080" title="PC 1920×1080"><svg class="ic"><use href="#i-desktop"/></svg></button>
+            <button type="button" class="icon-btn" data-dev="768x1024" aria-pressed="false" aria-label="태블릿 768×1024" title="태블릿 768×1024"><svg class="ic"><use href="#i-tablet"/></svg></button>
+            <button type="button" class="icon-btn" data-dev="390x844" aria-pressed="false" aria-label="모바일 390×844" title="모바일 390×844"><svg class="ic"><use href="#i-phone"/></svg></button>
+          </div>
+          <span class="dev-label" id="dev-label">PC · 1920</span>
         </div>
         <span class="vsep"></span>
         <div class="icon-group" role="group" aria-label="되돌리기">
@@ -3436,6 +3445,7 @@ $('dev').addEventListener('click', e => {
   const b = e.target.closest('[data-dev]'); if (!b) return;
   [devW, devH] = b.dataset.dev.split('x').map(Number);
   $('dev').querySelectorAll('[data-dev]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  $('dev-label').textContent = `${{1920:'PC',768:'태블릿',390:'모바일'}[devW] || ''} · ${devW}`;
   sync(); render();
 });
 function setMoving(on){
