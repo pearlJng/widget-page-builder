@@ -74,7 +74,41 @@ svg.ic{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-wid
 .sec-item.on .si-acts{display:flex;flex-wrap:wrap}
 .si-acts .icon-btn{width:28px;height:28px;color:var(--fg-2)}
 .si-acts .icon-btn svg.ic{width:16px;height:16px}
-.si-acts .icon-btn.danger{background:var(--danger-weak);color:var(--danger);width:auto;padding:0 8px;font-size:12px;font-weight:600;gap:4px}
+.si-main{padding-right:36px}
+.si-grip{position:absolute;right:4px;top:6px;width:28px;height:30px;display:grid;place-items:center;border:0;border-radius:6px;background:transparent;color:var(--muted);opacity:.55;cursor:grab;touch-action:none}
+.si-grip svg.ic{width:16px;height:16px}
+.sec-item:hover .si-grip,.si-grip:focus-visible{opacity:1}
+.si-grip:hover{background:var(--hover);color:var(--fg)}
+.sec-item.on .si-grip{color:#fff;opacity:.85}
+.sec-item.on .si-grip:hover{background:rgba(255,255,255,.16);color:#fff}
+.sec-list.sorting .sec-item{transition:transform .16s ease}
+.sec-list.sorting .sec-item.dragging{transition:none;z-index:2;cursor:grabbing}
+.sec-list.sorting .sec-item.dragging .si-acts{visibility:hidden}
+.sec-list.sorting .sec-item.dragging .si-main{box-shadow:0 8px 24px rgba(16,24,40,.18);background:var(--surface);color:var(--fg)}
+.sec-list.sorting .sec-item.dragging.on .si-main{background:var(--accent);color:var(--accent-fg)}
+.sec-list.sorting,.sec-list.sorting *{cursor:grabbing!important;user-select:none}
+.app.side-collapsed .si-grip{display:none}
+.app.side-collapsed .si-main{padding-right:0}
+/* right-click menu */
+.ctx{position:fixed;z-index:80;min-width:184px;padding:6px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px rgba(16,24,40,.16);display:grid;gap:1px}
+.ctx button{display:flex;align-items:center;gap:10px;height:34px;padding:0 10px;border:0;border-radius:6px;background:transparent;color:var(--fg);font-size:13.5px;text-align:left;white-space:nowrap}
+.ctx button svg.ic{width:16px;height:16px;color:var(--fg-2)}
+.ctx button:hover:not(:disabled),.ctx button:focus-visible{background:var(--hover);outline:none}
+.ctx button:disabled{opacity:.4;cursor:default}
+.ctx button.danger,.ctx button.danger svg.ic{color:var(--danger)}
+.ctx button.danger:hover,.ctx button.danger:focus-visible{background:var(--danger-weak)}
+.ctx kbd{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.ctx hr{border:0;border-top:1px solid var(--line-2);margin:4px 2px}
+.ctx-head{padding:6px 10px 4px;font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
+/* confirm */
+.sheet.cf-sheet{width:min(420px,100%);grid-template-rows:auto 1fr auto}
+.sheet.cf-sheet header{padding-top:20px}
+.cf-body{padding:10px 20px 0;word-break:keep-all;font-size:13.5px;color:var(--fg-2);line-height:1.6}
+.cf-body strong{color:var(--fg);font-weight:600}
+.cf-body small{display:block;margin-top:6px;color:var(--muted);font-size:12.5px}
+.sheet.cf-sheet footer{justify-content:flex-end}
+.btn.danger-fill{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn.danger-fill:hover{filter:brightness(.94)}
 .add-sec{display:flex;align-items:center;gap:10px;width:100%;margin-top:6px;padding:9px 10px;border:1px dashed var(--line);border-radius:var(--r);background:transparent;color:var(--accent);font-weight:600;text-align:left}
 .add-sec:hover{border-color:var(--accent);background:var(--accent-weak)}
 .nav-sep{height:1px;background:var(--line-2);margin:12px 4px 6px}
@@ -294,6 +328,7 @@ input[type=color]{width:36px;height:36px;padding:3px;border:1px solid var(--line
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
   <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-grip" viewBox="0 0 24 24"><g fill="currentColor" stroke="none"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></g></symbol>
   <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
   <symbol id="i-desktop" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="12.5" rx="1.8"/><path d="M8.5 20h7M12 16.5V20"/></symbol>
   <symbol id="i-tablet" viewBox="0 0 24 24"><rect x="5" y="2.5" width="14" height="19" rx="2.2"/><path d="M11 18.2h2"/></symbol>
@@ -391,6 +426,14 @@ input[type=color]{width:36px;height:36px;padding:3px;border:1px solid var(--line
     <header><b id="i-title">이미지 바꾸기</b></header>
     <div class="img-body" id="i-body"></div>
     <footer><span class="meta" id="i-meta"></span><button class="btn" id="i-cancel">취소</button><button class="btn primary" id="i-apply">적용</button></footer>
+  </div>
+</div>
+<div class="ctx" id="ctx" role="menu" aria-label="섹션 메뉴" hidden></div>
+<div class="modal" id="confirm" hidden>
+  <div class="sheet cf-sheet" role="alertdialog" aria-modal="true" aria-labelledby="cf-title" aria-describedby="cf-body">
+    <header><b id="cf-title"></b></header>
+    <div class="cf-body" id="cf-body"></div>
+    <footer><button class="btn" id="cf-no">취소</button><button class="btn danger-fill" id="cf-yes"></button></footer>
   </div>
 </div>
 <div class="pv" id="pv" hidden role="dialog" aria-modal="true" aria-labelledby="pv-title">
@@ -3148,7 +3191,6 @@ function switchSection(i, opts={}){
     if (w) stage.scrollTo({top: Math.max(0, holder.offsetTop + w.offsetTop * scaleNow - 16), behavior:'smooth'});
   }
 }
-let delArm = -1, delTimer = null;
 function buildOutline(){
   const list = store.sections;
   $('sec-list').innerHTML = list.map((sec,i) => {
@@ -3158,12 +3200,11 @@ function buildOutline(){
         <span class="sw" style="background:${t.swatch}"></span>
         <span class="si-txt"><b>${t.title}</b><small>${String(i+1).padStart(2,'0')} · ${groupName(t.cat, t.group)}</small></span>
       </button>
+      <button type="button" class="si-grip" data-act="grip" aria-label="${t.title} 순서 바꾸기 (끌거나 ↑↓ 키)" title="끌어서 순서 바꾸기"><svg class="ic"><use href="#i-grip"/></svg></button>
       <div class="si-acts">
-        <button type="button" class="icon-btn" data-act="up" ${i?'':'disabled'} aria-label="위로 이동" title="위로 이동"><svg class="ic"><use href="#i-up"/></svg></button>
-        <button type="button" class="icon-btn" data-act="down" ${i<list.length-1?'':'disabled'} aria-label="아래로 이동" title="아래로 이동"><svg class="ic"><use href="#i-down"/></svg></button>
         <button type="button" class="icon-btn" data-act="swap" aria-label="다른 위젯으로 바꾸기" title="다른 위젯으로 바꾸기"><svg class="ic"><use href="#i-swap"/></svg></button>
         <button type="button" class="icon-btn" data-act="dup" aria-label="복제" title="복제"><svg class="ic"><use href="#i-copy"/></svg></button>
-        <button type="button" class="icon-btn${delArm===i?' danger':''}" data-act="del" aria-label="${delArm===i?'한 번 더 누르면 삭제':'삭제'}" title="삭제"><svg class="ic"><use href="#i-trash"/></svg>${delArm===i?'삭제 확인':''}</button>
+        <button type="button" class="icon-btn" data-act="del" aria-label="삭제" title="삭제"><svg class="ic"><use href="#i-trash"/></svg></button>
       </div></li>`;
   }).join('') || '<li class="ol-empty">섹션이 없어요. 아래 버튼으로 추가하세요.</li>';
   $('pg-set').setAttribute('aria-pressed', String(store.cur < 0));
@@ -3171,28 +3212,167 @@ function buildOutline(){
   $('brand-sub').textContent = `섹션 ${list.length}개`;
   $('sec-count').textContent = list.length;
 }
+/* ---- section actions (shared by the icons, the right-click menu and the keyboard) */
+function moveSec(i, j){
+  const L = store.sections;
+  if (j < 0 || j >= L.length || i === j) return;
+  L.splice(j, 0, L.splice(i, 1)[0]);
+  switchSection(j, {render:true, scroll:true}); save();
+}
+function dupSec(i){
+  const L = store.sections, copy = JSON.parse(JSON.stringify(L[i])); copy.s.id = uid();
+  L.splice(i+1, 0, copy);
+  switchSection(i+1, {render:true, scroll:true}); save(); toast('섹션을 복제했어요');
+}
+async function delSec(i){
+  const t = TPL[store.sections[i].type];
+  const ok = await confirmDlg({
+    title: '섹션을 삭제할까요?',
+    body: `<strong>${String(i+1).padStart(2,'0')} ${esc(t.title)}</strong> 섹션과 그 안의 문구·이미지·설정이 모두 삭제돼요.<small>삭제한 뒤에도 <kbd>⌘Z</kbd> / <kbd>Ctrl+Z</kbd>로 되돌릴 수 있어요.</small>`,
+    ok: '삭제'
+  });
+  if (!ok) return;
+  const L = store.sections; L.splice(i, 1);
+  switchSection(Math.min(i, L.length-1), {render:true}); save(); toast('섹션을 삭제했어요');
+}
+const focusGrip = i => { const g = $('sec-list').querySelector(`.sec-item[data-i="${i}"] .si-grip`); if (g) g.focus(); };
+
 $('sec-list').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
-  const i = +b.closest('.sec-item').dataset.i, L = store.sections, act = b.dataset.act;
-  if (act !== 'del') delArm = -1;
-  if (act === 'pick'){ switchSection(i, {scroll:true}); return; }
-  if (act === 'swap'){ openPicker(i); return; }
-  if (act === 'up' || act === 'down'){
-    const j = act === 'up' ? i-1 : i+1;
-    [L[i], L[j]] = [L[j], L[i]];
-    switchSection(j, {render:true, scroll:true});
+  const i = +b.closest('.sec-item').dataset.i, act = b.dataset.act;
+  if (act === 'pick') switchSection(i, {scroll:true});
+  else if (act === 'grip'){ if (!sortMoved && store.cur !== i) switchSection(i, {scroll:true}); focusGrip(i); }
+  else if (act === 'swap') openPicker(i);
+  else if (act === 'dup') dupSec(i);
+  else if (act === 'del') delSec(i);
+});
+// keyboard on the handle: ↑↓ moves the section
+$('sec-list').addEventListener('keydown', e => {
+  const g = e.target.closest('.si-grip'); if (!g) return;
+  if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+  e.preventDefault();
+  const i = +g.closest('.sec-item').dataset.i, j = e.key === 'ArrowUp' ? i-1 : i+1;
+  if (j < 0 || j >= store.sections.length) return;
+  moveSec(i, j); focusGrip(j);
+});
+
+/* ---- drag the handle to reorder */
+let sort = null, sortMoved = false;
+$('sec-list').addEventListener('pointerdown', e => {
+  const g = e.target.closest('.si-grip'); if (!g || e.button !== 0) return;
+  e.preventDefault(); closeCtx();
+  const li = g.closest('.sec-item'), items = [...$('sec-list').children];
+  const rects = items.map(x => x.getBoundingClientRect());
+  const from = +li.dataset.i, gap = items.length > 1 ? Math.max(0, (rects[1].top - rects[0].bottom)) : 0;
+  sort = {g, li, items, rects, from, to: from, y0: e.clientY, h: rects[from].height + gap, id: e.pointerId};
+  sortMoved = false;
+  g.setPointerCapture(e.pointerId);
+});
+$('sec-list').addEventListener('pointermove', e => {
+  if (!sort || e.pointerId !== sort.id) return;
+  const {li, items, rects, from, h} = sort;
+  const top = rects[0].top - rects[from].top, bottom = rects[rects.length-1].bottom - rects[from].bottom;
+  const dy = Math.max(top, Math.min(bottom, e.clientY - sort.y0));
+  if (!sortMoved){ if (Math.abs(dy) < 4) return; sortMoved = true; $('sec-list').classList.add('sorting'); li.classList.add('dragging'); }
+  li.style.transform = `translateY(${dy}px)`;
+  const mid = rects[from].top + rects[from].height/2 + dy;
+  let to = 0;
+  items.forEach((x, k) => { if (k !== from && rects[k].top + rects[k].height/2 < mid) to++; });
+  sort.to = to;
+  items.forEach((x, k) => {
+    if (k === from) return;
+    const shift = (from < to && k > from && k <= to) ? -h : (to < from && k >= to && k < from) ? h : 0;
+    x.style.transform = shift ? `translateY(${shift}px)` : '';
+  });
+});
+function endSort(e){
+  if (!sort || (e && e.pointerId !== sort.id)) return;
+  const {items, from, to} = sort; sort = null;
+  $('sec-list').classList.remove('sorting');
+  items.forEach(x => { x.style.transform = ''; x.classList.remove('dragging'); });
+  if (sortMoved && to !== from){ moveSec(from, to); focusGrip(to); toast(`${to+1}번째 위치로 옮겼어요`); }
+  setTimeout(() => { sortMoved = false; }, 0);
+}
+$('sec-list').addEventListener('pointerup', endSort);
+$('sec-list').addEventListener('pointercancel', endSort);
+
+/* ---- right-click menu */
+let ctxAt = -1;
+function openCtx(i, x, y){
+  const L = store.sections, t = TPL[L[i].type], ctx = $('ctx');
+  ctxAt = i;
+  if (store.cur !== i) switchSection(i, {scroll:true});
+  ctx.innerHTML = `<div class="ctx-head">${String(i+1).padStart(2,'0')} ${esc(t.title)}</div>
+    <button type="button" role="menuitem" data-ca="swap"><svg class="ic"><use href="#i-swap"/></svg>다른 위젯으로 바꾸기</button>
+    <button type="button" role="menuitem" data-ca="dup"><svg class="ic"><use href="#i-copy"/></svg>복제</button>
+    <hr>
+    <button type="button" role="menuitem" data-ca="up" ${i?'':'disabled'}><svg class="ic"><use href="#i-up"/></svg>위로 이동</button>
+    <button type="button" role="menuitem" data-ca="down" ${i<L.length-1?'':'disabled'}><svg class="ic"><use href="#i-down"/></svg>아래로 이동</button>
+    <hr>
+    <button type="button" role="menuitem" class="danger" data-ca="del"><svg class="ic"><use href="#i-trash"/></svg>삭제<kbd>Del</kbd></button>`;
+  ctx.hidden = false;
+  const r = ctx.getBoundingClientRect();
+  ctx.style.left = Math.max(8, Math.min(x, innerWidth - r.width - 8)) + 'px';
+  ctx.style.top = Math.max(8, Math.min(y, innerHeight - r.height - 8)) + 'px';
+  ctx.querySelector('button:not(:disabled)').focus();
+}
+function closeCtx(refocus){
+  if ($('ctx').hidden) return;
+  $('ctx').hidden = true;
+  if (refocus && ctxAt >= 0){ const b = $('sec-list').querySelector(`.sec-item[data-i="${ctxAt}"] .si-main`); if (b) b.focus(); }
+}
+$('sec-list').addEventListener('contextmenu', e => {
+  const li = e.target.closest('.sec-item[data-i]'); if (!li) return;
+  e.preventDefault();
+  let x = e.clientX, y = e.clientY;
+  if (!x && !y){ const r = li.getBoundingClientRect(); x = r.left + 24; y = r.top + 36; } // keyboard (context-menu key / Shift+F10)
+  openCtx(+li.dataset.i, x, y);
+});
+$('ctx').addEventListener('click', e => {
+  const b = e.target.closest('[data-ca]'); if (!b || b.disabled) return;
+  const i = ctxAt, a = b.dataset.ca;
+  closeCtx(false);
+  if (a === 'swap') openPicker(i);
+  else if (a === 'dup') dupSec(i);
+  else if (a === 'up') moveSec(i, i-1);
+  else if (a === 'down') moveSec(i, i+1);
+  else if (a === 'del') delSec(i);
+});
+$('ctx').addEventListener('keydown', e => {
+  const bs = [...$('ctx').querySelectorAll('button:not(:disabled)')], k = bs.indexOf(document.activeElement);
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp'){ e.preventDefault(); bs[(k + (e.key === 'ArrowDown' ? 1 : -1) + bs.length) % bs.length].focus(); }
+  else if (e.key === 'Home'){ e.preventDefault(); bs[0].focus(); }
+  else if (e.key === 'End'){ e.preventDefault(); bs[bs.length-1].focus(); }
+  else if (e.key === 'Escape'){ e.preventDefault(); closeCtx(true); }
+  else if (e.key === 'Tab'){ closeCtx(false); }
+  else if (e.key === 'Delete' || e.key === 'Backspace'){ e.preventDefault(); const i = ctxAt; closeCtx(false); delSec(i); }
+});
+document.addEventListener('pointerdown', e => { if (!$('ctx').hidden && !e.target.closest('#ctx')) closeCtx(false); }, true);
+window.addEventListener('resize', () => closeCtx(false));
+window.addEventListener('blur', () => closeCtx(false));
+$('sec-list').closest('.side').addEventListener('scroll', () => closeCtx(false), true);
+
+/* ---- confirm dialog */
+let cfDone = null;
+function confirmDlg({title, body, ok}){
+  if (cfDone) cfDone(false);
+  const back = document.activeElement;
+  $('cf-title').textContent = title; $('cf-body').innerHTML = body; $('cf-yes').textContent = ok;
+  $('confirm').hidden = false; $('cf-no').focus();
+  return new Promise(res => {
+    cfDone = v => { cfDone = null; $('confirm').hidden = true; if (back && back.isConnected) back.focus(); res(v); };
+  });
+}
+$('cf-yes').onclick = () => cfDone && cfDone(true);
+$('cf-no').onclick = () => cfDone && cfDone(false);
+$('confirm').addEventListener('click', e => { if (e.target === $('confirm') && cfDone) cfDone(false); });
+$('confirm').addEventListener('keydown', e => {
+  if (e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); cfDone && cfDone(false); }
+  if (e.key === 'Tab'){ // keep focus inside the dialog
+    const a = $('cf-no'), b = $('cf-yes');
+    if (e.shiftKey && document.activeElement === a){ e.preventDefault(); b.focus(); }
+    else if (!e.shiftKey && document.activeElement === b){ e.preventDefault(); a.focus(); }
   }
-  if (act === 'dup'){
-    const copy = JSON.parse(JSON.stringify(L[i])); copy.s.id = uid();
-    L.splice(i+1, 0, copy);
-    switchSection(i+1, {render:true, scroll:true}); toast('섹션을 복제했어요');
-  }
-  if (act === 'del'){
-    if (delArm !== i){ delArm = i; buildOutline(); clearTimeout(delTimer); delTimer = setTimeout(() => { delArm = -1; buildOutline(); }, 3000); return; }
-    delArm = -1; L.splice(i, 1);
-    switchSection(Math.min(i, L.length-1), {render:true}); toast('섹션을 삭제했어요');
-  }
-  save();
 });
 $('pg-set').onclick = () => switchSection(-1);
 
