@@ -45,12 +45,29 @@ button{cursor:pointer}
 svg.ic{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
 /* ---------- app frame ---------- */
-.app{display:grid;grid-template-columns:var(--side) minmax(0,1fr);height:100%;min-height:0}
+.app{display:grid;grid-template-columns:var(--side) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);height:100%;min-height:0}
+.app.mode-gallery,.app.mode-widget{grid-template-columns:minmax(0,1fr)}
+.app.mode-gallery .side,.app.mode-widget .side{display:none}
+.topbar{grid-column:1/-1;display:flex;align-items:center;gap:28px;height:52px;padding:0 20px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));background:var(--surface);border-bottom:1px solid var(--line)}
+.top-tabs{display:flex;align-items:stretch;gap:4px;height:100%}
+.top-tabs button{position:relative;display:inline-flex;align-items:center;gap:7px;border:0;background:transparent;padding:0 12px;font-size:14px;font-weight:500;color:var(--muted);white-space:nowrap}
+.top-tabs button svg.ic{width:17px;height:17px}
+.top-tabs button:hover{color:var(--fg)}
+.top-tabs button[aria-current="page"]{color:var(--accent);font-weight:600}
+.top-tabs button[aria-current="page"]::after{content:"";position:absolute;left:8px;right:8px;bottom:-1px;height:2px;border-radius:2px;background:var(--accent)}
+.top-tabs small{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-weak);border-radius:10px;padding:1px 7px;line-height:1.5}
+.top-tabs small:empty{display:none}
+.top-status{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);white-space:nowrap}
+.top-status i{width:7px;height:7px;border-radius:50%;background:var(--success);flex:none}
+@media (max-width:760px){.topbar{gap:12px}.top-status span{display:none}.top-tabs button{padding:0 8px}}
 .app.side-collapsed{--side:68px}
 
 /* ---------- sidebar ---------- */
 .side{background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;padding-left:env(safe-area-inset-left,0px)}
-.side-head{display:flex;align-items:center;justify-content:space-between;gap:8px;height:60px;padding:0 14px 0 18px;border-bottom:1px solid var(--line-2)}
+.side-head{display:flex;align-items:center;justify-content:space-between;gap:8px;height:56px;padding:0 10px 0 20px;border-bottom:1px solid var(--line-2)}
+.side-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden}
+.side-title small{font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:500}
+.app.side-collapsed .side-title{display:none}
 .logo{font-size:19px;font-weight:800;letter-spacing:-.02em;white-space:nowrap;overflow:hidden}
 .logo span{color:var(--accent)}
 .icon-btn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:0;border-radius:6px;background:transparent;color:var(--fg-2);flex:none}
@@ -287,7 +304,6 @@ input[type=color]{width:36px;height:36px;padding:3px;border:1px solid var(--line
 .app.mode-widget .w-only{display:inline-flex}
 .app.mode-widget #export{display:none}
 .app.mode-gallery .page-head .actions,.app.mode-gallery .body{display:none}
-.app.mode-widget .sec-item .si-main,.app.mode-gallery .sec-item .si-main{opacity:.75}
 .crumb-back{display:inline-flex;align-items:center;gap:4px;border:0;background:transparent;padding:2px 6px 2px 2px;margin-left:-2px;border-radius:4px;font-size:12px;font-weight:600;color:var(--accent)}
 .crumb-back:hover{background:var(--accent-weak)}
 .crumb-back svg.ic{width:14px;height:14px}
@@ -385,23 +401,26 @@ input[type=color]{width:36px;height:36px;padding:3px;border:1px solid var(--line
 </svg>
 
 <div class="app" id="app">
+  <header class="topbar">
+    <div class="logo">Page<span>Builder</span></div>
+    <nav class="top-tabs" aria-label="작업 공간">
+      <button type="button" id="nav-page" aria-current="page"><svg class="ic"><use href="#i-layers"/></svg>페이지 편집</button>
+      <button type="button" id="nav-gallery" aria-current="false"><svg class="ic"><use href="#i-grid"/></svg>위젯 갤러리<small id="style-count"></small></button>
+    </nav>
+    <div class="top-status"><i></i><span>이 브라우저에 자동 저장돼요</span></div>
+  </header>
   <aside class="side" aria-label="페이지 구성">
     <div class="side-head">
-      <div class="logo">Page<span>Builder</span></div>
+      <div class="side-title"><span>페이지 구성</span><small id="sec-count"></small></div>
       <button type="button" class="icon-btn" id="side-toggle" aria-label="사이드바 접기" title="사이드바 접기"><svg class="ic"><use href="#i-panel"/></svg></button>
     </div>
     <nav class="side-nav">
-      <div class="nav-group"><span>페이지 구성</span><small id="sec-count"></small></div>
       <ol class="sec-list" id="sec-list"></ol>
       <button type="button" class="add-sec" id="add-sec"><svg class="ic"><use href="#i-plus"/></svg><span>섹션 추가</span></button>
-      <div class="nav-sep"></div>
-      <div class="nav-group"><span>라이브러리</span></div>
-      <button type="button" class="nav-item" id="nav-gallery" aria-pressed="false"><svg class="ic"><use href="#i-grid"/></svg><span>위젯 갤러리</span><small id="style-count"></small></button>
       <div class="nav-sep"></div>
       <div class="nav-group"><span>설정</span></div>
       <button type="button" class="nav-item" id="pg-set" aria-pressed="false"><svg class="ic"><use href="#i-gear"/></svg><span>페이지 설정</span></button>
     </nav>
-    <div class="side-foot"><i></i><span>이 브라우저에 자동 저장돼요</span></div>
   </aside>
 
   <div class="work">
@@ -3289,7 +3308,8 @@ function buildOutline(){
       </div></li>`;
   }).join('') || '<li class="ol-empty">섹션이 없어요. 아래 버튼으로 추가하세요.</li>';
   $('pg-set').setAttribute('aria-pressed', String(cur === -1));
-  $('nav-gallery').setAttribute('aria-pressed', String(mode !== 'page'));
+  $('nav-gallery').setAttribute('aria-current', mode !== 'page' ? 'page' : 'false');
+  $('nav-page').setAttribute('aria-current', mode === 'page' ? 'page' : 'false');
   $('sec-count').textContent = list.length;
   $('style-count').textContent = lib.styles.length || '';
   setHead();
@@ -4017,6 +4037,7 @@ async function goPage(){
   if (!(await okToLeaveDraft())) return false;
   leaveWidget(); setMode('page');
   switchSection(store.cur, {render:true});
+  setTimeout(fit, 0);
   return true;
 }
 function openWidget(type, styleId){
@@ -4056,6 +4077,7 @@ async function delStyle(id){
 }
 
 $('nav-gallery').onclick = () => goGallery();
+$('nav-page').onclick = () => goPage();
 $('g-tabs').addEventListener('click', e => { const b = e.target.closest('[data-gcat]'); if (!b) return; gCat = b.dataset.gcat; buildGallery(); });
 $('g-search').addEventListener('input', e => { gQ = e.target.value; buildGallery(); });
 $('g-body').addEventListener('click', e => {
