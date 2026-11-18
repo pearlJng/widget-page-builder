@@ -45,12 +45,29 @@ button{cursor:pointer}
 svg.ic{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
 /* ---------- app frame ---------- */
-.app{display:grid;grid-template-columns:var(--side) minmax(0,1fr);height:100%;min-height:0}
+.app{display:grid;grid-template-columns:var(--side) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);height:100%;min-height:0}
+.app.mode-gallery,.app.mode-widget{grid-template-columns:minmax(0,1fr)}
+.app.mode-gallery .side,.app.mode-widget .side{display:none}
+.topbar{grid-column:1/-1;display:flex;align-items:center;gap:28px;height:52px;padding:0 20px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));background:var(--surface);border-bottom:1px solid var(--line)}
+.top-tabs{display:flex;align-items:stretch;gap:4px;height:100%}
+.top-tabs button{position:relative;display:inline-flex;align-items:center;gap:7px;border:0;background:transparent;padding:0 12px;font-size:14px;font-weight:500;color:var(--muted);white-space:nowrap}
+.top-tabs button svg.ic{width:17px;height:17px}
+.top-tabs button:hover{color:var(--fg)}
+.top-tabs button[aria-current="page"]{color:var(--accent);font-weight:600}
+.top-tabs button[aria-current="page"]::after{content:"";position:absolute;left:8px;right:8px;bottom:-1px;height:2px;border-radius:2px;background:var(--accent)}
+.top-tabs small{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-weak);border-radius:10px;padding:1px 7px;line-height:1.5}
+.top-tabs small:empty{display:none}
+.top-status{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);white-space:nowrap}
+.top-status i{width:7px;height:7px;border-radius:50%;background:var(--success);flex:none}
+@media (max-width:760px){.topbar{gap:12px}.top-status span{display:none}.top-tabs button{padding:0 8px}}
 .app.side-collapsed{--side:68px}
 
 /* ---------- sidebar ---------- */
 .side{background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;padding-left:env(safe-area-inset-left,0px)}
-.side-head{display:flex;align-items:center;justify-content:space-between;gap:8px;height:60px;padding:0 14px 0 18px;border-bottom:1px solid var(--line-2)}
+.side-head{display:flex;align-items:center;justify-content:space-between;gap:8px;height:56px;padding:0 10px 0 20px;border-bottom:1px solid var(--line-2)}
+.side-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden}
+.side-title small{font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:500}
+.app.side-collapsed .side-title{display:none}
 .logo{font-size:19px;font-weight:800;letter-spacing:-.02em;white-space:nowrap;overflow:hidden}
 .logo span{color:var(--accent)}
 .icon-btn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:0;border-radius:6px;background:transparent;color:var(--fg-2);flex:none}
@@ -279,6 +296,50 @@ input[type=color]{width:36px;height:36px;padding:3px;border:1px solid var(--line
 .img-prev{width:100%;max-height:240px;aspect-ratio:16/9;object-fit:contain;border:1px solid var(--line);border-radius:var(--r);background:repeating-conic-gradient(var(--bg) 0 25%,var(--surface) 0 50%) 0 0/14px 14px}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#1F2329;color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;z-index:60;box-shadow:0 8px 24px rgba(0,0,0,.2)}
 
+/* ---------- widget gallery ---------- */
+.nav-item small{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:500}
+.nav-item[aria-pressed="true"] small{color:rgba(255,255,255,.8)}
+.app.side-collapsed .nav-item small{display:none}
+.w-only{display:none}
+.app.mode-widget .w-only{display:inline-flex}
+.app.mode-widget #export{display:none}
+.app.mode-gallery .page-head .actions,.app.mode-gallery .body{display:none}
+.crumb-back{display:inline-flex;align-items:center;gap:4px;border:0;background:transparent;padding:2px 6px 2px 2px;margin-left:-2px;border-radius:4px;font-size:12px;font-weight:600;color:var(--accent)}
+.crumb-back:hover{background:var(--accent-weak)}
+.crumb-back svg.ic{width:14px;height:14px}
+.title-row .t-edit{width:28px;height:28px;align-self:center}
+.title-row .t-edit svg.ic{width:15px;height:15px}
+.gallery{display:grid;grid-template-rows:auto minmax(0,1fr);min-height:0;background:var(--bg)}
+.g-tools{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 28px 0;background:transparent;border-bottom:1px solid var(--line)}
+.g-tools .tabs{border-bottom:0;overflow-x:auto;overflow-y:hidden;max-width:100%;scrollbar-width:none}
+.g-tools .tabs::-webkit-scrollbar{display:none}
+.g-body{overflow:auto;padding:22px 28px 40px;display:grid;align-content:start;gap:26px}
+.g-intro{font-size:13px;color:var(--fg-2);line-height:1.6;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+.g-intro b{color:var(--fg);font-weight:600}
+.g-group h3{margin:0 0 14px;font-size:16px;font-weight:700;display:flex;align-items:center;gap:6px}
+.g-group h3 small{font-size:12px;color:var(--accent);font-weight:600}
+.g-sub{margin-bottom:18px}
+.g-sub h4{margin:0 0 10px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.g-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.g-card{display:grid;grid-template-rows:auto 1fr auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;transition:box-shadow .15s,border-color .15s}
+.g-card:hover{border-color:#C9D3E3;box-shadow:0 8px 24px rgba(16,24,40,.08)}
+.g-card.mine{border-color:var(--accent-weak);box-shadow:inset 0 3px 0 var(--accent)}
+.g-thumb{position:relative;display:block;width:100%;aspect-ratio:16/10;padding:0;border:0;border-bottom:1px solid var(--line-2);background:repeating-linear-gradient(45deg,var(--bg) 0 10px,var(--surface) 10px 20px);overflow:hidden;cursor:pointer}
+.g-thumb iframe{position:absolute;left:0;top:0;width:1440px;height:900px;border:0;transform-origin:0 0;pointer-events:none;background:transparent}
+.g-thumb::after{content:"편집하기";position:absolute;inset:0;display:grid;place-items:center;background:rgba(16,24,40,.42);color:#fff;font-size:14px;font-weight:600;opacity:0;transition:opacity .15s}
+.g-thumb:hover::after,.g-thumb:focus-visible::after{opacity:1}
+.g-badge{position:absolute;left:10px;top:10px;z-index:1;height:22px;display:inline-flex;align-items:center;padding:0 8px;border-radius:4px;background:var(--accent);color:#fff;font-size:11.5px;font-weight:600}
+.g-info{padding:12px 14px 4px;display:grid;gap:3px;align-content:start;min-width:0}
+.g-info small{font-size:11.5px;color:var(--muted);font-family:var(--mono)}
+.g-info b{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-info p{margin:0;font-size:12.5px;color:var(--fg-2);line-height:1.5}
+.g-acts{display:flex;align-items:center;gap:6px;padding:10px 14px 14px}
+.g-acts .icon-btn{margin-left:auto;width:30px;height:30px}
+.g-empty{border:1px dashed var(--line);border-radius:12px;padding:28px;text-align:center;color:var(--muted);font-size:13.5px;line-height:1.7;background:var(--surface)}
+.cf-input{display:block;width:100%;box-sizing:border-box;margin-top:12px;height:38px;padding:0 12px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--fg);font:inherit;font-size:14px}
+.cf-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-weak)}
+@media (max-width:760px){.g-tools,.g-body{padding-left:16px;padding-right:16px}.g-grid{grid-template-columns:1fr}}
+
 /* ---------- device preview ---------- */
 .pv{position:fixed;inset:0;z-index:70;display:grid;grid-template-rows:auto minmax(0,1fr);background:#E9ECF1}
 .pv-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 16px;padding-top:max(10px,env(safe-area-inset-top,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:var(--surface);border-bottom:1px solid var(--line)}
@@ -328,6 +389,10 @@ input[type=color]{width:36px;height:36px;padding:3px;border:1px solid var(--line
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
   <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><g fill="currentColor" stroke="none"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></g></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M5 4h11l3 3v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4Z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></symbol>
   <symbol id="i-grip" viewBox="0 0 24 24"><g fill="currentColor" stroke="none"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></g></symbol>
   <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
   <symbol id="i-desktop" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="12.5" rx="1.8"/><path d="M8.5 20h7M12 16.5V20"/></symbol>
@@ -336,26 +401,32 @@ input[type=color]{width:36px;height:36px;padding:3px;border:1px solid var(--line
 </svg>
 
 <div class="app" id="app">
+  <header class="topbar">
+    <div class="logo">Page<span>Builder</span></div>
+    <nav class="top-tabs" aria-label="작업 공간">
+      <button type="button" id="nav-page" aria-current="page"><svg class="ic"><use href="#i-layers"/></svg>페이지 편집</button>
+      <button type="button" id="nav-gallery" aria-current="false"><svg class="ic"><use href="#i-grid"/></svg>위젯 갤러리<small id="style-count"></small></button>
+    </nav>
+    <div class="top-status"><i></i><span>이 브라우저에 자동 저장돼요</span></div>
+  </header>
   <aside class="side" aria-label="페이지 구성">
     <div class="side-head">
-      <div class="logo">Page<span>Builder</span></div>
+      <div class="side-title"><span>페이지 구성</span><small id="sec-count"></small></div>
       <button type="button" class="icon-btn" id="side-toggle" aria-label="사이드바 접기" title="사이드바 접기"><svg class="ic"><use href="#i-panel"/></svg></button>
     </div>
     <nav class="side-nav">
-      <div class="nav-group"><span>페이지 구성</span><small id="sec-count"></small></div>
       <ol class="sec-list" id="sec-list"></ol>
       <button type="button" class="add-sec" id="add-sec"><svg class="ic"><use href="#i-plus"/></svg><span>섹션 추가</span></button>
       <div class="nav-sep"></div>
       <div class="nav-group"><span>설정</span></div>
       <button type="button" class="nav-item" id="pg-set" aria-pressed="false"><svg class="ic"><use href="#i-gear"/></svg><span>페이지 설정</span></button>
     </nav>
-    <div class="side-foot"><i></i><span>이 브라우저에 자동 저장돼요</span></div>
   </aside>
 
   <div class="work">
     <header class="page-head">
       <div>
-        <div class="crumb"><svg class="ic" style="width:14px;height:14px"><use href="#i-layers"/></svg>페이지 빌더</div>
+        <div class="crumb" id="crumb"><svg class="ic" style="width:14px;height:14px"><use href="#i-layers"/></svg>페이지 빌더</div>
         <div class="title-row"><h1 id="page-title">페이지</h1><span id="brand-sub"></span></div>
       </div>
       <div class="actions">
@@ -378,6 +449,8 @@ input[type=color]{width:36px;height:36px;padding:3px;border:1px solid var(--line
         <span class="reset-wrap" id="reset-wrap"><button class="btn" id="reset"><svg class="ic"><use href="#i-reset"/></svg>기본값으로 초기화</button></span>
         <button class="btn outline" id="preview"><svg class="ic"><use href="#i-eye"/></svg>미리보기</button>
         <button class="btn primary" id="export"><svg class="ic"><use href="#i-export"/></svg>HTML 내보내기</button>
+        <button class="btn w-only" id="w-add"><svg class="ic"><use href="#i-plus"/></svg>페이지에 추가</button>
+        <button class="btn primary w-only" id="w-save"><svg class="ic"><use href="#i-save"/></svg>내 스타일로 저장</button>
       </div>
     </header>
     <div class="body">
@@ -387,6 +460,13 @@ input[type=color]{width:36px;height:36px;padding:3px;border:1px solid var(--line
       </div>
       <aside class="rail" id="rail" aria-label="요소 설정"></aside>
     </div>
+    <section class="gallery" id="gallery" hidden aria-label="위젯 갤러리">
+      <div class="g-tools">
+        <div class="tabs" id="g-tabs" role="group" aria-label="위젯 종류"></div>
+        <label class="search"><svg class="ic" style="width:16px;height:16px"><use href="#i-search"/></svg><input id="g-search" type="search" placeholder="위젯 · 내 스타일 검색" aria-label="위젯 검색"></label>
+      </div>
+      <div class="g-body" id="g-body"></div>
+    </section>
   </div>
 </div>
 
@@ -2742,7 +2822,25 @@ function set(k, v){
   if (FIELD[k]?.r) obj[last][dk()] = v; else obj[last] = v;
 }
 let saveT;
-function persist(){ clearTimeout(saveT); saveT = setTimeout(()=>{ try{ localStorage.setItem(KEY, JSON.stringify(store)); }catch(e){ toast('브라우저 저장 공간이 부족해 자동 저장을 못 했어요. 큰 이미지는 주소로 넣어주세요.'); } }, 300); }
+// mode: 'page' (page editor) · 'gallery' (widget gallery) · 'widget' (one widget / style on its own)
+let mode = 'page', pageCtx = null, wStyle = null, wType = null, baseSnap = '';
+const LIBKEY = 'page-builder-lib-v1';
+const clone = o => JSON.parse(JSON.stringify(o));
+let lib = {styles:[]};
+try { const l = JSON.parse(localStorage.getItem(LIBKEY)); if (l && Array.isArray(l.styles)) lib = l; } catch(e) {}
+lib.styles = lib.styles.filter(x => x && TPL[x.type]).map(x => ({id:x.id || uid(), type:x.type, name:String(x.name || TPL[x.type].title), at:x.at || 0, s:merge(TPL[x.type].defaults(), x.s || {})}));
+const quotaMsg = '브라우저 저장 공간이 부족해 자동 저장을 못 했어요. 큰 이미지는 주소로 넣어주세요.';
+function saveLib(){ try { localStorage.setItem(LIBKEY, JSON.stringify(lib)); } catch(e) { toast(quotaMsg); } }
+function flushSave(){
+  clearTimeout(saveT); saveT = null;
+  if (mode === 'widget'){
+    const st = wStyle && lib.styles.find(x => x.id === wStyle);
+    if (st){ st.s = clone(store.sections[0].s); st.at = Date.now(); saveLib(); }
+    return;
+  }
+  try { localStorage.setItem(KEY, JSON.stringify(store)); } catch(e) { toast(quotaMsg); }
+}
+function persist(){ clearTimeout(saveT); saveT = setTimeout(flushSave, 300); }
 
 /* ================= undo / redo ================= */
 // every save() becomes one history step; rapid changes (slider drags, typing) are merged into one step
@@ -2789,7 +2887,7 @@ function updateUndoUI(){
   if (r) r.disabled = !redoStack.length;
 }
 function undoKeys(e){
-  const mod = e.metaKey || e.ctrlKey; if (!mod) return;
+  const mod = e.metaKey || e.ctrlKey; if (!mod || mode === 'gallery') return;
   const k = e.key.toLowerCase();
   const isUndo = k === 'z' && !e.shiftKey, isRedo = (k === 'z' && e.shiftKey) || (k === 'y' && e.ctrlKey && !e.metaKey);
   if (!isUndo && !isRedo) return;
@@ -2962,6 +3060,7 @@ function measure(){
   if (Math.abs(h - contentH) > 1){ contentH = h; fit(); }
 }
 function fit(){
+  if (!stage.clientWidth) return;
   const aw = stage.clientWidth - 56;
   const s = scaleNow = Math.min(1, aw/devW);
   view.style.width = devW+'px'; view.style.height = contentH+'px';
@@ -3191,12 +3290,13 @@ function switchSection(i, opts={}){
     if (w) stage.scrollTo({top: Math.max(0, holder.offsetTop + w.offsetTop * scaleNow - 16), behavior:'smooth'});
   }
 }
+const pageStore = () => mode === 'widget' ? pageCtx.store : store;
 function buildOutline(){
-  const list = store.sections;
+  const P = pageStore(), list = P.sections, cur = mode === 'page' ? P.cur : -2;
   $('sec-list').innerHTML = list.map((sec,i) => {
     const t = TPL[sec.type];
-    return `<li class="sec-item${i===store.cur?' on':''}" data-i="${i}">
-      <button type="button" class="si-main" data-act="pick" aria-current="${i===store.cur}" title="${t.title}">
+    return `<li class="sec-item${i===cur?' on':''}" data-i="${i}">
+      <button type="button" class="si-main" data-act="pick" aria-current="${i===cur}" title="${t.title}">
         <span class="sw" style="background:${t.swatch}"></span>
         <span class="si-txt"><b>${t.title}</b><small>${String(i+1).padStart(2,'0')} · ${groupName(t.cat, t.group)}</small></span>
       </button>
@@ -3207,10 +3307,12 @@ function buildOutline(){
         <button type="button" class="icon-btn" data-act="del" aria-label="삭제" title="삭제"><svg class="ic"><use href="#i-trash"/></svg></button>
       </div></li>`;
   }).join('') || '<li class="ol-empty">섹션이 없어요. 아래 버튼으로 추가하세요.</li>';
-  $('pg-set').setAttribute('aria-pressed', String(store.cur < 0));
-  $('page-title').textContent = store.page.title || '이름 없는 페이지';
-  $('brand-sub').textContent = `섹션 ${list.length}개`;
+  $('pg-set').setAttribute('aria-pressed', String(cur === -1));
+  $('nav-gallery').setAttribute('aria-current', mode !== 'page' ? 'page' : 'false');
+  $('nav-page').setAttribute('aria-current', mode === 'page' ? 'page' : 'false');
   $('sec-count').textContent = list.length;
+  $('style-count').textContent = lib.styles.length || '';
+  setHead();
 }
 /* ---- section actions (shared by the icons, the right-click menu and the keyboard) */
 function moveSec(i, j){
@@ -3300,11 +3402,12 @@ $('sec-list').addEventListener('pointercancel', endSort);
 let ctxAt = -1;
 function openCtx(i, x, y){
   const L = store.sections, t = TPL[L[i].type], ctx = $('ctx');
-  ctxAt = i;
+  ctxAt = i; ctx.dataset.kind = 'sec';
   if (store.cur !== i) switchSection(i, {scroll:true});
   ctx.innerHTML = `<div class="ctx-head">${String(i+1).padStart(2,'0')} ${esc(t.title)}</div>
     <button type="button" role="menuitem" data-ca="swap"><svg class="ic"><use href="#i-swap"/></svg>다른 위젯으로 바꾸기</button>
     <button type="button" role="menuitem" data-ca="dup"><svg class="ic"><use href="#i-copy"/></svg>복제</button>
+    <button type="button" role="menuitem" data-ca="style"><svg class="ic"><use href="#i-save"/></svg>내 스타일로 저장</button>
     <hr>
     <button type="button" role="menuitem" data-ca="up" ${i?'':'disabled'}><svg class="ic"><use href="#i-up"/></svg>위로 이동</button>
     <button type="button" role="menuitem" data-ca="down" ${i<L.length-1?'':'disabled'}><svg class="ic"><use href="#i-down"/></svg>아래로 이동</button>
@@ -3319,7 +3422,7 @@ function openCtx(i, x, y){
 function closeCtx(refocus){
   if ($('ctx').hidden) return;
   $('ctx').hidden = true;
-  if (refocus && ctxAt >= 0){ const b = $('sec-list').querySelector(`.sec-item[data-i="${ctxAt}"] .si-main`); if (b) b.focus(); }
+  if (refocus && ctxAt >= 0 && $('ctx').dataset.kind === 'sec'){ const b = $('sec-list').querySelector(`.sec-item[data-i="${ctxAt}"] .si-main`); if (b) b.focus(); }
 }
 $('sec-list').addEventListener('contextmenu', e => {
   const li = e.target.closest('.sec-item[data-i]'); if (!li) return;
@@ -3337,6 +3440,7 @@ $('ctx').addEventListener('click', e => {
   else if (a === 'up') moveSec(i, i-1);
   else if (a === 'down') moveSec(i, i+1);
   else if (a === 'del') delSec(i);
+  else if (a === 'style') saveAsStyle(store.sections[i].type, store.sections[i].s);
 });
 $('ctx').addEventListener('keydown', e => {
   const bs = [...$('ctx').querySelectorAll('button:not(:disabled)')], k = bs.indexOf(document.activeElement);
@@ -3345,7 +3449,7 @@ $('ctx').addEventListener('keydown', e => {
   else if (e.key === 'End'){ e.preventDefault(); bs[bs.length-1].focus(); }
   else if (e.key === 'Escape'){ e.preventDefault(); closeCtx(true); }
   else if (e.key === 'Tab'){ closeCtx(false); }
-  else if (e.key === 'Delete' || e.key === 'Backspace'){ e.preventDefault(); const i = ctxAt; closeCtx(false); delSec(i); }
+  else if ((e.key === 'Delete' || e.key === 'Backspace') && $('ctx').dataset.kind === 'sec'){ e.preventDefault(); const i = ctxAt; closeCtx(false); delSec(i); }
 });
 document.addEventListener('pointerdown', e => { if (!$('ctx').hidden && !e.target.closest('#ctx')) closeCtx(false); }, true);
 window.addEventListener('resize', () => closeCtx(false));
@@ -3354,22 +3458,32 @@ $('sec-list').closest('.side').addEventListener('scroll', () => closeCtx(false),
 
 /* ---- confirm dialog */
 let cfDone = null;
-function confirmDlg({title, body, ok}){
+function confirmDlg({title, body, ok, danger = true, input}){
   if (cfDone) cfDone(false);
   const back = document.activeElement;
-  $('cf-title').textContent = title; $('cf-body').innerHTML = body; $('cf-yes').textContent = ok;
-  $('confirm').hidden = false; $('cf-no').focus();
+  $('cf-title').textContent = title; $('cf-yes').textContent = ok;
+  $('cf-yes').className = 'btn ' + (danger ? 'danger-fill' : 'primary');
+  $('cf-body').innerHTML = body + (input !== undefined ? `<input class="cf-input" id="cf-in" type="text" maxlength="60" aria-label="${esc(title)}">` : '');
+  $('confirm').hidden = false;
+  if (input !== undefined){ const f = $('cf-in'); f.value = input; f.focus(); f.select(); }
+  else $('cf-no').focus();
   return new Promise(res => {
     cfDone = v => { cfDone = null; $('confirm').hidden = true; if (back && back.isConnected) back.focus(); res(v); };
   });
 }
-$('cf-yes').onclick = () => cfDone && cfDone(true);
+$('cf-yes').onclick = () => {
+  if (!cfDone) return;
+  const f = $('cf-in');
+  if (f){ const v = f.value.trim(); if (!v){ f.focus(); return; } cfDone(v); }
+  else cfDone(true);
+};
+$('cf-body').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'cf-in'){ e.preventDefault(); $('cf-yes').click(); } });
 $('cf-no').onclick = () => cfDone && cfDone(false);
 $('confirm').addEventListener('click', e => { if (e.target === $('confirm') && cfDone) cfDone(false); });
 $('confirm').addEventListener('keydown', e => {
   if (e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); cfDone && cfDone(false); }
   if (e.key === 'Tab'){ // keep focus inside the dialog
-    const a = $('cf-no'), b = $('cf-yes');
+    const a = $('cf-in') || $('cf-no'), b = $('cf-yes');
     if (e.shiftKey && document.activeElement === a){ e.preventDefault(); b.focus(); }
     else if (!e.shiftKey && document.activeElement === b){ e.preventDefault(); a.focus(); }
   }
@@ -3393,8 +3507,12 @@ function buildPicker(){
         <span class="sw" style="background:${w.swatch}"></span><span class="no">${w.no} · ${groupName(w.cat, w.group)}</span><b>${w.title}</b><small>${w.sub}</small></button>`;
   const q = pickQ.trim().toLowerCase();
   const hit = w => !q || [w.title, w.sub, w.no, groupName(w.cat, w.group), catName(w.cat)].join(' ').toLowerCase().includes(q);
-  if (q && !WIDGETS.some(w => hit(w) && (pickCat === 'all' || w.cat === pickCat))){ $('pk-body').innerHTML = `<div class="pk-none">"${esc(pickQ)}"에 맞는 위젯이 없어요.</div>`; return; }
-  $('pk-body').innerHTML = cats.map(([k,l]) => {
+  const mine = lib.styles.filter(x => { const w = TPL[x.type]; return (pickCat === 'all' || w.cat === pickCat) && (!q || hit(w) || x.name.toLowerCase().includes(q)); });
+  if (q && !mine.length && !WIDGETS.some(w => hit(w) && (pickCat === 'all' || w.cat === pickCat))){ $('pk-body').innerHTML = `<div class="pk-none">"${esc(pickQ)}"에 맞는 위젯이 없어요.</div>`; return; }
+  const mineHTML = mine.length ? `<section class="pk-group"><h3>내 스타일 <small>${mine.length}</small></h3><div class="pk-grid">${mine.map(x => { const w = TPL[x.type]; return `<button type="button" class="tpl" data-add="${w.key}" data-style="${x.id}" aria-pressed="false">
+        <span class="sw" style="background:${w.swatch}"></span><span class="no">내 스타일 · ${w.no} ${esc(w.title)}</span><b>${esc(x.name)}</b><small>${w.sub}</small></button>`; }).join('')}</div></section>` : '';
+  $('pk-body').innerHTML = mineHTML + cats.map(([k,l]) => {
+    if (q && !WIDGETS.some(w => w.cat === k && hit(w))) return '';
     const ws = WIDGETS.filter(w => w.cat === k && hit(w));
     if (q && !ws.length) return '';
     if (!ws.length) return `<section class="pk-group"><h3>${l}</h3><div class="pk-grid"><div class="pk-empty">아직 ${l} 위젯이 없어요. 참고할 사이트를 주시면 위젯으로 만들어 넣을게요.</div></div></section>`;
@@ -3411,18 +3529,21 @@ $('pk-tabs').addEventListener('click', e => { const b = e.target.closest('[data-
 $('pk-body').addEventListener('click', e => {
   const b = e.target.closest('[data-add]'); if (!b) return;
   $('picker').hidden = true;
+  const st = b.dataset.style && lib.styles.find(x => x.id === b.dataset.style);
+  const make = () => st ? styleSection(st) : newSection(b.dataset.add);
+  const label = st ? `내 스타일 '${st.name}'` : TPL[b.dataset.add].title;
   if (pickReplace >= 0){
     const i = pickReplace; pickReplace = -1;
-    if (store.sections[i].type === b.dataset.add) return;
-    store.sections[i] = newSection(b.dataset.add);
+    if (!st && store.sections[i].type === b.dataset.add) return;
+    store.sections[i] = make();
     switchSection(i, {render:true, scroll:true}); save();
-    toast(`${TPL[b.dataset.add].title}(으)로 바꿨어요`);
+    toast(`${label}(으)로 바꿨어요`);
     return;
   }
   const at = store.cur < 0 ? store.sections.length : store.cur + 1;
-  store.sections.splice(at, 0, newSection(b.dataset.add));
+  store.sections.splice(at, 0, make());
   switchSection(at, {render:true, scroll:true}); save();
-  toast(`${TPL[b.dataset.add].title} 섹션을 넣었어요`);
+  toast(`${label} 섹션을 넣었어요`);
 });
 $('pk-close').onclick = () => { $('picker').hidden = true; };
 $('picker').addEventListener('click', e => { if (e.target.id === 'picker') $('picker').hidden = true; });
@@ -3535,7 +3656,7 @@ function buildRail(fresh=false){
   const open = fresh ? [] : [...rail.querySelectorAll('details[open]')].map(d=>d.dataset.g);
   const head = store.cur < 0
     ? `<div class="rail-head"><small>페이지</small><b>페이지 설정</b><div class="chips"><span class="chip">제목 · 설명 · 바탕색 · 기본 글꼴</span></div></div>`
-    : `<div class="rail-head"><small>섹션 ${String(store.cur+1).padStart(2,'0')} 설정</small><b>${T.title}</b><div class="chips"><span class="chip blue">${catName(T.cat)}</span><span class="chip">${groupName(T.cat, T.group)}</span><span class="chip">${T.no}</span></div></div>`;
+    : `<div class="rail-head"><small>${mode === 'widget' ? (wStyle ? '내 스타일 편집 · 자동 저장' : '기본형 편집') : `섹션 ${String(store.cur+1).padStart(2,'0')} 설정`}</small><b>${T.title}</b><div class="chips"><span class="chip blue">${catName(T.cat)}</span><span class="chip">${groupName(T.cat, T.group)}</span><span class="chip">${T.no}</span></div></div>`;
   rail.innerHTML = head + T.groups.map((g,i) => `<details data-g="${g.id}" ${open.includes(g.id)||(!open.length&&i===0)?'open':''}>
     <summary><span class="dot"></span>${g.title}</summary><div class="fields">${g.fields.map(fieldHTML).join('')}</div></details>`).join('');
   if (fresh) rail.scrollTop = 0;
@@ -3690,7 +3811,7 @@ $('play').onclick = () => { showSlide = 0; moving = true; $('mv-on').setAttribut
 const resetWrap = $('reset-wrap');
 function resetIdle(){ resetWrap.innerHTML = '<button class="btn" id="reset"><svg class="ic"><use href="#i-reset"/></svg>기본값으로 초기화</button>'; $('reset').onclick = resetAsk; }
 function resetAsk(){
-  const what = store.cur < 0 ? '페이지 설정' : `${String(store.cur+1).padStart(2,'0')} ${T.title} 섹션`;
+  const what = store.cur < 0 ? '페이지 설정' : mode === 'widget' ? `이 ${T.title} 위젯` : `${String(store.cur+1).padStart(2,'0')} ${T.title} 섹션`;
   resetWrap.innerHTML = `<small>${what}을 기본값으로?</small><button class="btn danger" id="r-yes">초기화</button><button class="btn ghost" id="r-no">취소</button>`;
   $('r-yes').onclick = () => {
     if (store.cur < 0) store.page = PAGE.defaults();
@@ -3763,6 +3884,283 @@ $('m-apply').onclick = () => {
 };
 let tt;
 function toast(msg){ const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(tt); tt = setTimeout(()=>t.hidden = true, 2400); }
+
+/* ================= widget gallery ================= */
+const styleSection = st => { const s = clone(st.s); s.id = uid(); return {type: st.type, s}; };
+async function saveAsStyle(type, s){
+  const n = lib.styles.filter(x => x.type === type).length + 1;
+  const name = await confirmDlg({title:'내 스타일로 저장', body:`지금 모습 그대로 <strong>${esc(TPL[type].title)}</strong> 위젯의 내 스타일을 만들어요. 위젯 갤러리와 섹션 추가 창에서 다시 쓸 수 있어요.`, ok:'저장', danger:false, input:`${TPL[type].title} 스타일 ${n}`});
+  if (!name) return null;
+  const st = {id: uid(), type, name, at: Date.now(), s: clone(s)};
+  lib.styles.push(st); saveLib(); buildOutline();
+  toast(`'${name}' 스타일을 저장했어요`);
+  return st;
+}
+
+let gCat = 'all', gQ = '', gIO = null, gRO = null;
+const fixVhAt = (c, h) => c.replace(/(-?\d*\.?\d+)(?:s|d|l)?vh\b/g, (m, v) => `${+(v * h / 100).toFixed(2)}px`);
+function thumbDoc(type, s){
+  const t = TPL[type], P = pageStore().page;
+  return `<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?${gAll}&display=swap">
+${Object.values(LIB).map(u => `<script src="${u}"><\/script>`).join('\n')}
+<style>html,body{margin:0;overflow:hidden}body{background:${P.bg};font-family:'${P.font}','Pretendard',-apple-system,sans-serif;-webkit-font-smoothing:antialiased}img{max-width:100%}
+${fixVhAt(t.css(s, {preview:true, anim:false}), 900)}</style></head><body>${t.html(s, {preview:true, slide:0})}</body></html>`;
+}
+function loadThumb(fr){
+  const card = fr.closest('.g-card'), st = card.dataset.style && lib.styles.find(x => x.id === card.dataset.style);
+  const type = card.dataset.type, s = st ? st.s : TPL[type].defaults();
+  fr.onload = () => {
+    try {
+      loadFonts(fr.contentWindow, fr.contentDocument);
+      const t = TPL[type], root = fr.contentDocument.querySelector('.hw-' + s.id);
+      if (t.run && t.alwaysRun && root) t.run(root, Object.assign({}, t.cfg(s, true), {on:false}));
+      // short widgets sit in the middle of the card instead of leaving an empty bottom
+      const fitH = () => { const h = fr.contentDocument && fr.contentDocument.body ? fr.contentDocument.body.scrollHeight : 900; fr.dataset.h = Math.min(900, h); scaleThumbs(); };
+      fitH(); setTimeout(fitH, 600);
+    } catch(e) {}
+  };
+  fr.parentElement.style.background = pageStore().page.bg;
+  fr.srcdoc = thumbDoc(type, s);
+}
+function scaleThumbs(){
+  $('g-body').querySelectorAll('.g-thumb').forEach(b => {
+    const f = b.firstElementChild; if (!f || !b.clientWidth) return;
+    const k = b.clientWidth / 1440, h = +f.dataset.h || 900;
+    f.style.transform = `scale(${k})`;
+    f.style.top = Math.max(0, (b.clientHeight - h * k) / 2) + 'px';
+  });
+}
+function gCard(w, st){
+  const name = st ? st.name : w.title;
+  return `<article class="g-card${st ? ' mine' : ''}" data-type="${w.key}" data-style="${st ? st.id : ''}">
+    <button type="button" class="g-thumb" data-ga="edit" aria-label="${esc(name)} 편집하기"><iframe tabindex="-1" aria-hidden="true" title=""></iframe>${st ? '<span class="g-badge">내 스타일</span>' : ''}</button>
+    <div class="g-info"><small>${w.no} · ${groupName(w.cat, w.group)}${st ? ` · ${esc(w.title)}` : ''}</small><b title="${esc(name)}">${esc(name)}</b><p>${w.sub}</p></div>
+    <div class="g-acts">
+      <button type="button" class="btn sm" data-ga="edit"><svg class="ic" style="width:15px;height:15px"><use href="#i-edit"/></svg>편집</button>
+      <button type="button" class="btn sm" data-ga="add"><svg class="ic" style="width:15px;height:15px"><use href="#i-plus"/></svg>페이지에 추가</button>
+      ${st ? `<button type="button" class="icon-btn" data-ga="more" aria-label="${esc(name)} 더 보기" aria-haspopup="menu" title="이름 바꾸기 · 복제 · 삭제"><svg class="ic"><use href="#i-more"/></svg></button>` : ''}
+    </div></article>`;
+}
+function buildGallery(){
+  const q = gQ.trim().toLowerCase();
+  const hitW = w => !q || [w.title, w.sub, w.no, groupName(w.cat, w.group), catName(w.cat)].join(' ').toLowerCase().includes(q);
+  const hitS = x => !q || hitW(TPL[x.type]) || x.name.toLowerCase().includes(q);
+  const cats = CATS.filter(([k]) => WIDGETS.some(w => w.cat === k));
+  $('g-tabs').innerHTML = [['all','전체', WIDGETS.length], ...cats.map(([k,l]) => [k, l, WIDGETS.filter(w => w.cat === k).length]), ['mine','내 스타일', lib.styles.length]]
+    .map(([k,l,n]) => `<button type="button" data-gcat="${k}" aria-pressed="${k === gCat}">${l} <small>${n}</small></button>`).join('');
+  let html = '';
+  if (gCat === 'mine'){
+    const ss = lib.styles.filter(hitS).sort((a,b) => b.at - a.at);
+    html = ss.length ? `<div class="g-grid">${ss.map(x => gCard(TPL[x.type], x)).join('')}</div>`
+      : `<div class="g-empty">${q ? `"${esc(gQ)}"에 맞는 내 스타일이 없어요.` : '아직 저장한 스타일이 없어요.<br>위젯을 <b>편집</b>한 뒤 <b>내 스타일로 저장</b>을 누르거나, 페이지의 섹션을 우클릭해 <b>내 스타일로 저장</b>하세요.'}</div>`;
+  } else {
+    const showCats = gCat === 'all' ? cats : cats.filter(c => c[0] === gCat);
+    html = showCats.map(([k, l]) => {
+      const ws = WIDGETS.filter(w => w.cat === k && (hitW(w) || lib.styles.some(x => x.type === w.key && hitS(x))));
+      if (!ws.length) return '';
+      // one grid per category, ordered by group (the group name is on each card)
+      const order = (GROUPS_UI[k] || []).map(x => x[0]), gi = w => { const i = order.indexOf(w.group); return i < 0 ? 99 : i; };
+      const cards = [...ws].sort((x, y) => gi(x) - gi(y)).map(w => (hitW(w) ? gCard(w) : '') + lib.styles.filter(x => x.type === w.key && hitS(x)).map(x => gCard(w, x)).join('')).join('');
+      return `<section class="g-group"><h3>${l} <small>${ws.length}</small></h3><div class="g-grid">${cards}</div></section>`;
+    }).join('') || `<div class="g-empty">"${esc(gQ)}"에 맞는 위젯이 없어요.</div>`;
+    if (gCat === 'all' && !q) html = `<div class="g-intro">위젯을 하나씩 열어 <b>속성을 다듬고 내 스타일로 저장</b>하세요. 저장한 스타일은 <b>섹션 추가</b> 창에서 바로 고를 수 있어요. 페이지에 넣은 섹션은 복사본이라, 나중에 스타일을 고쳐도 이미 넣은 섹션은 그대로예요.</div>` + html;
+  }
+  if (gIO) gIO.disconnect();
+  $('g-body').innerHTML = html;
+  gIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ gIO.unobserve(e.target); loadThumb(e.target.querySelector('iframe')); } }), {root: $('g-body'), rootMargin: '300px 0px'});
+  $('g-body').querySelectorAll('.g-thumb').forEach(b => gIO.observe(b));
+  scaleThumbs();
+}
+gRO = new ResizeObserver(() => { if (mode === 'gallery') scaleThumbs(); });
+gRO.observe($('g-body'));
+
+function setHead(){
+  const P = pageStore();
+  if (mode === 'page'){
+    $('crumb').innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-layers"/></svg>페이지 빌더';
+    $('page-title').textContent = P.page.title || '이름 없는 페이지';
+    $('brand-sub').textContent = `섹션 ${P.sections.length}개`;
+  } else if (mode === 'gallery'){
+    $('crumb').innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-grid"/></svg>라이브러리';
+    $('page-title').textContent = '위젯 갤러리';
+    $('brand-sub').textContent = `위젯 ${WIDGETS.length}개 · 내 스타일 ${lib.styles.length}개`;
+  } else {
+    const w = TPL[wType], st = wStyle && lib.styles.find(x => x.id === wStyle);
+    $('crumb').innerHTML = '<button type="button" class="crumb-back" id="w-back"><svg class="ic"><use href="#i-left"/></svg>위젯 갤러리</button>';
+    $('w-back').onclick = () => goGallery();
+    const tr = $('page-title');
+    tr.textContent = st ? st.name : w.title;
+    $('brand-sub').innerHTML = (st ? `${esc(w.title)} 기반 내 스타일 · 자동 저장돼요` : `${w.no} · 기본형 · 고친 뒤 <b>내 스타일로 저장</b>하세요`) +
+      (st ? ' <button type="button" class="icon-btn t-edit" id="w-rename" aria-label="스타일 이름 바꾸기" title="이름 바꾸기"><svg class="ic"><use href="#i-edit"/></svg></button>' : '');
+    if (st) $('w-rename').onclick = () => renameStyle(st.id);
+    $('w-save').innerHTML = `<svg class="ic"><use href="#i-save"/></svg>${st ? '다른 스타일로 저장' : '내 스타일로 저장'}`;
+    $('w-save').className = 'btn w-only' + (st ? '' : ' primary');
+    $('w-add').className = 'btn w-only' + (st ? ' primary' : ' outline');
+  }
+}
+function setMode(m){
+  mode = m;
+  $('app').classList.toggle('mode-gallery', m === 'gallery');
+  $('app').classList.toggle('mode-widget', m === 'widget');
+  $('gallery').hidden = m !== 'gallery';
+  if (m !== 'gallery' && gIO){ gIO.disconnect(); $('g-body').innerHTML = ''; }
+}
+// back from a single widget to the page's own state and history
+function leaveWidget(){
+  if (mode !== 'widget') return;
+  if (editing) endEdit(true);
+  flushSave();
+  clearTimeout(histT); histT = null;
+  store = pageCtx.store; undoStack = pageCtx.undoStack; redoStack = pageCtx.redoStack; lastSnap = pageCtx.lastSnap;
+  pageCtx = null; wStyle = null; wType = null;
+  setMode('page'); useSection(store.cur); updateUndoUI();
+}
+async function okToLeaveDraft(){
+  if (mode !== 'widget' || wStyle) return true;
+  if (histT) commitHistory();
+  if (snap() === baseSnap) return true;
+  return confirmDlg({title:'수정한 내용을 버릴까요?', body:`<strong>${esc(TPL[wType].title)}</strong> 기본형에서 고친 내용이 아직 저장되지 않았어요. 남기려면 취소한 뒤 <strong>내 스타일로 저장</strong>을 누르세요.`, ok:'저장하지 않고 나가기'});
+}
+async function goGallery(){
+  if (mode === 'gallery') return;
+  if (!(await okToLeaveDraft())) return;
+  if (editing) endEdit(true);
+  if (!$('pv').hidden) closePreview();
+  leaveWidget(); closeCtx(false);
+  gQ = ''; $('g-search').value = '';
+  setMode('gallery'); buildGallery(); buildOutline();
+  $('g-body').scrollTop = 0;
+}
+async function goPage(){
+  if (mode === 'page') return true;
+  if (!(await okToLeaveDraft())) return false;
+  leaveWidget(); setMode('page');
+  switchSection(store.cur, {render:true});
+  setTimeout(fit, 0);
+  return true;
+}
+function openWidget(type, styleId){
+  if (editing) endEdit(true);
+  if (histT) commitHistory();
+  if (mode === 'widget') leaveWidget();
+  const st = styleId && lib.styles.find(x => x.id === styleId);
+  pageCtx = {store, undoStack, redoStack, lastSnap};
+  store = {page: clone(pageCtx.store.page), sections:[{type, s: st ? clone(st.s) : TPL[type].defaults()}], cur:0};
+  undoStack = []; redoStack = []; lastSnap = baseSnap = snap();
+  wStyle = st ? st.id : null; wType = type;
+  setMode('widget');
+  switchSection(0, {render:true});
+  stage.scrollTop = 0; updateUndoUI();
+}
+// copy a widget / style into the page (the page keeps its own copy)
+function addToPage(sec){
+  const at = store.cur < 0 ? store.sections.length : store.cur + 1;
+  store.sections.splice(at, 0, sec); store.cur = at;
+  save(); buildOutline();
+  return at;
+}
+async function renameStyle(id){
+  const st = lib.styles.find(x => x.id === id); if (!st) return;
+  const name = await confirmDlg({title:'스타일 이름 바꾸기', body:'', ok:'바꾸기', danger:false, input:st.name});
+  if (!name) return;
+  st.name = name; saveLib(); buildOutline();
+  if (mode === 'gallery') buildGallery();
+  toast('이름을 바꿨어요');
+}
+async function delStyle(id){
+  const st = lib.styles.find(x => x.id === id); if (!st) return;
+  const ok = await confirmDlg({title:'내 스타일을 삭제할까요?', body:`<strong>${esc(st.name)}</strong> 스타일이 갤러리에서 사라져요.<small>이미 페이지에 넣은 섹션은 복사본이라 그대로 남아요. 삭제한 스타일은 되돌릴 수 없어요.</small>`, ok:'삭제'});
+  if (!ok) return;
+  lib.styles = lib.styles.filter(x => x.id !== id); saveLib(); buildOutline(); buildGallery();
+  toast('스타일을 삭제했어요');
+}
+
+$('nav-gallery').onclick = () => goGallery();
+$('nav-page').onclick = () => goPage();
+$('g-tabs').addEventListener('click', e => { const b = e.target.closest('[data-gcat]'); if (!b) return; gCat = b.dataset.gcat; buildGallery(); });
+$('g-search').addEventListener('input', e => { gQ = e.target.value; buildGallery(); });
+$('g-body').addEventListener('click', e => {
+  const b = e.target.closest('[data-ga]'); if (!b) return;
+  const card = b.closest('.g-card'), type = card.dataset.type, sid = card.dataset.style;
+  const st = sid && lib.styles.find(x => x.id === sid);
+  if (b.dataset.ga === 'edit') openWidget(type, sid);
+  else if (b.dataset.ga === 'add'){
+    const at = addToPage(st ? styleSection(st) : newSection(type));
+    toast(`${st ? `'${st.name}'` : TPL[type].title}을(를) 페이지 ${at+1}번째에 넣었어요`);
+  }
+  else if (b.dataset.ga === 'more'){ const r = b.getBoundingClientRect(); openStyleMenu(sid, r.right - 190, r.bottom + 6); }
+});
+$('g-body').addEventListener('contextmenu', e => {
+  const card = e.target.closest('.g-card[data-style]:not([data-style=""])'); if (!card) return;
+  e.preventDefault(); openStyleMenu(card.dataset.style, e.clientX, e.clientY);
+});
+let menuStyle = null;
+function openStyleMenu(id, x, y){
+  const st = lib.styles.find(s => s.id === id), ctx = $('ctx'); if (!st) return;
+  menuStyle = id; ctx.dataset.kind = 'gal';
+  ctx.innerHTML = `<div class="ctx-head">${esc(st.name)}</div>
+    <button type="button" role="menuitem" data-gm="edit"><svg class="ic"><use href="#i-edit"/></svg>편집</button>
+    <button type="button" role="menuitem" data-gm="rename"><svg class="ic"><use href="#i-edit"/></svg>이름 바꾸기</button>
+    <button type="button" role="menuitem" data-gm="dup"><svg class="ic"><use href="#i-copy"/></svg>복제</button>
+    <button type="button" role="menuitem" data-gm="add"><svg class="ic"><use href="#i-plus"/></svg>페이지에 추가</button>
+    <hr>
+    <button type="button" role="menuitem" class="danger" data-gm="del"><svg class="ic"><use href="#i-trash"/></svg>삭제</button>`;
+  ctx.hidden = false;
+  const r = ctx.getBoundingClientRect();
+  ctx.style.left = Math.max(8, Math.min(x, innerWidth - r.width - 8)) + 'px';
+  ctx.style.top = Math.max(8, Math.min(y, innerHeight - r.height - 8)) + 'px';
+  ctx.querySelector('button').focus();
+}
+$('ctx').addEventListener('click', e => {
+  const b = e.target.closest('[data-gm]'); if (!b) return;
+  const id = menuStyle, st = lib.styles.find(x => x.id === id); closeCtx(false); if (!st) return;
+  const a = b.dataset.gm;
+  if (a === 'edit') openWidget(st.type, id);
+  else if (a === 'rename') renameStyle(id);
+  else if (a === 'del') delStyle(id);
+  else if (a === 'add'){ const at = addToPage(styleSection(st)); toast(`'${st.name}'을(를) 페이지 ${at+1}번째에 넣었어요`); }
+  else if (a === 'dup'){
+    const c = {id: uid(), type: st.type, name: `${st.name} 복사본`, at: Date.now(), s: clone(st.s)};
+    lib.styles.splice(lib.styles.indexOf(st) + 1, 0, c); saveLib(); buildOutline(); buildGallery(); toast('스타일을 복제했어요');
+  }
+});
+$('g-body').addEventListener('scroll', () => closeCtx(false));
+
+// single widget: save as / add to page
+$('w-save').onclick = async () => {
+  if (histT) commitHistory();
+  const st = await saveAsStyle(wType, store.sections[0].s);
+  if (!st) return;
+  wStyle = st.id; baseSnap = snap();
+  setHead(); buildRail();
+};
+$('w-add').onclick = async () => {
+  if (histT) commitHistory();
+  const st = wStyle && lib.styles.find(x => x.id === wStyle);
+  const sec = {type: wType, s: clone(store.sections[0].s)}; sec.s.id = uid();
+  const label = st ? `'${st.name}'` : TPL[wType].title;
+  leaveWidget(); setMode('page');
+  const at = addToPage(sec);
+  switchSection(at, {render:true, scroll:true});
+  toast(`${label}을(를) 페이지 ${at+1}번째에 넣었어요`);
+};
+
+// the page outline, page settings and "add section" always lead back to the page
+$('app').querySelector('.side-nav').addEventListener('click', async e => {
+  if (mode === 'page') return;
+  const item = e.target.closest('#sec-list .sec-item[data-i]'), add = e.target.closest('#add-sec'), pg = e.target.closest('#pg-set');
+  if (!item && !add && !pg) return;
+  e.preventDefault(); e.stopPropagation();
+  if (!(await goPage())) return;
+  if (item) switchSection(+item.dataset.i, {scroll:true});
+  else if (add) openPicker(-1);
+  else switchSection(-1);
+}, true);
+['pointerdown', 'contextmenu'].forEach(ev => $('sec-list').addEventListener(ev, e => {
+  if (mode === 'page') return;
+  e.preventDefault(); e.stopPropagation();
+}, true));
 
 /* ================= device preview ================= */
 let pvW = 1920, pvH = 1080;
