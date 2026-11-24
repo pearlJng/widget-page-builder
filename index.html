@@ -3396,7 +3396,7 @@ const BENTO = (() => {
     layout:{bg:'#F2F2F2', padT:R(120,72), padB:R(120,72), maxW:1280, side:R(40,20)},
     head:{show:true, eyebrow:'BENTO GRID', text:'여러 가지 콘텐츠를\n한 화면에 담는 타일', font:'Pretendard Variable', color:'#111111', min:28, vw:3, max:52, mb:R(56,32), align:'left'},
     items:JSON.parse(JSON.stringify(ITEMS)),
-    tile:{auto:true, cols:4, rowH:R(240,200), gap:R(16,12), radius:20, light:'#FFFFFF', lightFg:'#111111', dark:'#111111', darkFg:'#FFFFFF', pad:28, tsize:R(24,20), nsize:R(64,48), hover:true}
+    tile:{count:7, auto:true, cols:4, rowH:R(240,200), gap:R(16,12), radius:20, light:'#FFFFFF', lightFg:'#111111', dark:'#111111', darkFg:'#FFFFFF', pad:28, tsize:R(24,20), nsize:R(64,48), hover:true}
   });
   const groups = [
     {id:'layout', title:'섹션', fields:[
@@ -3411,7 +3411,9 @@ const BENTO = (() => {
       A('head.mb','제목과 타일 간격',0,160,1,'px',{r:1}), {k:'head.align', l:'정렬', t:'align'}
     ]},
     {id:'items', title:'타일 목록', fields:[
-      {k:'items', l:'타일', t:'list', item:'타일', orig:ITEMS, min:4, max:7,
+      {k:'tile.count', l:'타일 개수', t:'align', num:true, relist:true, opts:[['4','4개'],['5','5개'],['6','6개'],['7','7개']],
+       hint:'개수를 줄였다가 다시 늘리면 숨겨 두었던 타일 내용이 그대로 돌아와요.'},
+      {k:'items', l:'타일', t:'list', item:'타일', orig:ITEMS, countKey:'tile.count',
        cols:[{k:'kind', l:'종류', t:'select', opts:[['image','이미지'],['text','글'],['number','숫자']]},
              {k:'size', l:'크기 (자동 배치를 끄면 적용)', t:'select', opts:[['1x1','1×1'],['2x1','2×1 (가로로 길게)'],['1x2','1×2 (세로로 길게)'],['2x2','2×2 (크게)']]},
              {k:'dark', l:'어두운 타일', t:'toggle'}, {k:'img', l:'이미지 (종류가 이미지일 때)', t:'img'},
@@ -3450,6 +3452,7 @@ ${C} .bn-copy{position:relative;z-index:1}
 ${C} .bn-tt{font-size:${T_.tsize.d}px;font-weight:700;line-height:1.3;letter-spacing:-.01em;word-break:keep-all}
 ${C} .bn-tx{margin-top:8px;font-size:15px;line-height:1.6;opacity:.75;word-break:keep-all}
 ${C} .bn-num{font-size:${T_.nsize.d}px;font-weight:800;line-height:1;letter-spacing:-.04em}
+${C} .bn-t.has-link:not(.bn-image) .bn-tt,${C} .bn-t.has-link .bn-num{padding-right:48px}
 ${C} .bn-arrow{position:absolute;right:${T_.pad}px;top:${T_.pad}px;z-index:1;width:36px;height:36px;border-radius:50%;border:1px solid currentColor;display:grid;place-items:center;opacity:.6;transition:transform .45s ${ease},opacity .3s}
 ${C} .bn-arrow svg{width:16px;height:16px}
 ${T_.hover ? `@media (hover:hover){${C} .bn-t:hover{transform:translateY(-4px);box-shadow:0 18px 40px -24px rgba(0,0,0,.45)}${C} .bn-t:hover .bn-img{transform:scale(1.05)}${C} .bn-t:hover .bn-arrow{transform:rotate(-45deg);opacity:1}}` : ''}
@@ -3462,10 +3465,11 @@ ${T_.hover ? `@media (hover:hover){${C} .bn-t:hover{transform:translateY(-4px);b
     const ARROW = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`;
     // automatic sizes per tile count: every layout fills whole rows of a 4-column grid
     const AUTO = {4:['2x2','2x1','1x1','1x1'], 5:['2x2','1x1','1x1','1x1','1x1'], 6:['2x2','2x1','1x1','1x1','2x1','2x1'], 7:['2x2','1x1','1x1','1x2','2x1','1x1','1x1']};
-    const list = st.items.slice(0, 7), auto = st.tile.auto && AUTO[list.length];
+    const count = Math.min(7, Math.max(4, +st.tile.count || 7));
+    const list = Array.from({length:count}, (_, i) => st.items[i] || ITEMS[i]), auto = st.tile.auto && AUTO[count];
     const tiles = list.map((it, i) => {
       const tag = it.href ? `a href="${esc(it.href)}"` : 'div', end = it.href ? 'a' : 'div';
-      const cls = `bn-t bn-${auto ? auto[i] : it.size} bn-${it.kind}${it.dark ? ' is-dark' : ''}`;
+      const cls = `bn-t bn-${auto ? auto[i] : it.size} bn-${it.kind}${it.dark ? ' is-dark' : ''}${it.href ? ' has-link' : ''}`;
       const arrow = it.href ? `<span class="bn-arrow">${ARROW}</span>` : '';
       if (it.kind === 'image') return `<${tag} class="${cls}">${it.img ? `<img class="bn-img" src="${esc(src(it.img))}" alt=""${preview ? ` data-img="items.${i}.img"` : ''}>` : ''}${arrow}
         <div class="bn-copy">${it.title ? `<h3 class="bn-tt"${ed('items.'+i+'.title')}>${esc(it.title)}</h3>` : ''}${it.text ? `<p class="bn-tx"${ed('items.'+i+'.text')}>${rich(it.text)}</p>` : ''}</div></${end}>`;
@@ -4659,7 +4663,7 @@ function fieldHTML(f){
     case 'select': return `<div class="f"><label for="${id}">${f.l}${ol}</label><select id="${id}" data-k="${f.k}">${f.opts.map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}</select>${hint}</div>`;
     case 'toggle': return `<div class="f"><label class="tog" for="${id}">${f.l}<input type="checkbox" id="${id}" data-k="${f.k}"></label>${hint}</div>`;
     case 'align': return `<div class="f"><span class="lab">${f.l}</span><div class="seg full" role="group" aria-label="${f.l}">
-      ${[['left','왼쪽'],['center','가운데'],['right','오른쪽']].map(([v,l])=>`<button type="button" data-k="${f.k}" data-v="${v}" aria-pressed="false">${l}</button>`).join('')}</div></div>`;
+      ${(f.opts || [['left','왼쪽'],['center','가운데'],['right','오른쪽']]).map(([v,l])=>`<button type="button" data-k="${f.k}" data-v="${v}" aria-pressed="false">${l}</button>`).join('')}</div>${f.hint ? `<div class="hint">${f.hint}</div>` : ''}</div>`;
     case 'image': return `<div class="f"><span class="lab">${f.l}</span><div class="img-f">
       <img class="thumb" data-thumb="${f.k}" alt="">
       <div class="img-actions">
@@ -4668,7 +4672,7 @@ function fieldHTML(f){
         <button type="button" class="btn sm ghost" data-default="${f.k}">기본 이미지</button></div>
       </div></div><div class="hint" data-imghint="${f.k}"></div></div>`;
     case 'list': return `<div class="f"><div class="slides" data-list="${f.k}">${listHTML(f)}</div>
-      ${f.min || f.max ? `<div class="hint" data-lcount="${f.k}"></div>` : ''}<div class="row"><button type="button" class="btn sm" data-lact="add" data-lk="${f.k}">${f.item} 추가</button>
+      ${f.min || f.max ? `<div class="hint" data-lcount="${f.k}"></div>` : ''}<div class="row">${f.countKey ? '' : `<button type="button" class="btn sm" data-lact="add" data-lk="${f.k}">${f.item} 추가</button>`}
       <button type="button" class="btn sm ghost" data-lact="orig" data-lk="${f.k}">기본 목록으로</button></div>
       <div class="hint">카드의 "보기"를 누르면 그 ${f.item}을 가운데에 띄워 멈춘 상태로 보여줘요. 미리보기에서 이미지를 더블클릭해도 바꿀 수 있어요.</div></div>`;
     case 'dnslides': return `<div class="f"><div class="slides" id="dnslides"></div>
@@ -4698,12 +4702,15 @@ function slidesHTML(){
 }
 function listHTML(f){
   const L = getRaw(f.k) || [];
-  return L.map((it,i) => `<div class="slide dn${i===showSlide?' on':''}" data-i="${i}" data-lk="${f.k}">
+  // count-driven list (e.g. Bento Grid "타일 개수"): keep enough items, show only the chosen number
+  const n = f.countKey ? Math.max(1, +getRaw(f.countKey) || L.length) : L.length;
+  if (f.countKey) while (L.length < n) L.push(JSON.parse(JSON.stringify(f.orig[L.length] || f.blank)));
+  return L.slice(0, n).map((it,i) => `<div class="slide dn${i===showSlide?' on':''}" data-i="${i}" data-lk="${f.k}">
     <div class="dn-head"><b>${f.item} ${String(i+1).padStart(2,'0')}</b>
       <button type="button" class="btn sm ghost" data-lact="show">보기</button>
       <button type="button" class="btn sm ghost" data-lact="up" ${i?'':'disabled'} aria-label="앞으로">↑</button>
-      <button type="button" class="btn sm ghost" data-lact="down" ${i<L.length-1?'':'disabled'} aria-label="뒤로">↓</button>
-      <button type="button" class="btn sm ghost" data-lact="del" ${L.length>(f.min||1)?'':'disabled'}>삭제</button></div>
+      <button type="button" class="btn sm ghost" data-lact="down" ${i<n-1?'':'disabled'} aria-label="뒤로">↓</button>
+      ${f.countKey ? '' : `<button type="button" class="btn sm ghost" data-lact="del" ${L.length>(f.min||1)?'':'disabled'}>삭제</button>`}</div>
     ${f.cols.map(c => {
       const v = it[c.k] ?? '';
       if (c.t === 'img') return `<div class="img-f"><img class="thumb" src="${esc(pv(v))}" alt="">
@@ -4750,7 +4757,7 @@ function sync(except){
   rail.querySelectorAll('[data-k]').forEach(el => {
     if (el===except) return;
     const k = el.dataset.k, v = get(k), f = FIELD[k];
-    if (f.t==='align') el.setAttribute('aria-pressed', String(el.dataset.v===v));
+    if (f.t==='align') el.setAttribute('aria-pressed', String(el.dataset.v===String(v)));
     else if (el.type==='checkbox') el.checked = !!v;
     else if (el.dataset.url!==undefined) el.value = String(v).startsWith('data:') ? '' : v;
     else el.value = v;
@@ -4814,7 +4821,7 @@ rail.addEventListener('click', e => {
     if (a==='orig'){ setPath(k, JSON.parse(JSON.stringify(f.orig))); showSlide = 0; }
     refreshLists(); render(); save(); return;
   }
-  if (b.dataset.v){ set(b.dataset.k, b.dataset.v); render(); sync(); save(); return; }
+  if (b.dataset.v){ const f = FIELD[b.dataset.k]; set(b.dataset.k, f && f.num ? +b.dataset.v : b.dataset.v); if (f && f.relist){ showSlide = 0; refreshLists(); } render(); sync(); save(); return; }
   if (b.dataset.default){ set(b.dataset.default, FIELD[b.dataset.default].def); render(); sync(); save(); return; }
   const act = b.dataset.act; if (!act) return;
   if (act.startsWith('dn-')){
