@@ -2633,14 +2633,775 @@ ${st.btn.show ? `    <div class="im-btn-row" style="--d:${n(u.end + AN.btnDelay,
   };
 })();
 
+/* =====================================================================
+   Hero 04 · Reveal Lens (original design)
+   a lens follows the cursor and reveals a second scene (another image, colors and headline) under the first
+   ===================================================================== */
+const LENS = (() => {
+  const stack = f => `'${f}','Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif`;
+  const BASE = PH('dark', 'BASE IMAGE', 1920, 1080), REVEAL = PH('photo', 'REVEAL IMAGE', 1920, 1080);
+  const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<em>$1</em>').replace(/\n/g, '<br>');
+  const defaults = () => ({
+    id: uid(),
+    layout:{vh:100, minH:640, side:R(96,24), maxW:1280, align:'left'},
+    base:{src:BASE, px:50, py:50, color:'#0B0C10', a:.35, text:'#FFFFFF', accent:'#FFD25A'},
+    reveal:{src:REVEAL, px:50, py:50, color:'#FFD25A', imgA:.45, text:'#111111', accent:'#111111'},
+    eyebrow:{show:true, text:'INTERACTIVE HERO', size:14, ls:.2},
+    head:{tag:'h1', text:'보이는 것 너머의\n**이야기**를 만듭니다.', alt:'커서를 움직이면\n**숨은 장면**이 보여요.', font:'Pretendard Variable', weight:'800', min:40, vw:6, max:104, lh:1.12, ls:-.03},
+    sub:{show:true, text:'히어로 문구를 설명하는 한 줄을 입력하세요. 두 번째 장면의 이미지와 문구는 렌즈 안에서만 보여요.', size:R(19,15), maxW:560},
+    btn:{show:true, text:'자세히 보기', href:'#', bg:'#FFFFFF', fg:'#0B0C10'},
+    lens:{size:R(200,130), press:1.6, soft:2, ease:.16, ring:true, ringColor:'#FFFFFF', idle:true}
+  });
+  const groups = [
+    {id:'layout', title:'섹션', fields:[
+      A('layout.vh','높이 (화면 높이 대비)',40,100,1,'vh'), A('layout.minH','최소 높이',0,1200,10,'px'),
+      A('layout.side','좌우 여백',0,200,1,'px',{r:1}), A('layout.maxW','내용 최대 너비',600,1800,10,'px'),
+      {k:'layout.align', l:'정렬', t:'align'}
+    ]},
+    {id:'base', title:'기본 장면', fields:[
+      {k:'base.src', l:'배경 이미지', t:'image', def:BASE},
+      A('base.px','초점 가로',0,100,1,'%'), A('base.py','초점 세로',0,100,1,'%'),
+      {k:'base.color', l:'덮는 색', t:'color'}, A('base.a','덮는 색 진하기',0,1,.01,''),
+      {k:'base.text', l:'글자색', t:'color'}, {k:'base.accent', l:'강조색', t:'color'}
+    ]},
+    {id:'reveal', title:'렌즈 속 장면', fields:[
+      {k:'reveal.src', l:'렌즈 속 이미지', t:'image', def:REVEAL},
+      A('reveal.px','초점 가로',0,100,1,'%'), A('reveal.py','초점 세로',0,100,1,'%'),
+      {k:'reveal.color', l:'바탕색', t:'color'}, A('reveal.imgA','이미지 진하기',0,1,.01,'',{hint:'0이면 바탕색만, 1이면 이미지만 보여요.'}),
+      {k:'reveal.text', l:'글자색', t:'color'}, {k:'reveal.accent', l:'강조색', t:'color'},
+      {k:'head.alt', l:'렌즈 속 제목 (줄바꿈 · **강조**)', t:'textarea', hint:'기본 장면의 제목과 같은 자리에 겹쳐서, 렌즈 안에서만 보여요.'}
+    ]},
+    {id:'head', title:'제목', fields:[
+      {k:'eyebrow.show', l:'작은 제목 표시', t:'toggle'}, {k:'eyebrow.text', l:'작은 제목', t:'text'},
+      A('eyebrow.size','작은 제목 크기',10,24,1,'px'), A('eyebrow.ls','작은 제목 자간',0,.5,.01,'em'),
+      {k:'head.text', l:'제목 (줄바꿈 · **강조**)', t:'textarea'},
+      {k:'head.tag', l:'제목 태그', t:'select', opts:[['h1','h1'],['h2','h2'],['p','p']], hint:'페이지에 다른 h1이 있으면 h2로 바꾸세요.'},
+      {k:'head.font', l:'글꼴', t:'select', opts:fontOpts}, {k:'head.weight', l:'굵기', t:'select', opts:weightOpts},
+      ...sizeFields('head'),
+      A('head.lh','줄 간격',.8,2,.01,'×'), A('head.ls','자간',-.1,.2,.005,'em')
+    ]},
+    {id:'sub', title:'설명 · 버튼', fields:[
+      {k:'sub.show', l:'설명 표시', t:'toggle'}, {k:'sub.text', l:'설명', t:'textarea'},
+      A('sub.size','설명 크기',11,32,1,'px',{r:1}), A('sub.maxW','설명 최대 너비',240,1200,10,'px'),
+      {k:'btn.show', l:'버튼 표시', t:'toggle'}, {k:'btn.text', l:'버튼 문구', t:'text'}, {k:'btn.href', l:'연결 주소', t:'text'},
+      {k:'btn.bg', l:'버튼 색', t:'color'}, {k:'btn.fg', l:'버튼 글자색', t:'color'}
+    ]},
+    {id:'lens', title:'렌즈', fields:[
+      A('lens.size','렌즈 반지름',40,500,1,'px',{r:1}),
+      A('lens.press','누르고 있을 때 커지는 배율',1,3,.05,'×'),
+      A('lens.soft','가장자리 부드럽게',0,60,1,'px'),
+      A('lens.ease','따라오는 속도',.03,1,.01,'',{hint:'작을수록 느긋하게, 1이면 커서에 바로 붙어요.'}),
+      {k:'lens.ring', l:'렌즈 테두리', t:'toggle'}, {k:'lens.ringColor', l:'테두리 색', t:'color'},
+      {k:'lens.idle', l:'커서가 없을 때 렌즈가 천천히 떠다니기', t:'toggle', hint:'터치 화면에서는 이 움직임으로 렌즈 속 장면을 보여줘요.'}
+    ]}
+  ];
+  const fonts = st => [st.head.font, 'Pretendard Variable'];
+  function css(st){
+    const C = '.hw-'+st.id, L = st.layout, B = st.base, V = st.reveal, E = st.eyebrow, H = st.head, S = st.sub, BT = st.btn, LN = st.lens;
+    const items = {left:'flex-start', center:'center', right:'flex-end'}[L.align];
+    return `${C}{position:relative;isolation:isolate;overflow:hidden;min-height:max(${L.minH}px, ${L.vh}svh);margin:0;background:${B.color};font-family:${stack(H.font)};-webkit-font-smoothing:antialiased;touch-action:pan-y}
+${C} *{box-sizing:border-box;margin:0;padding:0}
+${C} .ln-layer{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:0 ${L.side.d}px}
+${C} .ln-img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover}
+${C} .ln-base{z-index:0}
+${C} .ln-base .ln-img{object-position:${B.px}% ${B.py}%}
+${C} .ln-base::before{content:"";position:absolute;inset:0;z-index:1;background:${rgba(B.color, B.a)};pointer-events:none}
+${C} .ln-reveal{z-index:2;background:${V.color};pointer-events:none;--x:-999px;--y:-999px;--r:0px;
+  -webkit-mask-image:radial-gradient(circle at var(--x) var(--y),#000 calc(var(--r) - ${LN.soft}px),transparent var(--r));mask-image:radial-gradient(circle at var(--x) var(--y),#000 calc(var(--r) - ${LN.soft}px),transparent var(--r))}
+${C} .ln-reveal .ln-img{object-position:${V.px}% ${V.py}%;opacity:${V.imgA};mix-blend-mode:multiply}
+${C} .ln-inner{position:relative;z-index:2;width:100%;max-width:${L.maxW}px;display:flex;flex-direction:column;align-items:${items};text-align:${L.align}}
+${C} .ln-eyebrow{margin-bottom:24px;font-size:${E.size}px;font-weight:600;letter-spacing:${E.ls}em;text-transform:uppercase;opacity:.75}
+${C} .ln-head{font-family:${stack(H.font)};font-weight:${H.weight};font-size:${clampF(H)};line-height:${H.lh};letter-spacing:${H.ls}em;word-break:keep-all}
+${C} .ln-head em{font-style:normal}
+${C} .ln-sub{margin-top:28px;max-width:${S.maxW}px;font-size:${S.size.d}px;line-height:1.65;opacity:.8;word-break:keep-all}
+${C} .ln-btn{display:inline-flex;align-items:center;gap:10px;margin-top:40px;height:54px;padding:0 30px;border-radius:999px;font-size:16px;font-weight:700;text-decoration:none;background:${BT.bg};color:${BT.fg};transition:transform .3s cubic-bezier(.22,.61,.36,1)}
+${C} .ln-btn:hover{transform:translateY(-2px)}
+${C} .ln-base .ln-inner{color:${B.text}}
+${C} .ln-base .ln-head em{color:${B.accent}}
+${C} .ln-reveal .ln-inner{color:${V.text}}
+${C} .ln-reveal .ln-head em{color:${V.accent}}
+${C} .ln-reveal .ln-btn{background:${V.text};color:${V.color}}
+${C} .ln-ring{position:absolute;left:0;top:0;z-index:3;width:0;height:0;border-radius:50%;border:1.5px solid ${LN.ringColor};opacity:0;pointer-events:none;${LN.ring ? '' : 'display:none;'}}
+@media (max-width:767px){${C} .ln-layer{padding:0 ${L.side.m}px}${C} .ln-eyebrow{margin-bottom:16px;font-size:${Math.max(10, E.size - 2)}px}${C} .ln-sub{margin-top:18px;font-size:${S.size.m}px}${C} .ln-btn{margin-top:28px;height:48px;padding:0 24px;font-size:15px}}`;
+  }
+  function html(st, {preview=false}={}){
+    const a = k => preview ? ` data-el="${k}"` : '', ed = p => preview ? ` data-edit="${p}"` : '';
+    const src = s => preview ? pv(s) : s, H = st.head, tag = H.tag;
+    // both layers share the same layout, so the lens shows the second scene exactly in place
+    const inner = (alt) => `<div class="ln-inner"${alt ? ' aria-hidden="true"' : a('text')}>
+${st.eyebrow.show ? `      <p class="ln-eyebrow"${alt ? '' : ed('eyebrow.text')}>${esc(st.eyebrow.text)}</p>\n` : ''}      <${alt ? 'p' : tag} class="ln-head"${alt ? '' : ed('head.text')}>${rich(alt ? H.alt : H.text)}</${alt ? 'p' : tag}>
+${st.sub.show ? `      <p class="ln-sub"${alt ? '' : ed('sub.text')}>${esc(st.sub.text)}</p>\n` : ''}${st.btn.show ? `      <${alt ? 'span' : `a href="${esc(st.btn.href)}"`} class="ln-btn"><span${alt ? '' : ed('btn.text')}>${esc(st.btn.text)}</span></${alt ? 'span' : 'a'}>\n` : ''}    </div>`;
+    return `<section class="hw-hero hw-${st.id}"${a('section')}>
+  <div class="ln-layer ln-base"${preview ? ' data-img="base.src"' : ''}>
+    <img class="ln-img" src="${esc(src(st.base.src))}" alt="" aria-hidden="true">
+    ${inner(false)}
+  </div>
+  <div class="ln-layer ln-reveal" aria-hidden="true">
+    <img class="ln-img" src="${esc(src(st.reveal.src))}" alt="">
+    ${inner(true)}
+  </div>
+  <div class="ln-ring" aria-hidden="true"></div>
+</section>`;
+  }
+  // lens: follows the pointer (eased), grows while pressed, drifts by itself when idle; paused off screen
+  function run(root, o){
+    var W = root.ownerDocument.defaultView, rv = root.querySelector('.ln-reveal'), ring = root.querySelector('.ln-ring');
+    if (!rv) return function(){};
+    var reduce = W.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var size = function(){ return W.matchMedia('(max-width:767px)').matches ? o.rm : o.rd; };
+    var w = root.clientWidth, h = root.clientHeight;
+    var x = w * .62, y = h * .5, r = 0, tx = x, ty = y, tr = 0, hover = false, down = false, t0 = W.performance.now(), raf = 0, vis = true, io = null;
+    function paint(){
+      rv.style.setProperty('--x', x.toFixed(1) + 'px'); rv.style.setProperty('--y', y.toFixed(1) + 'px'); rv.style.setProperty('--r', Math.max(0, r).toFixed(1) + 'px');
+      if (ring){ ring.style.width = ring.style.height = (2 * r).toFixed(1) + 'px'; ring.style.transform = 'translate3d(' + (x - r).toFixed(1) + 'px,' + (y - r).toFixed(1) + 'px,0)'; ring.style.opacity = r > 4 ? '.85' : '0'; }
+    }
+    // static lens (animation off · gallery thumbnails)
+    if (o.on === false){ r = size(); paint(); return function(){}; }
+    function idleTarget(){
+      var t = (W.performance.now() - t0) / 1000;
+      tx = w * (.55 + .25 * Math.sin(t * .37)); ty = h * (.5 + .2 * Math.sin(t * .61 + 1.3)); tr = size() * .85;
+    }
+    function loop(){
+      raf = 0;
+      if (!hover){ if (o.idle && !reduce) idleTarget(); else tr = o.idle ? size() * .85 : 0; }
+      var k = reduce ? 1 : o.ease;
+      x += (tx - x) * k; y += (ty - y) * k; r += (tr - r) * (reduce ? 1 : .14);
+      paint();
+      if (vis) raf = W.requestAnimationFrame(loop);
+    }
+    function start(){ if (!raf && vis) raf = W.requestAnimationFrame(loop); }
+    function pos(e){ var b = root.getBoundingClientRect(); tx = e.clientX - b.left; ty = e.clientY - b.top; }
+    var onMove = function(e){ pos(e); hover = true; tr = size() * (down ? o.press : 1); start(); };
+    var onLeave = function(){ hover = false; down = false; start(); };
+    var onDown = function(e){ pos(e); hover = true; down = true; tr = size() * o.press; start(); };
+    var onUp = function(){ down = false; if (hover) tr = size(); };
+    var onResize = function(){ w = root.clientWidth; h = root.clientHeight; };
+    root.addEventListener('pointermove', onMove); root.addEventListener('pointerleave', onLeave);
+    root.addEventListener('pointerdown', onDown); W.addEventListener('pointerup', onUp); W.addEventListener('resize', onResize);
+    if (o.idle){ x = w * .55; y = h * .5; }
+    io = new W.IntersectionObserver(function(es){ vis = es[0].isIntersecting; if (vis) start(); }, {threshold:0});
+    io.observe(root); start();
+    return function(){
+      if (raf) W.cancelAnimationFrame(raf); raf = 0; vis = false; io.disconnect();
+      root.removeEventListener('pointermove', onMove); root.removeEventListener('pointerleave', onLeave);
+      root.removeEventListener('pointerdown', onDown); W.removeEventListener('pointerup', onUp); W.removeEventListener('resize', onResize);
+    };
+  }
+  const cfg = st => ({rd:st.lens.size.d, rm:st.lens.size.m, press:st.lens.press, ease:st.lens.ease, idle:st.lens.idle});
+  return {
+    key:'lens', cat:'hero', group:'hover', no:'H04', title:'Reveal Lens', sub:'커서를 따라오는 렌즈 속에 숨은 두 번째 장면',
+    swatch:'radial-gradient(circle at 62% 50%,#FFD25A 0 26%,transparent 27%),linear-gradient(135deg,#2A2D35,#0B0C10)',
+    defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
+    header:()=>0, bp:()=>767,
+    drag:{}, selectGroup:{section:'base', text:'head'},
+    multiline:/^(head\.text|sub\.text)$/, rich:/^head\.text$/,
+    note:''
+  };
+})();
+
+/* =====================================================================
+   Content 10 · Expand Panels (original design)
+   a row of image panels; the hovered one widens and shows its text (vertical accordion on small screens)
+   ===================================================================== */
+const PANELS = (() => {
+  const stack = f => `'${f}','Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif`;
+  const KINDS = ['photo', 'dark', 'art', 'photo', 'dark'];
+  const ITEMS = [1,2,3,4,5].map(i => ({img:PH(KINDS[i-1], `PANEL 0${i}`, 1200, 1400), title:`패널 제목 0${i}`, desc:'패널을 설명하는 짧은 문장을 입력하세요.\n두 번째 줄 설명입니다.', link:'자세히 보기', href:'#'}));
+  const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<em>$1</em>').replace(/\n/g, '<br>');
+  const defaults = () => ({
+    id: uid(),
+    layout:{bg:'#0E0F13', padT:R(120,72), padB:R(120,72), maxW:1440, side:R(40,20)},
+    head:{show:true, eyebrow:'EXPAND PANELS', text:'마우스를 올리면\n**펼쳐지는** 갤러리', font:'Pretendard Variable', color:'#FFFFFF', accent:'#7CF2C6', min:28, vw:3.2, max:56, mb:R(56,32), align:'left'},
+    panel:{h:R(600,380), closed:76, gap:12, radius:20, grow:4.5, speed:.7, dim:.5, start:0, keep:true, numbers:true},
+    items:JSON.parse(JSON.stringify(ITEMS)),
+    text:{title:'#FFFFFF', desc:'#D7DAE0', num:'#7CF2C6', tsize:R(32,24), dsize:R(16,14)}
+  });
+  const groups = [
+    {id:'layout', title:'섹션', fields:[
+      {k:'layout.bg', l:'배경색', t:'color'},
+      A('layout.padT','위 여백',0,300,1,'px',{r:1}), A('layout.padB','아래 여백',0,300,1,'px',{r:1}),
+      A('layout.maxW','최대 너비',600,2000,10,'px'), A('layout.side','좌우 여백',0,120,1,'px',{r:1})
+    ]},
+    {id:'head', title:'제목', fields:[
+      {k:'head.show', l:'제목 표시', t:'toggle'}, {k:'head.eyebrow', l:'작은 제목', t:'text'},
+      {k:'head.text', l:'제목 (줄바꿈 · **강조**)', t:'textarea'},
+      {k:'head.font', l:'글꼴', t:'select', opts:fontOpts},
+      {k:'head.color', l:'글자색', t:'color'}, {k:'head.accent', l:'강조색', t:'color'},
+      ...sizeFields('head'), A('head.mb','제목과 패널 간격',0,160,1,'px',{r:1}), {k:'head.align', l:'정렬', t:'align'}
+    ]},
+    {id:'items', title:'패널 목록', fields:[
+      {k:'items', l:'패널', t:'list', item:'패널', orig:ITEMS,
+       cols:[{k:'img', l:'이미지', t:'img'}, {k:'title', l:'제목', t:'text'}, {k:'desc', l:'설명 (줄바꿈 · **굵게**)', t:'textarea'},
+             {k:'link', l:'링크 문구 (비우면 숨김)', t:'text'}, {k:'href', l:'연결 주소', t:'text'}],
+       blank:{img:'', title:'새 패널', desc:'설명을 입력하세요.', link:'자세히 보기', href:'#'}}
+    ]},
+    {id:'panel', title:'패널 동작', fields:[
+      A('panel.h','패널 높이 (좁은 화면은 펼친 높이)',200,900,10,'px',{r:1}), A('panel.closed','좁은 화면 · 접힌 패널 높이',44,160,1,'px'),
+      A('panel.gap','패널 간격',0,40,1,'px'), A('panel.radius','모서리',0,48,1,'px'),
+      A('panel.grow','펼친 패널 너비 (접힌 패널의 몇 배)',1.5,10,.1,'×'),
+      A('panel.speed','펼쳐지는 시간',.2,2,.05,'s'), A('panel.dim','접힌 패널 어둡게',0,.9,.01,''),
+      A('panel.start','처음 펼쳐 둘 패널 번호',1,10,1,'',{hint:'페이지를 열었을 때 펼쳐져 있는 패널이에요.'}),
+      {k:'panel.keep', l:'마우스가 나가도 마지막 패널을 펼쳐 두기', t:'toggle'},
+      {k:'panel.numbers', l:'번호 표시', t:'toggle'}
+    ]},
+    {id:'text', title:'패널 글자', fields:[
+      {k:'text.title', l:'제목 색', t:'color'}, {k:'text.desc', l:'설명 색', t:'color'}, {k:'text.num', l:'번호 색', t:'color'},
+      A('text.tsize','제목 크기',14,64,1,'px',{r:1}), A('text.dsize','설명 크기',11,24,1,'px',{r:1})
+    ]}
+  ];
+  const fonts = st => [st.head.font, 'Pretendard Variable'];
+  function css(st){
+    const C = '.hw-'+st.id, L = st.layout, H = st.head, P = st.panel, X = st.text;
+    const ease = 'cubic-bezier(.65,.05,.25,1)';
+    return `${C}{background:${L.bg};margin:0;padding:${L.padT.d}px 0 ${L.padB.d}px;font-family:${stack(H.font)};-webkit-font-smoothing:antialiased}
+${C} *{box-sizing:border-box;margin:0;padding:0}
+${C} .xp-inner{max-width:${L.maxW}px;margin:0 auto;padding:0 ${L.side.d}px}
+${C} .xp-head{margin-bottom:${H.mb.d}px;text-align:${H.align};color:${H.color}}
+${C} .xp-eyebrow{margin-bottom:14px;font-size:13px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
+${C} .xp-title{font-family:${stack(H.font)};font-size:${clampF(H)};font-weight:800;line-height:1.2;letter-spacing:-.02em;word-break:keep-all}
+${C} .xp-title em{font-style:normal;color:${H.accent}}
+${C} .xp-row{display:flex;gap:${P.gap}px;height:${P.h.d}px}
+${C} .xp-p{position:relative;flex:1 1 0;min-width:0;border-radius:${P.radius}px;overflow:hidden;cursor:pointer;background:#1C1E24;outline:none;transition:flex-grow ${P.speed}s ${ease}}
+${C} .xp-p:focus-visible{box-shadow:0 0 0 3px ${H.accent}}
+${C} .xp-p.is-on{flex-grow:${P.grow}}
+${C} .xp-img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;transform:scale(1.12);transition:transform ${(P.speed * 1.8).toFixed(2)}s ${ease}}
+${C} .xp-p.is-on .xp-img{transform:scale(1)}
+${C} .xp-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,${(P.dim * .4).toFixed(2)}),rgba(0,0,0,${P.dim}));transition:background ${P.speed}s}
+${C} .xp-p.is-on .xp-shade{background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(0,0,0,.72))}
+${C} .xp-label{position:absolute;left:50%;bottom:28px;writing-mode:vertical-rl;transform:translateX(-50%) rotate(180deg);white-space:nowrap;font-size:16px;font-weight:700;letter-spacing:.02em;color:${X.title};transition:opacity .3s}
+${C} .xp-label b{display:inline-block;margin-bottom:12px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:12px;font-weight:500;color:${X.num}}
+${C} .xp-p.is-on .xp-label{opacity:0}
+${C} .xp-body{position:absolute;left:32px;right:32px;bottom:32px;min-width:280px;opacity:0;transform:translateY(18px);transition:opacity .35s,transform .35s}
+${C} .xp-p.is-on .xp-body{opacity:1;transform:none;transition:opacity .5s ${(P.speed * .5).toFixed(2)}s,transform .6s ${ease} ${(P.speed * .5).toFixed(2)}s}
+${C} .xp-num{display:block;margin-bottom:10px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:13px;color:${X.num}}
+${C} .xp-ptitle{font-size:${X.tsize.d}px;font-weight:800;line-height:1.2;letter-spacing:-.02em;color:${X.title}}
+${C} .xp-desc{margin-top:12px;max-width:420px;font-size:${X.dsize.d}px;line-height:1.6;color:${X.desc};word-break:keep-all}
+${C} .xp-desc em{font-style:normal;font-weight:700;color:${X.title}}
+${C} .xp-link{display:inline-flex;align-items:center;gap:8px;margin-top:20px;font-size:14px;font-weight:700;color:${X.title};text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:3px}
+${C} .xp-link:hover{color:${X.num}}
+@media (max-width:767px){
+${C}{padding:${L.padT.m}px 0 ${L.padB.m}px}
+${C} .xp-inner{padding:0 ${L.side.m}px}
+${C} .xp-head{margin-bottom:${H.mb.m}px}
+${C} .xp-row{flex-direction:column;height:auto}
+${C} .xp-p{flex:none;height:${P.closed}px;transition:height ${P.speed}s ${ease}}
+${C} .xp-p.is-on{height:${P.h.m}px}
+${C} .xp-label{left:20px;top:50%;bottom:auto;writing-mode:horizontal-tb;transform:translateY(-50%)}
+${C} .xp-label b{margin:0 10px 0 0}
+${C} .xp-body{left:20px;right:20px;bottom:22px;min-width:0}
+${C} .xp-ptitle{font-size:${X.tsize.m}px}
+${C} .xp-desc{font-size:${X.dsize.m}px}
+}
+@media (prefers-reduced-motion:reduce){${C} .xp-p,${C} .xp-img,${C} .xp-body,${C} .xp-shade{transition:none}}`;
+  }
+  function html(st, {preview=false, slide}={}){
+    const a = k => preview ? ` data-el="${k}"` : '', ed = p => preview ? ` data-edit="${p}"` : '';
+    const src = s => preview ? pv(s) : s, H = st.head, P = st.panel;
+    const on = Math.min(st.items.length - 1, Math.max(0, preview && slide > 0 ? slide : P.start - 1));
+    const num = i => String(i + 1).padStart(2, '0');
+    const panels = st.items.map((it, i) => `<div class="xp-p${i === on ? ' is-on' : ''}" tabindex="0" role="button" aria-expanded="${i === on}" aria-label="${esc(it.title)}">
+      ${it.img ? `<img class="xp-img" src="${esc(src(it.img))}" alt=""${preview ? ` data-img="items.${i}.img"` : ''}>` : ''}
+      <div class="xp-shade"></div>
+      <div class="xp-label" aria-hidden="true">${P.numbers ? `<b>${num(i)}</b>` : ''}${esc(it.title)}</div>
+      <div class="xp-body">
+        ${P.numbers ? `<span class="xp-num">${num(i)}</span>` : ''}<h3 class="xp-ptitle"${ed('items.'+i+'.title')}>${esc(it.title)}</h3>
+        <p class="xp-desc"${ed('items.'+i+'.desc')}>${rich(it.desc)}</p>
+        ${it.link ? `<a class="xp-link" href="${esc(it.href)}"><span${ed('items.'+i+'.link')}>${esc(it.link)}</span> →</a>` : ''}
+      </div>
+    </div>`).join('\n    ');
+    return `<section class="hw-hero hw-${st.id}"${a('section')}>
+  <div class="xp-inner">
+${H.show ? `    <div class="xp-head"${a('head')}>${H.eyebrow ? `<p class="xp-eyebrow"${ed('head.eyebrow')}>${esc(H.eyebrow)}</p>` : ''}<h2 class="xp-title"${ed('head.text')}>${rich(H.text)}</h2></div>\n` : ''}    <div class="xp-row"${a('items')}>
+    ${panels}
+    </div>
+  </div>
+</section>`;
+  }
+  // mouse: hover opens a panel · touch / keyboard: tap or focus opens it
+  function run(root, o){
+    var W = root.ownerDocument.defaultView, row = root.querySelector('.xp-row');
+    var ps = Array.prototype.slice.call(root.querySelectorAll('.xp-p'));
+    if (!row || !ps.length) return function(){};
+    var first = Math.max(0, ps.findIndex(function(p){ return p.classList.contains('is-on'); })), offs = [];
+    function open(i){ ps.forEach(function(p, k){ p.classList.toggle('is-on', k === i); p.setAttribute('aria-expanded', String(k === i)); }); }
+    ps.forEach(function(p, i){
+      var enter = function(e){ if (e.pointerType === 'mouse' || e.pointerType === 'pen') open(i); };
+      var tap = function(e){ if (!p.classList.contains('is-on') && !e.target.closest('a')){ open(i); } };
+      var focus = function(){ open(i); };
+      var key = function(e){ if (e.key === 'Enter' || e.key === ' '){ if (e.target === p){ e.preventDefault(); open(i); } } };
+      p.addEventListener('pointerenter', enter); p.addEventListener('click', tap); p.addEventListener('focus', focus); p.addEventListener('keydown', key);
+      offs.push(function(){ p.removeEventListener('pointerenter', enter); p.removeEventListener('click', tap); p.removeEventListener('focus', focus); p.removeEventListener('keydown', key); });
+    });
+    var leave = function(e){ if (!o.keep && (e.pointerType === 'mouse' || e.pointerType === 'pen')) open(first); };
+    row.addEventListener('pointerleave', leave); offs.push(function(){ row.removeEventListener('pointerleave', leave); });
+    return function(){ offs.forEach(function(f){ f(); }); };
+  }
+  const cfg = st => ({keep:st.panel.keep});
+  return {
+    key:'panels', cat:'content', group:'hover', no:'C10', title:'Expand Panels', sub:'마우스를 올린 패널이 넓게 펼쳐지는 이미지 갤러리',
+    swatch:'linear-gradient(90deg,#3A3F4B 0 12%,#0E0F13 12% 14%,#7CF2C6 14% 62%,#0E0F13 62% 64%,#3A3F4B 64% 76%,#0E0F13 76% 78%,#3A3F4B 78%)',
+    defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
+    header:()=>0, bp:()=>767,
+    drag:{}, selectGroup:{section:'layout', head:'head', items:'items'},
+    multiline:/^(head\.text|items\.\d+\.desc)$/, rich:/^(head\.text|items\.\d+\.desc)$/,
+    note:''
+  };
+})();
+
+/* =====================================================================
+   Content 11 · Tilt Cards (original design)
+   cards tilt toward the cursor in 3D with a moving glare; the other cards step back
+   ===================================================================== */
+const TILT = (() => {
+  const stack = f => `'${f}','Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif`;
+  const ITEMS = [1,2,3].map(i => ({img:PH('art', `CARD 0${i}`, 800, 600), tag:`카테고리 0${i}`, title:`카드 제목 0${i}`, desc:'카드를 설명하는 첫 번째 줄\n두 번째 줄 설명을 입력하세요.', href:''}));
+  const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<em>$1</em>').replace(/\n/g, '<br>');
+  const defaults = () => ({
+    id: uid(),
+    layout:{bg:'#F3F4F7', padT:R(120,72), padB:R(120,72), maxW:1280, side:R(40,20)},
+    head:{show:true, eyebrow:'TILT CARDS', text:'움직임에 반응하는\n**입체 카드**', font:'Pretendard Variable', color:'#111318', accent:'#3D5AFE', min:28, vw:3, max:52, mb:R(64,36), align:'center'},
+    items:JSON.parse(JSON.stringify(ITEMS)),
+    card:{cols:3, gap:R(28,16), radius:24, bg:'#FFFFFF', title:'#111318', desc:'#5B6170', tagBg:'#EEF1FF', tagFg:'#3D5AFE', ratio:'4/3', pad:28},
+    tilt:{max:12, scale:1.04, depth:36, glare:true, glareA:.45, dim:true, ease:.14}
+  });
+  const groups = [
+    {id:'layout', title:'섹션', fields:[
+      {k:'layout.bg', l:'배경색', t:'color'},
+      A('layout.padT','위 여백',0,300,1,'px',{r:1}), A('layout.padB','아래 여백',0,300,1,'px',{r:1}),
+      A('layout.maxW','최대 너비',600,2000,10,'px'), A('layout.side','좌우 여백',0,120,1,'px',{r:1})
+    ]},
+    {id:'head', title:'제목', fields:[
+      {k:'head.show', l:'제목 표시', t:'toggle'}, {k:'head.eyebrow', l:'작은 제목', t:'text'},
+      {k:'head.text', l:'제목 (줄바꿈 · **강조**)', t:'textarea'},
+      {k:'head.font', l:'글꼴', t:'select', opts:fontOpts},
+      {k:'head.color', l:'글자색', t:'color'}, {k:'head.accent', l:'강조색', t:'color'},
+      ...sizeFields('head'), A('head.mb','제목과 카드 간격',0,160,1,'px',{r:1}), {k:'head.align', l:'정렬', t:'align'}
+    ]},
+    {id:'items', title:'카드 목록', fields:[
+      {k:'items', l:'카드', t:'list', item:'카드', orig:ITEMS,
+       cols:[{k:'img', l:'이미지', t:'img'}, {k:'tag', l:'태그 (비우면 숨김)', t:'text'}, {k:'title', l:'제목', t:'text'},
+             {k:'desc', l:'설명 (줄바꿈 · **굵게**)', t:'textarea'}, {k:'href', l:'연결 주소 (비우면 링크 없음)', t:'text'}],
+       blank:{img:'', tag:'카테고리', title:'새 카드', desc:'설명을 입력하세요.', href:''}}
+    ]},
+    {id:'card', title:'카드 디자인', fields:[
+      A('card.cols','한 줄에 카드 수',1,4,1,'개'), A('card.gap','카드 간격',0,80,1,'px',{r:1}),
+      A('card.radius','모서리',0,48,1,'px'), A('card.pad','안쪽 여백',12,60,1,'px'),
+      {k:'card.ratio', l:'이미지 비율', t:'select', opts:[['4/3','4:3'],['3/2','3:2'],['1/1','1:1'],['16/9','16:9'],['3/4','3:4']]},
+      {k:'card.bg', l:'카드 색', t:'color'}, {k:'card.title', l:'제목 색', t:'color'}, {k:'card.desc', l:'설명 색', t:'color'},
+      {k:'card.tagBg', l:'태그 바탕', t:'color'}, {k:'card.tagFg', l:'태그 글자', t:'color'}
+    ]},
+    {id:'tilt', title:'기울기 효과', fields:[
+      A('tilt.max','최대 기울기',0,30,1,'°'), A('tilt.scale','올렸을 때 크기',1,1.15,.005,'×'),
+      A('tilt.depth','이미지 · 글자 떠오름 (입체감)',0,100,1,'px'),
+      {k:'tilt.glare', l:'빛 반사', t:'toggle'}, A('tilt.glareA','빛 반사 세기',0,1,.01,''),
+      {k:'tilt.dim', l:'다른 카드 흐리게', t:'toggle'},
+      A('tilt.ease','따라오는 속도',.04,1,.01,'')
+    ]}
+  ];
+  const fonts = st => [st.head.font, 'Pretendard Variable'];
+  function css(st){
+    const C = '.hw-'+st.id, L = st.layout, H = st.head, K = st.card, T_ = st.tilt;
+    return `${C}{background:${L.bg};margin:0;padding:${L.padT.d}px 0 ${L.padB.d}px;font-family:${stack(H.font)};-webkit-font-smoothing:antialiased}
+${C} *{box-sizing:border-box;margin:0;padding:0}
+${C} .tc-inner{max-width:${L.maxW}px;margin:0 auto;padding:0 ${L.side.d}px}
+${C} .tc-head{margin-bottom:${H.mb.d}px;text-align:${H.align};color:${H.color}}
+${C} .tc-eyebrow{margin-bottom:14px;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:${H.accent}}
+${C} .tc-title{font-family:${stack(H.font)};font-size:${clampF(H)};font-weight:800;line-height:1.2;letter-spacing:-.02em;word-break:keep-all}
+${C} .tc-title em{font-style:normal;color:${H.accent}}
+${C} .tc-grid{display:grid;grid-template-columns:repeat(${K.cols},minmax(0,1fr));gap:${K.gap.d}px;perspective:1200px}
+${C} .tc-card{position:relative;display:block;border-radius:${K.radius}px;background:${K.bg};color:inherit;text-decoration:none;transform-style:preserve-3d;will-change:transform;
+  transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) scale(var(--s,1));
+  box-shadow:calc(var(--sx,0) * 1px) calc(18px + var(--sy,0) * 1px) 40px -18px rgba(17,19,24,.28);transition:opacity .4s,filter .4s}
+${C} .tc-media{display:block;margin:${K.pad * .5}px ${K.pad * .5}px 0;border-radius:${Math.max(0, K.radius - K.pad * .5)}px;overflow:hidden;aspect-ratio:${K.ratio};background:#E4E7EE;transform:translateZ(${T_.depth}px)}
+${C} .tc-media img{display:block;width:100%;height:100%;max-width:none;object-fit:cover}
+${C} .tc-body{padding:${K.pad * .8}px ${K.pad}px ${K.pad}px;transform:translateZ(${(T_.depth * .6).toFixed(1)}px)}
+${C} .tc-tag{display:inline-block;margin-bottom:12px;padding:5px 10px;border-radius:999px;background:${K.tagBg};color:${K.tagFg};font-size:12px;font-weight:700}
+${C} .tc-ctitle{font-size:22px;font-weight:800;line-height:1.3;letter-spacing:-.01em;color:${K.title}}
+${C} .tc-desc{margin-top:8px;font-size:15px;line-height:1.6;color:${K.desc};word-break:keep-all}
+${C} .tc-desc em{font-style:normal;font-weight:700;color:${K.title}}
+${C} .tc-glare{position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:var(--go,0);background:radial-gradient(circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,${T_.glareA}),rgba(255,255,255,0) 60%);transform:translateZ(${T_.depth + 1}px);${T_.glare ? '' : 'display:none;'}}
+${T_.dim ? `${C} .tc-grid.is-hover .tc-card:not(.is-on){opacity:.55;filter:saturate(.6)}` : ''}
+@media (max-width:1023px){${C} .tc-grid{grid-template-columns:repeat(${Math.min(K.cols, 2)},minmax(0,1fr))}}
+@media (max-width:767px){${C}{padding:${L.padT.m}px 0 ${L.padB.m}px}${C} .tc-inner{padding:0 ${L.side.m}px}${C} .tc-head{margin-bottom:${H.mb.m}px}${C} .tc-grid{grid-template-columns:1fr;gap:${K.gap.m}px}}`;
+  }
+  function html(st, {preview=false}={}){
+    const a = k => preview ? ` data-el="${k}"` : '', ed = p => preview ? ` data-edit="${p}"` : '';
+    const src = s => preview ? pv(s) : s, H = st.head;
+    const cards = st.items.map((it, i) => {
+      const tag = it.href ? `a href="${esc(it.href)}"` : 'div';
+      return `<${tag} class="tc-card">
+      <div class="tc-media">${it.img ? `<img src="${esc(src(it.img))}" alt=""${preview ? ` data-img="items.${i}.img"` : ''}>` : ''}</div>
+      <div class="tc-body">
+        ${it.tag ? `<span class="tc-tag"${ed('items.'+i+'.tag')}>${esc(it.tag)}</span>` : ''}
+        <h3 class="tc-ctitle"${ed('items.'+i+'.title')}>${esc(it.title)}</h3>
+        <p class="tc-desc"${ed('items.'+i+'.desc')}>${rich(it.desc)}</p>
+      </div>
+      <div class="tc-glare" aria-hidden="true"></div>
+    </${it.href ? 'a' : 'div'}>`;
+    }).join('\n    ');
+    return `<section class="hw-hero hw-${st.id}"${a('section')}>
+  <div class="tc-inner">
+${H.show ? `    <div class="tc-head"${a('head')}>${H.eyebrow ? `<p class="tc-eyebrow"${ed('head.eyebrow')}>${esc(H.eyebrow)}</p>` : ''}<h2 class="tc-title"${ed('head.text')}>${rich(H.text)}</h2></div>\n` : ''}    <div class="tc-grid"${a('items')}>
+    ${cards}
+    </div>
+  </div>
+</section>`;
+  }
+  // each card eases toward a tilt computed from the pointer position; mouse / pen only
+  function run(root, o){
+    var W = root.ownerDocument.defaultView, grid = root.querySelector('.tc-grid');
+    var cards = Array.prototype.slice.call(root.querySelectorAll('.tc-card'));
+    if (!grid || !cards.length || W.matchMedia('(prefers-reduced-motion: reduce)').matches) return function(){};
+    var st = cards.map(function(){ return {rx:0, ry:0, s:1, g:0, tx:0, ty:0, ts:1, tg:0, gx:50, gy:50}; });
+    var raf = 0, offs = [];
+    function frame(){
+      raf = 0; var busy = false;
+      cards.forEach(function(c, i){
+        var q = st[i], k = o.ease;
+        q.rx += (q.tx - q.rx) * k; q.ry += (q.ty - q.ry) * k; q.s += (q.ts - q.s) * k; q.g += (q.tg - q.g) * k;
+        if (Math.abs(q.tx - q.rx) + Math.abs(q.ty - q.ry) + Math.abs(q.ts - q.s) * 50 + Math.abs(q.tg - q.g) > .02) busy = true;
+        c.style.setProperty('--rx', q.rx.toFixed(2) + 'deg'); c.style.setProperty('--ry', q.ry.toFixed(2) + 'deg');
+        c.style.setProperty('--s', q.s.toFixed(4)); c.style.setProperty('--go', q.g.toFixed(3));
+        c.style.setProperty('--gx', q.gx.toFixed(1) + '%'); c.style.setProperty('--gy', q.gy.toFixed(1) + '%');
+        c.style.setProperty('--sx', (-q.ry * 1.4).toFixed(1)); c.style.setProperty('--sy', (q.rx * 1.4).toFixed(1));
+      });
+      if (busy) raf = W.requestAnimationFrame(frame);
+    }
+    function kick(){ if (!raf) raf = W.requestAnimationFrame(frame); }
+    cards.forEach(function(c, i){
+      var q = st[i];
+      var move = function(e){
+        if (e.pointerType === 'touch') return;
+        var b = c.getBoundingClientRect(), px = (e.clientX - b.left) / b.width, py = (e.clientY - b.top) / b.height;
+        q.tx = (.5 - py) * 2 * o.max; q.ty = (px - .5) * 2 * o.max; q.ts = o.scale; q.tg = 1; q.gx = px * 100; q.gy = py * 100;
+        c.classList.add('is-on'); grid.classList.add('is-hover'); kick();
+      };
+      var leave = function(){ q.tx = 0; q.ty = 0; q.ts = 1; q.tg = 0; c.classList.remove('is-on'); kick(); };
+      c.addEventListener('pointermove', move); c.addEventListener('pointerleave', leave);
+      offs.push(function(){ c.removeEventListener('pointermove', move); c.removeEventListener('pointerleave', leave); });
+    });
+    var out = function(){ grid.classList.remove('is-hover'); };
+    grid.addEventListener('pointerleave', out); offs.push(function(){ grid.removeEventListener('pointerleave', out); });
+    return function(){ if (raf) W.cancelAnimationFrame(raf); offs.forEach(function(f){ f(); }); };
+  }
+  const cfg = st => ({max:st.tilt.max, scale:st.tilt.scale, ease:st.tilt.ease});
+  return {
+    key:'tilt', cat:'content', group:'hover', no:'C11', title:'Tilt Cards', sub:'커서 쪽으로 기울어지는 입체 카드 + 빛 반사',
+    swatch:'linear-gradient(160deg,#F3F4F7 0 30%,#FFFFFF 30% 70%,#3D5AFE 70%)',
+    defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
+    header:()=>0, bp:()=>767,
+    drag:{}, selectGroup:{section:'layout', head:'head', items:'items'},
+    multiline:/^(head\.text|items\.\d+\.desc)$/, rich:/^(head\.text|items\.\d+\.desc)$/,
+    note:''
+  };
+})();
+
+/* =====================================================================
+   Content 12 · Hover List (original design)
+   large text rows; the hovered row fills in and a preview image follows the cursor
+   ===================================================================== */
+const HLIST = (() => {
+  const stack = f => `'${f}','Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif`;
+  const KINDS = ['photo', 'dark', 'art', 'photo', 'dark'];
+  const ITEMS = [1,2,3,4,5].map(i => ({title:`프로젝트 이름 0${i}`, meta:`카테고리 · 202${6 - (i % 3)}`, img:PH(KINDS[i-1], `PREVIEW 0${i}`, 800, 1000), href:'#'}));
+  const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<em>$1</em>').replace(/\n/g, '<br>');
+  const defaults = () => ({
+    id: uid(),
+    layout:{bg:'#F4F1EA', padT:R(120,72), padB:R(120,72), maxW:1440, side:R(40,20)},
+    head:{show:true, eyebrow:'SELECTED WORKS', text:'호버하면 미리보기가\n**따라오는** 리스트', font:'Pretendard Variable', color:'#141414', accent:'#FF5A36', min:28, vw:3, max:52, mb:R(56,32)},
+    items:JSON.parse(JSON.stringify(ITEMS)),
+    row:{size:R(56,26), weight:'700', color:'#141414', meta:'#77736B', line:'#141414', lineA:.2, padY:R(26,18), fill:'#141414', fillFg:'#F4F1EA', shift:28, numbers:true},
+    preview:{show:true, w:300, h:380, radius:14, ease:.15, tilt:true}
+  });
+  const groups = [
+    {id:'layout', title:'섹션', fields:[
+      {k:'layout.bg', l:'배경색', t:'color'},
+      A('layout.padT','위 여백',0,300,1,'px',{r:1}), A('layout.padB','아래 여백',0,300,1,'px',{r:1}),
+      A('layout.maxW','최대 너비',600,2000,10,'px'), A('layout.side','좌우 여백',0,120,1,'px',{r:1})
+    ]},
+    {id:'head', title:'제목', fields:[
+      {k:'head.show', l:'제목 표시', t:'toggle'}, {k:'head.eyebrow', l:'작은 제목', t:'text'},
+      {k:'head.text', l:'제목 (줄바꿈 · **강조**)', t:'textarea'},
+      {k:'head.font', l:'글꼴', t:'select', opts:fontOpts},
+      {k:'head.color', l:'글자색', t:'color'}, {k:'head.accent', l:'강조색', t:'color'},
+      ...sizeFields('head'), A('head.mb','제목과 목록 간격',0,160,1,'px',{r:1})
+    ]},
+    {id:'items', title:'목록', fields:[
+      {k:'items', l:'항목', t:'list', item:'항목', orig:ITEMS,
+       cols:[{k:'title', l:'이름', t:'text'}, {k:'meta', l:'보조 정보 (분류 · 연도 등)', t:'text'}, {k:'img', l:'미리보기 이미지', t:'img'}, {k:'href', l:'연결 주소', t:'text'}],
+       blank:{title:'새 항목', meta:'카테고리 · 2026', img:'', href:'#'}}
+    ]},
+    {id:'row', title:'줄 디자인', fields:[
+      A('row.size','이름 크기',14,120,1,'px',{r:1}), {k:'row.weight', l:'이름 굵기', t:'select', opts:weightOpts},
+      {k:'row.color', l:'이름 색', t:'color'}, {k:'row.meta', l:'보조 정보 색', t:'color'},
+      {k:'row.line', l:'구분선 색', t:'color'}, A('row.lineA','구분선 진하기',0,1,.01,''),
+      A('row.padY','줄 위아래 여백',4,80,1,'px',{r:1}),
+      {sub:'마우스를 올렸을 때'},
+      {k:'row.fill', l:'채워지는 색', t:'color'}, {k:'row.fillFg', l:'채워졌을 때 글자색', t:'color'},
+      A('row.shift','이름이 밀려나는 거리',0,120,1,'px'),
+      {k:'row.numbers', l:'번호 표시', t:'toggle'}
+    ]},
+    {id:'preview', title:'따라오는 미리보기', fields:[
+      {k:'preview.show', l:'미리보기 이미지 표시', t:'toggle', hint:'터치 화면에서는 줄마다 작은 이미지로 보여요.'},
+      A('preview.w','너비',120,600,1,'px'), A('preview.h','높이',120,700,1,'px'), A('preview.radius','모서리',0,48,1,'px'),
+      A('preview.ease','따라오는 속도',.04,1,.01,''), {k:'preview.tilt', l:'움직이는 방향으로 살짝 기울이기', t:'toggle'}
+    ]}
+  ];
+  const fonts = st => [st.head.font, 'Pretendard Variable'];
+  function css(st){
+    const C = '.hw-'+st.id, L = st.layout, H = st.head, RW = st.row, P = st.preview;
+    const ease = 'cubic-bezier(.65,.05,.25,1)';
+    return `${C}{position:relative;overflow:hidden;background:${L.bg};margin:0;padding:${L.padT.d}px 0 ${L.padB.d}px;font-family:${stack(H.font)};-webkit-font-smoothing:antialiased}
+${C} *{box-sizing:border-box;margin:0;padding:0}
+${C} .hl-inner{max-width:${L.maxW}px;margin:0 auto;padding:0 ${L.side.d}px}
+${C} .hl-head{margin-bottom:${H.mb.d}px;color:${H.color}}
+${C} .hl-eyebrow{margin-bottom:14px;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:${H.accent}}
+${C} .hl-title{font-family:${stack(H.font)};font-size:${clampF(H)};font-weight:800;line-height:1.2;letter-spacing:-.02em;word-break:keep-all}
+${C} .hl-title em{font-style:normal;color:${H.accent}}
+${C} .hl-list{list-style:none;border-bottom:1px solid ${rgba(RW.line, RW.lineA)}}
+${C} .hl-row{position:relative;isolation:isolate;display:grid;grid-template-columns:${RW.numbers ? 'auto ' : ''}minmax(0,1fr) auto auto;align-items:center;gap:28px;padding:${RW.padY.d}px 20px;border-top:1px solid ${rgba(RW.line, RW.lineA)};color:${RW.color};text-decoration:none;overflow:hidden}
+${C} .hl-row::before{content:"";position:absolute;inset:0;z-index:-1;background:${RW.fill};transform:scaleY(0);transform-origin:50% 100%;transition:transform .55s ${ease}}
+${C} .hl-num{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:14px;color:${RW.meta};transition:color .35s}
+${C} .hl-name{font-family:${stack(H.font)};font-size:${RW.size.d}px;font-weight:${RW.weight};line-height:1.1;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:transform .55s ${ease},color .35s}
+${C} .hl-meta{font-size:15px;color:${RW.meta};white-space:nowrap;transition:color .35s}
+${C} .hl-arrow{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;border:1px solid currentColor;transform:rotate(-45deg);transition:transform .55s ${ease},color .35s}
+${C} .hl-arrow svg{width:20px;height:20px}
+${C} .hl-thumb{display:none}
+@media (hover:hover){
+${C} .hl-row:hover::before,${C} .hl-row:focus-visible::before{transform:scaleY(1);transform-origin:50% 0}
+${C} .hl-row:hover,${C} .hl-row:focus-visible{color:${RW.fillFg}}
+${C} .hl-row:hover .hl-num,${C} .hl-row:hover .hl-meta{color:${rgba(RW.fillFg, .7)}}
+${C} .hl-row:hover .hl-name{transform:translateX(${RW.shift}px)}
+${C} .hl-row:hover .hl-arrow{transform:rotate(0)}
+}
+${C} .hl-float{position:absolute;left:0;top:0;z-index:5;width:${P.w}px;height:${P.h}px;border-radius:${P.radius}px;overflow:hidden;background:${rgba(RW.line, .12)};pointer-events:none;opacity:0;transform:translate3d(-999px,-999px,0);box-shadow:0 30px 60px -20px rgba(0,0,0,.45);${P.show ? '' : 'display:none;'}}
+${C} .hl-float img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;opacity:0;transform:scale(1.15);transition:opacity .35s,transform .6s ${ease}}
+${C} .hl-float img.is-on{opacity:1;transform:scale(1)}
+@media (hover:none),(max-width:767px){
+${C} .hl-float{display:none}
+${P.show ? `${C} .hl-thumb{display:block;width:56px;height:70px;border-radius:${Math.min(P.radius, 10)}px;object-fit:cover;max-width:none}` : ''}
+}
+@media (max-width:767px){
+${C}{padding:${L.padT.m}px 0 ${L.padB.m}px}
+${C} .hl-inner{padding:0 ${L.side.m}px}
+${C} .hl-head{margin-bottom:${H.mb.m}px}
+${C} .hl-row{grid-template-columns:${RW.numbers ? 'auto ' : ''}minmax(0,1fr) auto;gap:14px;padding:${RW.padY.m}px 4px}
+${C} .hl-name{font-size:${RW.size.m}px}
+${C} .hl-meta{grid-column:${RW.numbers ? 2 : 1};grid-row:2;font-size:13px;margin-top:-6px}
+${C} .hl-arrow{display:none}
+}`;
+  }
+  function html(st, {preview=false}={}){
+    const a = k => preview ? ` data-el="${k}"` : '', ed = p => preview ? ` data-edit="${p}"` : '';
+    const src = s => preview ? pv(s) : s, H = st.head, RW = st.row;
+    const ARROW = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`;
+    const rows = st.items.map((it, i) => `<li><a class="hl-row" href="${esc(it.href || '#')}" data-i="${i}">
+      ${RW.numbers ? `<span class="hl-num">${String(i + 1).padStart(2, '0')}</span>` : ''}<span class="hl-name"${ed('items.'+i+'.title')}>${esc(it.title)}</span>
+      <span class="hl-meta"${ed('items.'+i+'.meta')}>${esc(it.meta)}</span>
+      ${it.img ? `<img class="hl-thumb" src="${esc(src(it.img))}" alt="">` : ''}<span class="hl-arrow">${ARROW}</span>
+    </a></li>`).join('\n    ');
+    const imgs = st.items.map((it, i) => it.img ? `<img src="${esc(src(it.img))}" alt="" data-i="${i}"${preview ? ` data-img="items.${i}.img"` : ''}>` : '').join('');
+    return `<section class="hw-hero hw-${st.id}"${a('section')}>
+  <div class="hl-inner">
+${H.show ? `    <div class="hl-head"${a('head')}>${H.eyebrow ? `<p class="hl-eyebrow"${ed('head.eyebrow')}>${esc(H.eyebrow)}</p>` : ''}<h2 class="hl-title"${ed('head.text')}>${rich(H.text)}</h2></div>\n` : ''}    <ul class="hl-list"${a('items')}>
+    ${rows}
+    </ul>
+  </div>
+  <div class="hl-float" aria-hidden="true">${imgs}</div>
+</section>`;
+  }
+  // the preview eases toward the cursor, leans with its speed, and swaps image per row (fine pointers only)
+  function run(root, o){
+    var W = root.ownerDocument.defaultView, list = root.querySelector('.hl-list'), fl = root.querySelector('.hl-float');
+    if (!list || !fl || !W.matchMedia('(hover: hover) and (pointer: fine)').matches) return function(){};
+    var imgs = Array.prototype.slice.call(fl.querySelectorAll('img'));
+    var reduce = W.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var x = 0, y = 0, tx = 0, ty = 0, s = 0, ts = 0, rot = 0, raf = 0, placed = false, offs = [];
+    function frame(){
+      raf = 0;
+      var k = reduce ? 1 : o.ease, px = x;
+      x += (tx - x) * k; y += (ty - y) * k; s += (ts - s) * (reduce ? 1 : .18);
+      rot += ((o.tilt ? Math.max(-14, Math.min(14, (x - px) * .6)) : 0) - rot) * .2;
+      fl.style.opacity = s > .01 ? '1' : '0';
+      fl.style.transform = 'translate3d(' + (x - o.w / 2).toFixed(1) + 'px,' + (y - o.h / 2).toFixed(1) + 'px,0) rotate(' + rot.toFixed(2) + 'deg) scale(' + s.toFixed(3) + ')';
+      if (Math.abs(tx - x) + Math.abs(ty - y) + Math.abs(ts - s) * 100 + Math.abs(rot) > .05) raf = W.requestAnimationFrame(frame);
+    }
+    function kick(){ if (!raf) raf = W.requestAnimationFrame(frame); }
+    function show(i){ imgs.forEach(function(im){ im.classList.toggle('is-on', +im.dataset.i === i); }); }
+    var move = function(e){
+      if (e.pointerType === 'touch') return;
+      var b = root.getBoundingClientRect(); tx = e.clientX - b.left; ty = e.clientY - b.top;
+      if (!placed){ x = tx; y = ty; placed = true; }
+      var row = e.target.closest && e.target.closest('.hl-row');
+      if (row){ show(+row.dataset.i); ts = imgs.some(function(im){ return +im.dataset.i === +row.dataset.i; }) ? 1 : 0; }
+      kick();
+    };
+    var leave = function(){ ts = 0; placed = s > .05; kick(); };
+    list.addEventListener('pointermove', move); list.addEventListener('pointerleave', leave);
+    offs.push(function(){ list.removeEventListener('pointermove', move); list.removeEventListener('pointerleave', leave); });
+    return function(){ if (raf) W.cancelAnimationFrame(raf); offs.forEach(function(f){ f(); }); };
+  }
+  const cfg = st => ({w:st.preview.w, h:st.preview.h, ease:st.preview.ease, tilt:st.preview.tilt});
+  return {
+    key:'hlist', cat:'content', group:'hover', no:'C12', title:'Hover List', sub:'줄이 채워지고 미리보기 이미지가 커서를 따라오는 목록',
+    swatch:'linear-gradient(180deg,#F4F1EA 0 20%,#141414 20% 22%,#F4F1EA 22% 40%,#141414 40% 62%,#F4F1EA 62% 80%,#141414 80% 82%,#F4F1EA 82%)',
+    defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
+    header:()=>0, bp:()=>767,
+    drag:{}, selectGroup:{section:'layout', head:'head', items:'items'},
+    multiline:/^head\.text$/, rich:/^head\.text$/,
+    note:''
+  };
+})();
+
+/* =====================================================================
+   Content 13 · Dot Field (original design)
+   a canvas grid of dots grows, recolors and moves away around the cursor; the button leans toward the cursor
+   ===================================================================== */
+const DOTS = (() => {
+  const stack = f => `'${f}','Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif`;
+  const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<em>$1</em>').replace(/\n/g, '<br>');
+  const defaults = () => ({
+    id: uid(),
+    layout:{bg:'#07080B', vh:80, minH:560, padY:R(120,80), maxW:900, align:'center'},
+    dots:{color:'#2E323C', accent:'#8B6CFF', gap:26, size:1.6, grow:4.5, radius:170, push:16, wave:true},
+    head:{eyebrow:'DOT FIELD', text:'커서가 지나가면\n**점들이 반응**해요', font:'Pretendard Variable', color:'#FFFFFF', accent:'#B9A8FF', min:32, vw:4.2, max:72, lh:1.18},
+    sub:{show:true, text:'배경의 점들이 마우스 위치에 따라 커지고 색이 바뀌어요.\n설명 문구를 입력하세요.', color:'#A3A8B5', size:R(18,15)},
+    btn:{show:true, text:'시작하기', href:'#', bg:'#FFFFFF', fg:'#07080B', magnet:true, strength:.35}
+  });
+  const groups = [
+    {id:'layout', title:'섹션', fields:[
+      {k:'layout.bg', l:'배경색', t:'color'},
+      A('layout.vh','높이 (화면 높이 대비)',30,100,1,'vh'), A('layout.minH','최소 높이',0,1200,10,'px'),
+      A('layout.padY','위아래 여백',0,300,1,'px',{r:1}), A('layout.maxW','문구 최대 너비',320,1600,10,'px'),
+      {k:'layout.align', l:'정렬', t:'align'}
+    ]},
+    {id:'dots', title:'점 배경', fields:[
+      {k:'dots.color', l:'점 색', t:'color'}, {k:'dots.accent', l:'커서 근처 점 색', t:'color'},
+      A('dots.gap','점 간격',10,80,1,'px'), A('dots.size','점 크기',.5,6,.1,'px'), A('dots.grow','커서 근처에서 커지는 배율',1,12,.1,'×'),
+      A('dots.radius','반응 범위',40,500,1,'px'), A('dots.push','밀려나는 거리',0,60,1,'px'),
+      {k:'dots.wave', l:'가만히 있을 때 잔잔한 물결', t:'toggle'}
+    ]},
+    {id:'head', title:'제목', fields:[
+      {k:'head.eyebrow', l:'작은 제목 (비우면 숨김)', t:'text'},
+      {k:'head.text', l:'제목 (줄바꿈 · **강조**)', t:'textarea'},
+      {k:'head.font', l:'글꼴', t:'select', opts:fontOpts},
+      {k:'head.color', l:'글자색', t:'color'}, {k:'head.accent', l:'강조색', t:'color'},
+      ...sizeFields('head'), A('head.lh','줄 간격',.8,2,.01,'×')
+    ]},
+    {id:'sub', title:'설명 · 버튼', fields:[
+      {k:'sub.show', l:'설명 표시', t:'toggle'}, {k:'sub.text', l:'설명 (줄바꿈)', t:'textarea'},
+      {k:'sub.color', l:'설명 색', t:'color'}, A('sub.size','설명 크기',11,32,1,'px',{r:1}),
+      {k:'btn.show', l:'버튼 표시', t:'toggle'}, {k:'btn.text', l:'버튼 문구', t:'text'}, {k:'btn.href', l:'연결 주소', t:'text'},
+      {k:'btn.bg', l:'버튼 색', t:'color'}, {k:'btn.fg', l:'버튼 글자색', t:'color'},
+      {k:'btn.magnet', l:'버튼이 커서 쪽으로 끌려오기', t:'toggle'}, A('btn.strength','끌려오는 세기',.05,1,.01,'')
+    ]}
+  ];
+  const fonts = st => [st.head.font, 'Pretendard Variable'];
+  function css(st){
+    const C = '.hw-'+st.id, L = st.layout, H = st.head, S = st.sub, B = st.btn;
+    const items = {left:'flex-start', center:'center', right:'flex-end'}[L.align];
+    return `${C}{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:max(${L.minH}px, ${L.vh}svh);margin:0;padding:${L.padY.d}px 24px;background:${L.bg};font-family:${stack(H.font)};-webkit-font-smoothing:antialiased}
+${C} *{box-sizing:border-box;margin:0;padding:0}
+${C} .df-canvas{position:absolute;inset:0;z-index:-1;width:100%;height:100%;display:block}
+${C} .df-inner{width:100%;max-width:${L.maxW}px;display:flex;flex-direction:column;align-items:${items};text-align:${L.align}}
+${C} .df-eyebrow{margin-bottom:20px;font-size:13px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:${H.accent}}
+${C} .df-title{font-family:${stack(H.font)};font-size:${clampF(H)};font-weight:800;line-height:${H.lh};letter-spacing:-.03em;color:${H.color};word-break:keep-all}
+${C} .df-title em{font-style:normal;color:${H.accent}}
+${C} .df-sub{margin-top:24px;font-size:${S.size.d}px;line-height:1.65;color:${S.color};word-break:keep-all}
+${C} .df-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;margin-top:44px;height:58px;padding:0 34px;border-radius:999px;background:${B.bg};color:${B.fg};font-size:16px;font-weight:700;text-decoration:none;transition:transform .5s cubic-bezier(.22,.61,.36,1),box-shadow .3s;will-change:transform}
+${C} .df-btn span{display:inline-block;transition:transform .5s cubic-bezier(.22,.61,.36,1)}
+${C} .df-btn:hover{box-shadow:0 0 0 6px ${rgba(st.dots.accent, .25)}}
+${C} .df-btn.is-pull,${C} .df-btn.is-pull span{transition:transform .12s linear}
+@media (max-width:767px){${C}{padding:${L.padY.m}px 20px}${C} .df-eyebrow{margin-bottom:14px}${C} .df-sub{margin-top:16px;font-size:${S.size.m}px}${C} .df-btn{margin-top:32px;height:50px;padding:0 26px;font-size:15px}}`;
+  }
+  function html(st, {preview=false}={}){
+    const a = k => preview ? ` data-el="${k}"` : '', ed = p => preview ? ` data-edit="${p}"` : '';
+    const H = st.head;
+    return `<section class="hw-hero hw-${st.id}"${a('section')}>
+  <canvas class="df-canvas" aria-hidden="true"></canvas>
+  <div class="df-inner"${a('text')}>
+${H.eyebrow ? `    <p class="df-eyebrow"${ed('head.eyebrow')}>${esc(H.eyebrow)}</p>\n` : ''}    <h2 class="df-title"${ed('head.text')}>${rich(H.text)}</h2>
+${st.sub.show ? `    <p class="df-sub"${ed('sub.text')}>${rich(st.sub.text)}</p>\n` : ''}${st.btn.show ? `    <a class="df-btn" href="${esc(st.btn.href)}"><span${ed('btn.text')}>${esc(st.btn.text)}</span></a>\n` : ''}  </div>
+</section>`;
+  }
+  // canvas dot grid: each dot reacts to its distance from the cursor; runs only while on screen
+  function run(root, o){
+    var W = root.ownerDocument.defaultView, cv = root.querySelector('.df-canvas');
+    if (!cv || !cv.getContext) return function(){};
+    var ctx = cv.getContext('2d'), dpr = Math.min(2, W.devicePixelRatio || 1), reduce = W.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var hex = function(h){ h = h.replace('#', ''); if (h.length === 3) h = h.replace(/./g, '$&$&'); return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]; };
+    var c0 = hex(o.color), c1 = hex(o.accent), w = 0, h = 0, pts = [], mx = -9999, my = -9999, act = 0, tact = 0, raf = 0, vis = true, t0 = W.performance.now();
+    function build(){
+      var b = root.getBoundingClientRect(); w = b.width; h = b.height;
+      cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+      pts = []; var g = o.gap, ox = (w % g) / 2, oy = (h % g) / 2;
+      for (var y = oy; y <= h; y += g) for (var x = ox; x <= w; x += g) pts.push(x, y);
+    }
+    function draw(t){
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
+      var R = o.radius, waveOn = o.wave && !reduce && o.on !== false;
+      for (var i = 0; i < pts.length; i += 2){
+        var x = pts[i], y = pts[i + 1], dx = x - mx, dy = y - my, d = Math.sqrt(dx * dx + dy * dy), f = 0;
+        if (act > 0 && d < R){ f = 1 - d / R; f = f * f * (3 - 2 * f) * act; }
+        var sz = o.size * (1 + (o.grow - 1) * f);
+        if (waveOn) sz *= 1 + .35 * Math.sin(t * 1.6 - (x + y) * .012);
+        if (f > 0 && d > 0){ x += dx / d * o.push * f; y += dy / d * o.push * f; }
+        ctx.fillStyle = f > .01 ? 'rgb(' + Math.round(c0[0] + (c1[0] - c0[0]) * f) + ',' + Math.round(c0[1] + (c1[1] - c0[1]) * f) + ',' + Math.round(c0[2] + (c1[2] - c0[2]) * f) + ')' : o.color;
+        ctx.beginPath(); ctx.arc(x, y, Math.max(.3, sz), 0, 6.2832); ctx.fill();
+      }
+    }
+    function loop(){
+      raf = 0; act += (tact - act) * .08;
+      draw((W.performance.now() - t0) / 1000);
+      if (vis && (o.wave && !reduce || Math.abs(tact - act) > .002 || tact > 0)) raf = W.requestAnimationFrame(loop);
+    }
+    function start(){ if (!raf && vis) raf = W.requestAnimationFrame(loop); }
+    build();
+    // static frame (animation off · gallery thumbnails): show the reaction at a fixed point
+    if (o.on === false){ mx = w * .68; my = h * .42; act = 1; draw(0); return function(){}; }
+    var btn = o.magnet ? root.querySelector('.df-btn') : null, inner = btn && btn.querySelector('span');
+    var move = function(e){
+      var b = root.getBoundingClientRect(); mx = e.clientX - b.left; my = e.clientY - b.top; tact = 1; start();
+      if (btn){
+        var r = btn.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, dx = e.clientX - cx, dy = e.clientY - cy;
+        if (Math.abs(dx) < r.width / 2 + 70 && Math.abs(dy) < r.height / 2 + 70){
+          btn.classList.add('is-pull');
+          btn.style.transform = 'translate(' + (dx * o.strength).toFixed(1) + 'px,' + (dy * o.strength).toFixed(1) + 'px)';
+          inner.style.transform = 'translate(' + (dx * o.strength * .45).toFixed(1) + 'px,' + (dy * o.strength * .45).toFixed(1) + 'px)';
+        } else release();
+      }
+    };
+    function release(){ if (!btn) return; btn.classList.remove('is-pull'); btn.style.transform = ''; inner.style.transform = ''; }
+    var leave = function(){ tact = 0; release(); start(); };
+    var ro = new W.ResizeObserver(function(){ build(); start(); if (!raf) draw(0); });
+    var io = new W.IntersectionObserver(function(es){ vis = es[0].isIntersecting; if (vis) start(); }, {threshold:0});
+    root.addEventListener('pointermove', move); root.addEventListener('pointerleave', leave);
+    ro.observe(root); io.observe(root); draw(0); start();
+    return function(){
+      if (raf) W.cancelAnimationFrame(raf); vis = false; ro.disconnect(); io.disconnect(); release();
+      root.removeEventListener('pointermove', move); root.removeEventListener('pointerleave', leave);
+    };
+  }
+  const cfg = st => ({color:st.dots.color, accent:st.dots.accent, gap:st.dots.gap, size:st.dots.size, grow:st.dots.grow, radius:st.dots.radius, push:st.dots.push, wave:st.dots.wave, magnet:st.btn.magnet, strength:st.btn.strength});
+  return {
+    key:'dots', cat:'content', group:'hover', no:'C13', title:'Dot Field', sub:'커서 주변 점들이 커지고 밀려나는 배경 + 끌려오는 버튼',
+    swatch:'radial-gradient(circle at 65% 45%,#8B6CFF 0 3px,transparent 4px) 0 0/14px 14px,radial-gradient(circle,#2E323C 0 1.5px,transparent 2px) 0 0/10px 10px,#07080B',
+    defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
+    header:()=>0, bp:()=>767,
+    drag:{}, selectGroup:{section:'dots', text:'head'},
+    multiline:/^(head\.text|sub\.text)$/, rich:/^(head\.text|sub\.text)$/,
+    note:''
+  };
+})();
+
 /* ================= widget registry ================= */
-const WIDGETS = [DASOT, MLAB, DONGNAM, QUOTE, IMGMSG, POTS, CHOICE, FAQ, TABFAQ, STICKY, STATS, LOGOS];
+const WIDGETS = [DASOT, MLAB, DONGNAM, LENS, QUOTE, IMGMSG, POTS, CHOICE, FAQ, TABFAQ, STICKY, STATS, LOGOS, PANELS, TILT, HLIST, DOTS];
 // widgets of the same nature are listed together in the picker
 const GROUP_OF = {dasot:'split', mlab:'typo', dongnam:'video', quote:'text', pots:'gallery', choice:'cards', faq:'faq', tabfaq:'faq', sticky:'feature'};
 WIDGETS.forEach(w => { w.group = w.group || GROUP_OF[w.key] || 'etc'; w.source = ''; });
 const GROUPS_UI = {
-  hero:[['split','분할형'],['typo','타이포그래피'],['video','영상 슬라이드']],
-  content:[['text','텍스트 · 인용'],['stats','숫자 · 지표'],['feature','서비스 · 기능 소개'],['cards','카드 · 비교'],['gallery','제품 · 갤러리'],['partners','파트너 · 로고'],['faq','FAQ · 자주 묻는 질문']]
+  hero:[['split','분할형'],['typo','타이포그래피'],['video','영상 슬라이드'],['hover','마우스 반응']],
+  content:[['text','텍스트 · 인용'],['stats','숫자 · 지표'],['feature','서비스 · 기능 소개'],['cards','카드 · 비교'],['gallery','제품 · 갤러리'],['partners','파트너 · 로고'],['faq','FAQ · 자주 묻는 질문'],['hover','마우스 반응']]
 };
 const groupName = (c, g) => ((GROUPS_UI[c] || []).find(x => x[0] === g) || [g, '기타'])[1];
 const TPL = Object.fromEntries(WIDGETS.map(t => [t.key, t]));
