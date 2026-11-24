@@ -459,22 +459,12 @@ const pv = u => PREVIEW[u] || u;
 
 /* ================= dummy images (placeholders instead of the reference sites' assets) ================= */
 const svgURI = svg => 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+// every image area starts with the same light-gray placeholder (mountains + sun + name · size); `kind` is kept for older calls
 function PH(kind, label, w, h){
   const t = `<text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" letter-spacing="2"`;
   const size = Math.round(Math.min(w, h) * .07);
   const sub = `<text x="50%" y="${50 + Math.round(size * 1.4 / h * 100)}%" text-anchor="middle" dominant-baseline="middle" font-family="Arial,Helvetica,sans-serif" font-size="${Math.round(size * .55)}"`;
-  if (kind === 'photo') return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="#E4E7EC"/><path d="M0 ${h} L${w*.32} ${h*.52} L${w*.5} ${h*.74} L${w*.68} ${h*.42} L${w} ${h} Z" fill="#D2D6DD"/><circle cx="${w*.8}" cy="${h*.24}" r="${Math.min(w,h)*.07}" fill="#D2D6DD"/>${t} font-size="${size}" fill="#8A909C">${label}</text>${sub} fill="#A2A7B1">${w} × ${h}</text></svg>`);
-  if (kind === 'dark') return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><defs><radialGradient id="g" cx=".35" cy=".25" r="1"><stop offset="0" stop-color="#4A4F58"/><stop offset=".55" stop-color="#22252B"/><stop offset="1" stop-color="#0E1013"/></radialGradient></defs><rect width="${w}" height="${h}" fill="url(#g)"/>${t} font-size="${size}" fill="rgba(255,255,255,.28)">${label}</text>${sub} fill="rgba(255,255,255,.2)">${w} × ${h}</text></svg>`);
-  if (kind === 'cutout') return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect x="${w*.14}" y="${h*.12}" width="${w*.72}" height="${h*.76}" rx="${Math.min(w,h)*.12}" fill="rgba(255,255,255,.16)" stroke="rgba(255,255,255,.7)" stroke-width="3" stroke-dasharray="14 10"/>${t} font-size="${size}" fill="rgba(255,255,255,.9)">${label}</text>${sub} fill="rgba(255,255,255,.65)">PNG · ${w} × ${h}</text></svg>`);
-  if (kind === 'art') return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="3">${[.42,.32,.22,.12].map((r,i) => `<ellipse cx="${w/2}" cy="${h/2}" rx="${w*r}" ry="${h*r*.8}" stroke-dasharray="${i % 2 ? '10 12' : '0'}"/>`).join('')}<text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="${Math.round(w*.05)}" fill="rgba(255,255,255,.85)" stroke="none">${label}</text></svg>`);
-  if (kind === 'logo') return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect x="4" y="${h*.22}" width="${h*.56}" height="${h*.56}" rx="${h*.14}" fill="none" stroke="#FFFFFF" stroke-width="6"/><circle cx="${4+h*.28}" cy="${h/2}" r="${h*.1}" fill="#FFFFFF"/><text x="${h*.56+24}" y="50%" dominant-baseline="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="${h*.36}" letter-spacing="3" fill="#FFFFFF">${label}</text></svg>`);
-  if (kind === 'stars'){
-    let seed = 7, dots = '';
-    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-    for (let i = 0; i < 260; i++) dots += `<circle cx="${(rnd()*w).toFixed(1)}" cy="${(rnd()*h).toFixed(1)}" r="${(rnd()*1.3+.3).toFixed(2)}" fill="rgba(255,255,255,${(rnd()*.6+.2).toFixed(2)})"/>`;
-    return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="#050507"/>${dots}</svg>`);
-  }
-  return '';
+  return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="#E7E7E7"/><path d="M0 ${h} L${w*.32} ${h*.52} L${w*.5} ${h*.74} L${w*.68} ${h*.42} L${w} ${h} Z" fill="#D6D6D6"/><circle cx="${w*.8}" cy="${h*.24}" r="${Math.min(w,h)*.07}" fill="#D6D6D6"/>${t} font-size="${size}" fill="#909090">${label}</text>${sub} fill="#A7A7A7">${w} × ${h}</text></svg>`);
 }
 const sizeFields = (p, title='글자 크기 · clamp(최소, 화면폭 비례, 최대)') => [
   {sub:title}, A(p+'.min','최소',8,160,1,'px'), A(p+'.vw','화면 너비 비례',.5,25,.1,'vw'), A(p+'.max','최대',10,320,1,'px')
@@ -491,16 +481,16 @@ const DASOT = (() => {
   const defaults = () => ({
     id: uid(),
     layout:{vh:100, minus:69, minH:0, split:50, swap:false, fullBleed:false, bp:860, mLeftMin:340, mRightMin:420},
-    left:{bg:'#04006F', pad:R(40,24)},
+    left:{bg:'#111111', pad:R(40,24)},
     pot:{slides:POTS.map(src=>({src})), alt:'제품 이미지', auto:true, interval:1600, dur:.4, scale:.88, ease:'bounce',
          w:88, maxW:720, ratio:'3/2', ox:R(0,0), oy:R(0,0)},
-    top:{text:'BRAND COPY TOP', font:'Black Han Sans', weight:'700', color:'#FFFCF7', min:20, vw:6, max:50, lh:1.2, ls:-.01,
+    top:{text:'BRAND COPY TOP', font:'Black Han Sans', weight:'700', color:'#FCFCFC', min:20, vw:6, max:50, lh:1.2, ls:-.01,
          x:R(40,24), y:R(40,24), anim:true, dist:70, adur:.9, delay:.2},
-    bottom:{text:'BRAND COPY BOTTOM', font:'Black Han Sans', weight:'700', color:'#FFFCF7', min:20, vw:6, max:50, lh:1.2, ls:-.01,
+    bottom:{text:'BRAND COPY BOTTOM', font:'Black Han Sans', weight:'700', color:'#FCFCFC', min:20, vw:6, max:50, lh:1.2, ls:-.01,
          x:R(40,24), y:R(40,24), anim:true, dist:70, adur:.9, delay:.35},
     right:{src:RIGHT, alt:'라이프스타일 사진', px:50, py:50, dim:0},
-    head:{tag:'h1', lines:'메인 헤드라인을\n입력하세요', font:'Black Han Sans', weight:'700', color:'#FFFCF7', stroke:'#04006F', sw:1.5,
-          sh:'#04006F', shx:3, shy:3, min:34, vw:5.2, max:74, lh:1.3, ls:-.02, align:'center', pad:40, ox:R(0,0), oy:R(0,0)},
+    head:{tag:'h1', lines:'메인 헤드라인을\n입력하세요', font:'Black Han Sans', weight:'700', color:'#FFFFFF', stroke:'#111111', sw:1.5,
+          sh:'#111111', shx:3, shy:3, min:34, vw:5.2, max:74, lh:1.3, ls:-.02, align:'center', pad:40, ox:R(0,0), oy:R(0,0)},
     type:{on:true, speed:100, pause:250, start:400, cursor:true, cchar:'|', blink:.9}
   });
 
@@ -677,7 +667,7 @@ ${st.right.dim ? '    <div class="hw-dim"></div>\n' : ''}    <div class="hw-cont
 
   return {
     key:'dasot', cat:'hero', no:'H01', title:'Split Showcase', sub:'제품 슬라이드 + 사진 위 타이핑',
-    source:'pearljng.github.io/dasot', swatch:'linear-gradient(90deg,#04006F 0 50%,#E9C98F 50%)',
+    source:'pearljng.github.io/dasot', swatch:'linear-gradient(90deg,#090909 0 50%,#CCCCCC 50%)',
     defaults, groups, fonts, css, html, run, cfg,
     header:st => st.layout.minus, bp:st => st.layout.bp, multiline:/^head\.lines$/,
     drag:{pot:['pot.ox','pot.oy',1,1], head:['head.ox','head.oy',1,1], top:['top.x','top.y',1,1], bottom:['bottom.x','bottom.y',-1,-1]},
@@ -697,9 +687,9 @@ const MLAB = (() => {
     id: uid(),
     layout:{vh:100, padTop:R(108,84), bg:'#020202', fullBleed:false, bp:720},
     bg:{src:BG, px:50, py:50, opacity:.78, bright:.6, contrast:1.15, sat:.9, d1:.28, d2:.44, d3:.78},
-    spot:{on:true, color:'#83FE75', alpha:.45, size:280, opacity:.5, x:50, y:42},
-    eyebrow:{text:'Eyebrow Text Here', font:'Pretendard Variable', weight:'600', color:'#C9FFBC', size:13, ls:.12, upper:true, mb:24},
-    head:{tag:'h1', lines:'Main headline\n*with highlight line.', font:'Pretendard Variable', weight:'600', color:'#FFFFFF', hl:'#83FE75',
+    spot:{on:true, color:'#FFFFFF', alpha:.45, size:280, opacity:.5, x:50, y:42},
+    eyebrow:{text:'Eyebrow Text Here', font:'Pretendard Variable', weight:'600', color:'#CCCCCC', size:13, ls:.12, upper:true, mb:24},
+    head:{tag:'h1', lines:'Main headline\n*with highlight line.', font:'Pretendard Variable', weight:'600', color:'#FFFFFF', hl:'#FFFFFF',
           min:32, vw:7.5, max:88, lh:1.12, ls:-.02, gap:8, align:'center'},
     inner:{padT:80, padB:140, ox:R(0,0), oy:R(0,0)},
     wm:{on:true, text:'BRAND NAME', font:'Pretendard Variable', weight:'800', color:'#FFFFFF', alpha:.04, min:56, vw:13, max:220, ls:-.03, oy:R(0,0)},
@@ -847,7 +837,7 @@ ${st.wm.on ? `  <div class="ml-wm" aria-hidden="true"${a('wm')}${ed('wm.text')}>
 
   return {
     key:'mlab', cat:'hero', alwaysRun:true, no:'H02', title:'Spotlight Statement', sub:'풀스크린 사진 + 글자 타이핑 + 스포트라이트',
-    source:'pearljng.github.io/marketinglab', swatch:'radial-gradient(circle at 50% 45%,#83FE75 0,#1b3a17 28%,#020202 62%)',
+    source:'pearljng.github.io/marketinglab', swatch:'radial-gradient(circle at 50% 45%,#DADADA 0,#313131 28%,#020202 62%)',
     defaults, groups, fonts, css, html, run, cfg:()=>({}),
     header:() => 0, bp:st => st.layout.bp,
     drag:{inner:['inner.ox','inner.oy',1,1], head:['inner.ox','inner.oy',1,1], eyebrow:['inner.ox','inner.oy',1,1], wm:[null,'wm.oy',0,1]},
@@ -873,7 +863,7 @@ const DONGNAM = (() => {
       {video:'', poster:PH('dark', 'VIDEO 02', 1920, 1080), filter:false, title:'Headline Text\nFor Slide 02', desc:'두 번째 슬라이드의 **설명 문구**를 입력하세요'}
     ],
     play:{speed:1000, auto:8000, useVideo:true},
-    filter:{color:'#1E1E1E', a1:.45, a2:.25},
+    filter:{color:'#1E1E1E', a1:.6, a2:.45},
     title:{font:'Pretendard Variable', weight:'700', color:'#FFFFFF', d:90, m:50, lh:1.1, ls:-.025, mb:30, ox:R(0,0), oy:R(0,0)},
     desc:{size:32, weight:'400', strong:'600', color:'#FFFFFF', ox:R(0,0), oy:R(0,0)},
     pos:{maxW:1680, side:15, padB:50, ox:R(0,0), oy:R(0,0)},
@@ -987,7 +977,7 @@ ${C} .dn-circle i{position:absolute;left:50%;top:0;width:8px;height:14px;backgro
 @keyframes dnFade-${id}{0%,100%{opacity:.45}50%{opacity:.9}}
 ${C} .dn-bar{height:2px;background:rgba(255,255,255,.35);margin-top:70px;position:relative;z-index:6}
 ${C} .dn-bar i{display:block;width:0;height:100%;background:#FFF;will-change:width}
-${C} .dn-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 90% at 30% 20%,#4A505A 0,#22262D 45%,#0E1014 100%);color:rgba(255,255,255,.38);font:500 13px/1.4 ui-monospace,Menlo,monospace;letter-spacing:.04em;text-align:center}`;
+${C} .dn-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 90% at 30% 20%,#4F4F4F 0,#262626 45%,#101010 100%);color:rgba(255,255,255,.38);font:500 13px/1.4 ui-monospace,Menlo,monospace;letter-spacing:.04em;text-align:center}`;
     if (anim && AN.on) c += `
 @keyframes dnUp-${id}{0%{opacity:0;transform:translateY(${AN.rise}px)}60%{opacity:1;transform:translateY(${+(AN.rise/15).toFixed(2)}px)}100%{opacity:1;transform:translateY(0)}}
 ${C} .dn-txt.is-anim h2{animation:dnUp-${id} ${AN.dur}s cubic-bezier(.16,.84,.32,1) both}
@@ -1105,7 +1095,7 @@ ${U.bar ? `    <div class="dn-bar"${a('bar')}><i></i></div>\n` : ''}  </div>
 
   return {
     key:'dongnam', cat:'hero', no:'H03', title:'Cinematic Reel', sub:'풀스크린 영상 슬라이드 + 진행 바',
-    source:'dongnamad.co.kr/DONGNAM', swatch:'linear-gradient(180deg,#5A606B 0,#1B1E24 70%,#1B1E24 86%,#FFF 86%,#FFF 89%,#1B1E24 89%)',
+    source:'dongnamad.co.kr/DONGNAM', swatch:'linear-gradient(180deg,#606060 0,#1E1E1E 70%,#1E1E1E 86%,#FFF 86%,#FFF 89%,#1E1E1E 89%)',
     defaults, groups, fonts, css, html, run, cfg,
     header:st => st.layout.minus, bp:st => st.layout.bp,
     drag:{cover:['pos.ox','pos.oy',1,1], title:['title.ox','title.oy',1,1], desc:['desc.ox','desc.oy',1,1], info:['ui.ix','ui.iy',1,1], scroll:['ui.sx','ui.sy',1,1]},
@@ -1125,9 +1115,9 @@ const QUOTE = (() => {
   const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<em>$1</em>');
   const defaults = () => ({
     id: uid(),
-    layout:{bg:'#FFFCF7', padT:R(64,40), padB:R(64,40), maxW:900, gutter:20},
+    layout:{bg:'#FCFCFC', padT:R(64,40), padB:R(64,40), maxW:900, gutter:20},
     text:{tag:'h2', lines:'인용 문구의 첫 번째 줄을 입력하세요.\n두 번째 줄에는 **강조 문구**를 넣을 수 있어요.\n세 번째 줄로 문장을 마무리합니다.', font:'GmarketSansMedium', weight:'500',
-          color:'#010000', em:'#04006F', min:20, vw:2.6, max:28, lh:1.6, ls:0, align:'center', ox:R(0,0), oy:R(0,0)}
+          color:'#000000', em:'#000000', min:20, vw:2.6, max:28, lh:1.6, ls:0, align:'center', ox:R(0,0), oy:R(0,0)}
   });
   const groups = [
     {id:'layout', title:'섹션', fields:[
@@ -1166,7 +1156,7 @@ ${C} .pq-text em{font-style:normal;color:${X.em}}
   }
   return {
     key:'quote', cat:'content', no:'C01', title:'Pull Quote', sub:'가운데 정렬 인용 문구', source:'pearljng.github.io/dasot',
-    swatch:'linear-gradient(180deg,#FFFCF7 0 38%,#010000 38% 42%,#FFFCF7 42% 52%,#04006F 52% 56%,#FFFCF7 56%)',
+    swatch:'linear-gradient(180deg,#FCFCFC 0 38%,#000000 38% 42%,#FCFCFC 42% 52%,#090909 52% 56%,#FCFCFC 56%)',
     defaults, groups, fonts, css, html, run:null, cfg:()=>({}),
     header:()=>0, bp:()=>640,
     drag:{text:['text.ox','text.oy',1,1]},
@@ -1187,12 +1177,12 @@ const POTS = (() => {
 
   const defaults = () => ({
     id: uid(),
-    layout:{bg:'#EEAC02', padT:R(64,40), padB:R(64,40), bp:860},
-    head:{text:'Our Products', font:'Black Han Sans', weight:'400', color:'#FFFCF7', min:32, vw:5, max:56, ls:-.02, mb:40, ox:R(0,0), oy:R(0,0)},
+    layout:{bg:'#161616', padT:R(64,40), padB:R(64,40), bp:860},
+    head:{text:'Our Products', font:'Black Han Sans', weight:'400', color:'#FCFCFC', min:32, vw:5, max:56, ls:-.02, mb:40, ox:R(0,0), oy:R(0,0)},
     items:JSON.parse(JSON.stringify(ITEMS)),
-    car:{half:'2', auto:true, interval:3200, gap:24, side:24, dim:.4, scale:.78, blur:2, grow:1.65, ratio:'388/360', arrows:true, arrowBg:'#FFFCF7', arrowFg:'#010000'},
-    cap:{font:'GmarketSansBold', color:'#FFFCF7', min:22, vw:3, max:32, dsize:18, dcolor:'#FFFCF7', mt:40, ox:R(0,0), oy:R(0,0)},
-    btn:{on:true, text:'LEARN MORE', href:'#', bg:'#FFFCF7', fg:'#010000', hover:'#EEAC02', font:'Black Han Sans'}
+    car:{half:'2', auto:true, interval:3200, gap:24, side:24, dim:.4, scale:.78, blur:2, grow:1.65, ratio:'388/360', arrows:true, arrowBg:'#FCFCFC', arrowFg:'#000000'},
+    cap:{font:'GmarketSansBold', color:'#FCFCFC', min:22, vw:3, max:32, dsize:18, dcolor:'#FCFCFC', mt:40, ox:R(0,0), oy:R(0,0)},
+    btn:{on:true, text:'LEARN MORE', href:'#', bg:'#FFFFFF', fg:'#000000', hover:'#D9D9D9', font:'Black Han Sans'}
   });
   const groups = [
     {id:'layout', title:'섹션', fields:[
@@ -1262,8 +1252,8 @@ ${C} .bp-arrow svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-w
 ${C} .bp-cap{text-align:center;margin-top:${P.mt}px;translate:${P.ox.d}px ${P.oy.d}px}
 ${C} .bp-cap h3{margin:0 0 12px;font-family:${stack(P.font)};font-weight:700;font-size:${clampF(P)};letter-spacing:-0.02em;color:${P.color};line-height:1.6}
 ${C} .bp-cap p{margin:0 0 24px;font-size:${P.dsize}px;line-height:1.5;color:${P.dcolor}}
-${C} .bp-btn{display:inline-flex;align-items:center;justify-content:center;height:44px;padding:10px 22px;border-radius:9999px;font-family:${stack(B.font)};font-size:15px;font-weight:400;letter-spacing:-0.01em;text-transform:uppercase;border:none;cursor:pointer;white-space:nowrap;text-decoration:none;background:${B.bg};color:${B.fg};box-shadow:3px 3px 0 #010000;transition:background-color .15s ease,box-shadow .15s ease,transform .15s ease}
-${C} .bp-btn:hover{background:${B.hover};box-shadow:4px 4px 0 #010000;transform:translate(-1px,-1px)}
+${C} .bp-btn{display:inline-flex;align-items:center;justify-content:center;height:44px;padding:10px 22px;border-radius:9999px;font-family:${stack(B.font)};font-size:15px;font-weight:400;letter-spacing:-0.01em;text-transform:uppercase;border:none;cursor:pointer;white-space:nowrap;text-decoration:none;background:${B.bg};color:${B.fg};box-shadow:3px 3px 0 #000000;transition:background-color .15s ease,box-shadow .15s ease,transform .15s ease}
+${C} .bp-btn:hover{background:${B.hover};box-shadow:4px 4px 0 #000000;transform:translate(-1px,-1px)}
 @media (max-width:${L.bp}px){${C} .bp-slot{display:none}${C} .bp-slot.is-center{display:flex;flex:1 1 auto}}
 @media (max-width:640px){${C}{padding:${L.padT.m}px 0 ${L.padB.m}px}${C} .bp-head h2{translate:${H.ox.m}px ${H.oy.m}px}${C} .bp-cap{translate:${P.ox.m}px ${P.oy.m}px}}`;
   }
@@ -1327,7 +1317,7 @@ ${st.btn.on ? `    <a class="bp-btn" href="${esc(st.btn.href)}"${ed('btn.text')}
 
   return {
     key:'pots', cat:'content', no:'C02', title:'Product Carousel', sub:'가운데가 커지는 제품 캐러셀 + 설명', source:'pearljng.github.io/dasot',
-    swatch:'radial-gradient(circle at 50% 46%,#E9831F 0 17%,transparent 18%),radial-gradient(circle at 18% 46%,#F2C3C8 0 9%,transparent 10%),radial-gradient(circle at 82% 46%,#3E4A2A 0 9%,transparent 10%),#EEAC02',
+    swatch:'radial-gradient(circle at 50% 46%,#919191 0 17%,transparent 18%),radial-gradient(circle at 18% 46%,#CDCDCD 0 9%,transparent 10%),radial-gradient(circle at 82% 46%,#454545 0 9%,transparent 10%),#AEAEAE',
     defaults, groups, fonts, css, html, run, cfg,
     header:()=>0, bp:()=>640,
     drag:{head:['head.ox','head.oy',1,1], cap:['cap.ox','cap.oy',1,1]},
@@ -1356,15 +1346,15 @@ const CHOICE = (() => {
     {title:'서비스 A 제목', desc:'서비스 A를 소개하는 첫 번째 줄\n두 번째 줄 설명을 입력하세요',
      tags:'태그 문구 01\n태그 문구 02\n조금 더 긴 태그 문구 03\n태그 문구 04\n태그 05\n태그 문구 06',
      href:'#', hover:'자세히 보기', bg:'#000000', bga:.4, accent:'#000000',
-     video:'', poster:PH('art', 'ART 01', 1080, 1080), left:59, top:-1, width:57, rot:0, flip:true, gray:false, opacity:.5, blend:'screen', rate:1.2, tTop:9, mRight:-46.6, mTop:3, mW:190},
+     video:'', poster:PH('art', 'ART 01', 1080, 1080), left:59, top:-1, width:57, rot:0, flip:true, gray:false, opacity:.35, blend:'screen', rate:1.2, tTop:9, mRight:-46.6, mTop:3, mW:190},
     {title:'서비스 B 제목', desc:'서비스 B를 소개하는 첫 번째 줄\n두 번째 줄 설명을 입력하세요',
      tags:'태그 문구 01\n태그 02\n조금 더 긴 태그 문구 03\n태그 문구 04\n태그 문구 05\n태그 06',
-     href:'#', hover:'자세히 보기', bg:'#2B5FFF', bga:1, accent:'#2B5FFF',
-     video:'', poster:PH('art', 'ART 02', 702, 720), left:40.8, top:-17.4, width:85, rot:-30, flip:false, gray:true, opacity:1, blend:'screen', rate:2, tTop:1, mRight:-92.5, mTop:-25, mW:277}
+     href:'#', hover:'자세히 보기', bg:'#3A3A3A', bga:1, accent:'#3A3A3A',
+     video:'', poster:PH('art', 'ART 02', 702, 720), left:40.8, top:-17.4, width:85, rot:-30, flip:false, gray:true, opacity:.35, blend:'screen', rate:2, tTop:1, mRight:-92.5, mTop:-25, mW:277}
   ];
   const defaults = () => ({
     id: uid(),
-    layout:{vh:100, minH:800, bg:'#000000', bgImg:BG, mMinH:700},
+    layout:{vh:100, minH:800, bg:'#000000', bgImg:BG, dim:.6, mMinH:700},
     title:{lines:'섹션 제목의 첫 번째 줄\n두 번째 줄을 입력하세요.', font:'Pretendard Variable', weight:'700', color:'#FFFFFF', min:42, vw:3.333, max:64, lh:1.2, ls:-.025, top:14.1, ox:R(0,0), oy:R(0,0)},
     cards:JSON.parse(JSON.stringify(CARDS)),
     grid:{top:36.25, gap:24, maxW:1280},
@@ -1374,7 +1364,7 @@ const CHOICE = (() => {
     {id:'layout', title:'섹션', fields:[
       A('layout.vh','높이 (화면 높이 대비)',40,100,1,'vh'), A('layout.minH','최소 높이',0,1400,10,'px'), A('layout.mMinH','모바일 최소 높이',0,1200,10,'px'),
       {k:'layout.bg', l:'바탕색', t:'color'},
-      {k:'layout.bgImg', l:'배경 이미지 (별 하늘)', t:'image', def:BG}
+      {k:'layout.bgImg', l:'배경 이미지', t:'image', def:BG}, A('layout.dim','배경 이미지 어둡게',0,1,.01,'',{hint:'흰 글자가 잘 보이도록 배경 이미지 위를 검게 덮어요.'})
     ]},
     {id:'title', title:'제목', fields:[
       {k:'title.lines', l:'제목 (줄바꿈 그대로)', t:'textarea'},
@@ -1399,7 +1389,7 @@ const CHOICE = (() => {
              {k:'opacity', l:'장식 진하기 (0~1)', t:'num', step:.05}, {k:'rate', l:'영상 속도 배율', t:'num', step:.1},
              {k:'blend', l:'장식 합성 방식', t:'select', opts:[['screen','screen (검정 배경 지우기)'],['normal','그대로'],['lighten','lighten']]},
              {k:'flip', l:'장식 좌우 뒤집기', t:'toggle'}, {k:'gray', l:'장식 흑백으로', t:'toggle'}],
-       blank:{title:'새 카드', desc:'설명을 입력하세요', tags:'태그 1\n태그 2\n태그 3', href:'#', hover:'바로가기', bg:'#1E1E28', bga:1, accent:'#000000',
+       blank:{title:'새 카드', desc:'설명을 입력하세요', tags:'태그 1\n태그 2\n태그 3', href:'#', hover:'바로가기', bg:'#1F1F1F', bga:1, accent:'#000000',
               video:'', poster:'', left:55, top:0, width:60, rot:0, flip:false, gray:false, opacity:1, blend:'normal', rate:1, tTop:5, mRight:-60, mTop:0, mW:200}}
     ]},
     {id:'grid', title:'카드 배치', fields:[
@@ -1431,7 +1421,7 @@ ${n} .cc-hover-text{color:${c.accent}}`;
     return `${C}{--mpx:1px;position:relative;height:${L.vh}svh;min-height:${L.minH}px;padding:0;margin:0;overflow:hidden;background:${L.bg};color:#fff;box-sizing:border-box;font-family:${stack(Ti.font)}}
 ${C} *{margin:0;padding:0;box-sizing:border-box}
 ${C} ul{list-style:none}
-${C} .cc-bg{position:absolute;inset:0;background:${L.bg}${L.bgImg ? ` url("${preview ? pv(L.bgImg) : L.bgImg}") center top / cover no-repeat` : ''};pointer-events:none}
+${C} .cc-bg{position:absolute;inset:0;background:${L.bgImg && L.dim ? `linear-gradient(rgba(0,0,0,${L.dim}),rgba(0,0,0,${L.dim})),` : ''}${L.bg}${L.bgImg ? ` url("${preview ? pv(L.bgImg) : L.bgImg}") center top / cover no-repeat` : ''};pointer-events:none}
 ${C} .cc-result{position:absolute;left:0;right:0;top:50%;height:min(100%,1080px);z-index:3;transform:translateY(-50%)}
 ${C} .cc-title{position:absolute;left:50%;top:${Ti.top}%;width:min(1840px,95%);transform:translateX(-50%);font-family:${stack(Ti.font)};font-size:${clampF(Ti)};font-weight:${Ti.weight};line-height:${Ti.lh};letter-spacing:${Ti.ls}em;text-align:center;color:${Ti.color};white-space:pre-line;translate:${Ti.ox.d}px ${Ti.oy.d}px}
 ${C} .cc-cards{--card-w:calc((min(${G.maxW}px, 86vw) - ${G.gap}px) / 2);position:absolute;left:50%;top:${G.top}%;display:flex;gap:${G.gap}px;width:min(${G.maxW}px,86%);height:min(52.43%, calc(var(--card-w) * 0.4335 + 256px));transform:translateX(-50%)}
@@ -1660,7 +1650,7 @@ ${C} .cc-arrow{opacity:1;transform:rotate(45deg);filter:brightness(0) invert(1)}
 
   return {
     key:'choice', cat:'content', no:'C03', title:'Choice Cards', sub:'제목 + 카드 2장, 떨어지는 태그 캡슐', source:'plan-et.co.kr',
-    swatch:'linear-gradient(90deg,#000 0 8%,#15161A 8% 47%,#000 47% 53%,#2B5FFF 53% 92%,#000 92%)',
+    swatch:'linear-gradient(90deg,#000 0 8%,#161616 8% 47%,#000 47% 53%,#5F5F5F 53% 92%,#000 92%)',
     defaults, groups, fonts, css, html, run, cfg, libs:[LIB.gsap, LIB.matter],
     header:()=>0, bp:()=>767,
     drag:{title:['title.ox','title.oy',1,1]},
@@ -1678,10 +1668,10 @@ const FAQ = (() => {
   const ITEMS = [1,2,3,4,5].map(i => ({q:`자주 묻는 질문 0${i}을 입력하세요?`, a:`질문 0${i}에 대한 답변을 입력하세요. 두세 문장으로 핵심을 설명하면 좋아요.`, open:false}));
   const defaults = () => ({
     id: uid(),
-    layout:{bg:'#F5F6F8', fill:true, padY:120, maxW:1280},
-    title:{text:'자주 묻는 **질문들**', tag:'h2', font:'Pretendard Variable', weight:'700', color:'#000000', em:'#2B5FFF', size:60, msize:32, ls:-1.5, lh:1.1, ox:R(0,0), oy:R(0,0)},
+    layout:{bg:'#F6F6F6', fill:true, padY:120, maxW:1280},
+    title:{text:'자주 묻는 **질문들**', tag:'h2', font:'Pretendard Variable', weight:'700', color:'#000000', em:'#000000', size:60, msize:32, ls:-1.5, lh:1.1, ox:R(0,0), oy:R(0,0)},
     items:JSON.parse(JSON.stringify(ITEMS)),
-    style:{gap:16, mt:97, radius:15, bg:'#FFFFFF', openBg:'#2B5FFF', q:'#444444', qOpen:'#FFFFFF', qHover:'#2B5FFF', qSize:20, aSize:16, a:'#FFFFFF', aAlpha:.8, icon:'#2B5FFF'},
+    style:{gap:16, mt:97, radius:15, bg:'#FFFFFF', openBg:'#111111', q:'#444444', qOpen:'#FFFFFF', qHover:'#000000', qSize:20, aSize:16, a:'#FFFFFF', aAlpha:.8, icon:'#111111'},
     anim:{on:true, single:true, pull:true}
   });
   const groups = [
@@ -1744,7 +1734,7 @@ ${C} .fq-item.is-open .fq-minus{opacity:1;transform:none}
 ${C} .fq-a{overflow:hidden;cursor:pointer}
 ${C} .fq-a[hidden]{display:none}
 ${C} .fq-a p{margin:-4px 0 0;padding:0 40px 30px;font-family:${stack(Ti.font)};font-size:${Y.aSize}px;font-weight:400;line-height:1.5;letter-spacing:-0.4px;color:${rgba(Y.a, Y.aAlpha)};white-space:pre-line}
-@media (hover:hover){${C} .fq-item:not(.is-open):hover{box-shadow:0 12px 32px rgba(40,59,104,.08)}${C} .fq-item:not(.is-open):hover .fq-q-text{color:${Y.qHover}}}
+@media (hover:hover){${C} .fq-item:not(.is-open):hover{box-shadow:0 12px 32px rgba(0,0,0,.08)}${C} .fq-item:not(.is-open):hover .fq-q-text{color:${Y.qHover}}}
 ${C} .fq-q:focus-visible{outline:2px solid ${Y.openBg};outline-offset:-2px;border-radius:${Y.radius}px}
 @media (max-width:767px){
 ${C}{--mpx:clamp(1px, calc(1px + (100vw - 375px) * 0.3 / 392), 1.3px);min-height:0;padding:calc(${L.padY} * var(--mpx)) 0}
@@ -1839,7 +1829,7 @@ ${C} .fq-a p{margin-top:-2px;padding:0 calc(16 * var(--mpx)) calc(16 * var(--mpx
   const cfg = st => ({on:st.anim.on, single:st.anim.single, pull:st.anim.pull});
   return {
     key:'faq', cat:'content', no:'C04', title:'FAQ Accordion', sub:'눌러서 펼치는 질문 목록', source:'plan-et.co.kr',
-    swatch:'linear-gradient(180deg,#F5F6F8 0 20%,#fff 20% 36%,#F5F6F8 36% 44%,#2B5FFF 44% 66%,#F5F6F8 66% 74%,#fff 74% 90%,#F5F6F8 90%)',
+    swatch:'linear-gradient(180deg,#F6F6F6 0 20%,#fff 20% 36%,#F6F6F6 36% 44%,#5F5F5F 44% 66%,#F6F6F6 66% 74%,#fff 74% 90%,#F6F6F6 90%)',
     defaults, groups, fonts, css, html, run, cfg, libs:[LIB.gsap], alwaysRun:true,
     header:()=>0, bp:()=>767,
     drag:{title:['title.ox','title.oy',1,1]},
@@ -1860,12 +1850,12 @@ const TABFAQ = (() => {
   const stack = f => `'${f}','Pretendard',Inter,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif`;
   const defaults = () => ({
     id: uid(),
-    layout:{bg:'#191716', padT:R(120,64), padB:R(120,64), maxW:1600, side:R(48,16), gap:R(40,36)},
-    title:{text:'FAQ', tag:'h2', font:'Pretendard Variable', color:'#FAFAF9', d:40, m:24, align:'left', ox:R(0,0), oy:R(0,0)},
-    tabs:{show:true, list:NY_TABS, color:'#767270', active:'#FAFAF9'},
+    layout:{bg:'#171717', padT:R(120,64), padB:R(120,64), maxW:1600, side:R(48,16), gap:R(40,36)},
+    title:{text:'FAQ', tag:'h2', font:'Pretendard Variable', color:'#FAFAFA', d:40, m:24, align:'left', ox:R(0,0), oy:R(0,0)},
+    tabs:{show:true, list:NY_TABS, color:'#737373', active:'#FAFAFA'},
     items:JSON.parse(JSON.stringify(NY_ITEMS)),
-    style:{line:'#FFFFFF', lineA:.25, q:'#FAFAF9', a:'#A6A3A0', link:'#2E90FA', plus:'#FAFAF9', minus:'#F22717', qd:20, qm:16, ad:20, am:14, ellipsis:true},
-    btn:{show:true, text:'FAQ 바로가기', href:'#', bg:'#FAFAF9', fg:'#191716'},
+    style:{line:'#FFFFFF', lineA:.25, q:'#FAFAFA', a:'#A3A3A3', link:'#FFFFFF', plus:'#FAFAFA', minus:'#FAFAFA', qd:20, qm:16, ad:20, am:14, ellipsis:true},
+    btn:{show:true, text:'FAQ 바로가기', href:'#', bg:'#FAFAFA', fg:'#171717'},
     behave:{single:true}
   });
   const tabNames = st => st.tabs.list.split('\n').map(s => s.trim()).filter(Boolean);
@@ -2053,7 +2043,7 @@ ${st.btn.show ? `    <a class="tf-btn" href="${esc(st.btn.href)}"${ed('btn.text'
 
   return {
     key:'tabfaq', cat:'content', no:'C05', title:'Tabbed FAQ', sub:'카테고리 탭 + 구분선 아코디언 (다크)', source:'new.nypc.co.kr',
-    swatch:'linear-gradient(180deg,#191716 0 22%,#FAFAF9 22% 25%,#191716 25% 40%,#5A5856 40% 41%,#191716 41% 58%,#5A5856 58% 59%,#191716 59% 76%,#5A5856 76% 77%,#191716 77%)',
+    swatch:'linear-gradient(180deg,#171717 0 22%,#FAFAFA 22% 25%,#171717 25% 40%,#585858 40% 41%,#171717 41% 58%,#585858 58% 59%,#171717 59% 76%,#585858 76% 77%,#171717 77%)',
     defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
     header:()=>0, bp:()=>767,
     drag:{title:['title.ox','title.oy',1,1]},
@@ -2081,9 +2071,9 @@ const STICKY = (() => {
     id: uid(),
     layout:{bg:'#FFFFFF', maxW:1314, padT:R(100,40), padB:R(120,50), side:R(0,20), gap:142, left:376, sticky:100, bp:1023},
     title:{text:'섹션 제목을\n두 줄로 입력하세요', font:'Pretendard Variable', color:'#000000', d:34, m:26},
-    nav:{size:18, color:'#818897', accent:'#0AC290', mt:40},
+    nav:{size:18, color:'#8A8A8A', accent:'#000000', mt:40},
     items:JSON.parse(JSON.stringify(ITEMS)),
-    post:{space:R(120,50), radius:R(0,8), title:'#2E3138', info:'#515662', tsize:22, isize:R(18,14)}
+    post:{space:R(120,50), radius:R(0,8), title:'#313131', info:'#565656', tsize:22, isize:R(18,14)}
   });
   const groups = [
     {id:'layout', title:'섹션', fields:[
@@ -2213,7 +2203,7 @@ ${C} .sf-step{font-size:${P.isize.m}px;line-height:24px;color:${P.info};letter-s
   const cfg = st => ({sticky:st.layout.sticky});
   return {
     key:'sticky', cat:'content', group:'feature', no:'C06', title:'Sticky Feature List', sub:'왼쪽 고정 제목·메뉴 + 오른쪽 이미지 설명 목록',
-    swatch:'linear-gradient(90deg,#fff 0 6%,#2E3138 6% 30%,#fff 30% 42%,#C9CDD4 42% 94%,#fff 94%)',
+    swatch:'linear-gradient(90deg,#fff 0 6%,#313131 6% 30%,#fff 30% 42%,#CDCDCD 42% 94%,#fff 94%)',
     defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
     header:()=>0, bp:st => st.layout.bp,
     drag:{},
@@ -2235,10 +2225,10 @@ const STATS = (() => {
   ];
   const defaults = () => ({
     id: uid(),
-    layout:{bg:'#FFFFFF', maxW:1600, line:'#D0CDC8'},
-    title:{text:'숫자로 증명하는\n**브랜드 이름**의\n핵심 성과', font:'Geist', color:'#0B0B0B', accent:'#EB5D2B', w:402},
+    layout:{bg:'#FFFFFF', maxW:1600, line:'#CDCDCD'},
+    title:{text:'숫자로 증명하는\n**브랜드 이름**의\n핵심 성과', font:'Geist', color:'#0B0B0B', accent:'#0B0B0B', w:402},
     items:JSON.parse(JSON.stringify(ITEMS)),
-    style:{num:'#0B0B0B', label:'#0B0B0B', desc:'#68655E', numW:460},
+    style:{num:'#0B0B0B', label:'#0B0B0B', desc:'#656565', numW:460},
     anim:{reveal:true, count:true, dur:1400}
   });
   const groups = [
@@ -2347,7 +2337,7 @@ ${C} .st-num{width:${Y.numW}px}}
   const cfg = st => ({reveal:st.anim.reveal, count:st.anim.count, dur:st.anim.dur});
   return {
     key:'stats', cat:'content', group:'stats', no:'C07', title:'Stat Counter', sub:'큰 숫자 지표 + 카운트업 + 구분선 목록',
-    swatch:'linear-gradient(180deg,#fff 0 20%,#0B0B0B 20% 34%,#fff 34% 40%,#D0CDC8 40% 42%,#fff 42% 52%,#0B0B0B 52% 66%,#fff 66% 72%,#D0CDC8 72% 74%,#fff 74%)',
+    swatch:'linear-gradient(180deg,#fff 0 20%,#0B0B0B 20% 34%,#fff 34% 40%,#CDCDCD 40% 42%,#fff 42% 52%,#0B0B0B 52% 66%,#fff 66% 72%,#CDCDCD 72% 74%,#fff 74%)',
     defaults, groups, fonts, css, html, run, cfg,
     header:()=>0, bp:()=>1279,
     drag:{}, selectGroup:{section:'items', title:'title', items:'items'},
@@ -2364,11 +2354,11 @@ const LOGOS = (() => {
   const ITEMS = [1,2,3,4,5,6,7,8,9,10,11,12].map(i => ({img:PH('logo', `LOGO ${String(i).padStart(2,'0')}`, 400, 120), alt:`파트너 ${String(i).padStart(2,'0')}`}));
   const defaults = () => ({
     id: uid(),
-    layout:{bg:'#0B0B0B', glow:'#B4461E', glowA:.55},
-    title:{text:'함께하는 **파트너 네트워크**', sub:'파트너십을 소개하는 한 줄 설명 문구를 입력하세요.', font:'Geist', color:'#FFFFFF', accent:'#EA5521', subColor:'#ACACAC'},
+    layout:{bg:'#0B0B0B', glow:'#5A5A5A', glowA:.55},
+    title:{text:'함께하는 **파트너 네트워크**', sub:'파트너십을 소개하는 한 줄 설명 문구를 입력하세요.', font:'Geist', color:'#FFFFFF', accent:'#FFFFFF', subColor:'#ACACAC'},
     logos:JSON.parse(JSON.stringify(ITEMS)),
     track:{speed:67, fade:true, hover:true},
-    cta:{show:true, text:'문의하기', href:'#', color:'#FFFFFF', fill:'#EA5623', glow:'#FF8A55'}
+    cta:{show:true, text:'문의하기', href:'#', color:'#FFFFFF', fill:'#3A3A3A', glow:'#6A6A6A'}
   });
   const groups = [
     {id:'layout', title:'섹션', fields:[
@@ -2482,7 +2472,7 @@ ${st.cta.show ? `  <div class="lg-cta-row rv" style="--ry:16px"><a class="lg-cta
   const cfg = st => ({speed:st.track.speed, reveal:true});
   return {
     key:'logos', cat:'content', group:'partners', no:'C08', title:'Logo Marquee', sub:'흐르는 파트너 로고 줄 + 채워지는 버튼 (다크)',
-    swatch:'radial-gradient(120% 70% at 50% 120%,rgba(180,70,30,.7) 0%,#0b0b0b 58%)',
+    swatch:'radial-gradient(120% 70% at 50% 120%,rgba(90,90,90,.7) 0%,#0b0b0b 58%)',
     defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
     header:()=>0, bp:()=>767,
     drag:{}, selectGroup:{section:'logos', title:'title', logos:'logos'},
@@ -2502,11 +2492,11 @@ const IMGMSG = (() => {
   const defaults = () => ({
     id: uid(),
     layout:{vh:80, minH:560, padY:R(140,96), maxW:960, align:'center'},
-    bg:{src:BGDEF, px:50, py:50, color:'#0B0C10', a1:.35, a2:.65, zoom:true},
+    bg:{src:BGDEF, px:50, py:50, color:'#0C0C0C', a1:.5, a2:.75, zoom:true},
     eyebrow:{show:true, text:'BRAND MESSAGE', color:'#FFFFFF', alpha:.7, size:14, ls:.2},
     msg:{lines:'브랜드가 전하고 싶은 메시지를\n**한 문장**으로 담아 보세요.\n세 번째 줄로 마무리합니다.', font:'Pretendard Variable', weight:'700',
-         color:'#FFFFFF', accent:'#FFD25A', min:28, vw:3.6, max:60, lh:1.4, ls:-.02},
-    btn:{show:true, text:'자세히 보기', href:'#', style:'fill', bg:'#FFFFFF', fg:'#0B0C10', gap:R(48,32)},
+         color:'#FFFFFF', accent:'#FFFFFF', min:28, vw:3.6, max:60, lh:1.4, ls:-.02},
+    btn:{show:true, text:'자세히 보기', href:'#', style:'fill', bg:'#FFFFFF', fg:'#0C0C0C', gap:R(48,32)},
     anim:{on:true, unit:'line', start:.2, dur:1.1, blur:8, rise:24, stagger:0, btnDelay:.2}
   });
   const groups = [
@@ -2624,7 +2614,7 @@ ${st.btn.show ? `    <div class="im-btn-row" style="--d:${n(u.end + AN.btnDelay,
   const cfg = st => ({on:st.anim.on});
   return {
     key:'imgmsg', cat:'content', group:'text', no:'C09', title:'Image Message', sub:'배경 이미지 + 스르르 나타나는 메시지 + 올라오는 버튼',
-    swatch:'linear-gradient(180deg,rgba(11,12,16,.35),rgba(11,12,16,.85)),radial-gradient(circle at 30% 30%,#6B7280,#1F2329)',
+    swatch:'linear-gradient(180deg,rgba(12,12,12,.35),rgba(12,12,12,.85)),radial-gradient(circle at 30% 30%,#727272,#232323)',
     defaults, groups, fonts, css, html, run, cfg,
     header:()=>0, bp:()=>767,
     drag:{}, selectGroup:{section:'bg', msg:'msg'},
@@ -2633,14 +2623,1448 @@ ${st.btn.show ? `    <div class="im-btn-row" style="--d:${n(u.end + AN.btnDelay,
   };
 })();
 
+/* =====================================================================
+   Hero 04 · Reveal Lens (original design)
+   a lens follows the cursor and reveals a second scene (another image, colors and headline) under the first
+   ===================================================================== */
+const LENS = (() => {
+  const stack = f => `'${f}','Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif`;
+  const BASE = PH('dark', 'BASE IMAGE', 1920, 1080), REVEAL = PH('photo', 'REVEAL IMAGE', 1920, 1080);
+  const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<em>$1</em>').replace(/\n/g, '<br>');
+  const defaults = () => ({
+    id: uid(),
+    layout:{vh:100, minH:640, side:R(96,24), maxW:1280, align:'left'},
+    base:{src:BASE, px:50, py:50, color:'#0B0B0B', a:.6, text:'#FFFFFF', accent:'#FFFFFF'},
+    reveal:{src:REVEAL, px:50, py:50, color:'#FFFFFF', imgA:.35, text:'#111111', accent:'#111111'},
+    eyebrow:{show:true, text:'INTERACTIVE HERO', size:14, ls:.2},
+    head:{tag:'h1', text:'보이는 것 너머의\n**이야기**를 만듭니다.', alt:'커서를 움직이면\n**숨은 장면**이 보여요.', font:'Pretendard Variable', weight:'800', min:40, vw:6, max:104, lh:1.12, ls:-.03},
+    sub:{show:true, text:'히어로 문구를 설명하는 한 줄을 입력하세요. 두 번째 장면의 이미지와 문구는 렌즈 안에서만 보여요.', size:R(19,15), maxW:560},
+    btn:{show:true, text:'자세히 보기', href:'#', bg:'#FFFFFF', fg:'#0C0C0C'},
+    lens:{size:R(200,130), press:1.6, soft:2, ease:.16, ring:true, ringColor:'#FFFFFF', idle:true}
+  });
+  const groups = [
+    {id:'layout', title:'섹션', fields:[
+      A('layout.vh','높이 (화면 높이 대비)',40,100,1,'vh'), A('layout.minH','최소 높이',0,1200,10,'px'),
+      A('layout.side','좌우 여백',0,200,1,'px',{r:1}), A('layout.maxW','내용 최대 너비',600,1800,10,'px'),
+      {k:'layout.align', l:'정렬', t:'align'}
+    ]},
+    {id:'base', title:'기본 장면', fields:[
+      {k:'base.src', l:'배경 이미지', t:'image', def:BASE},
+      A('base.px','초점 가로',0,100,1,'%'), A('base.py','초점 세로',0,100,1,'%'),
+      {k:'base.color', l:'덮는 색', t:'color'}, A('base.a','덮는 색 진하기',0,1,.01,''),
+      {k:'base.text', l:'글자색', t:'color'}, {k:'base.accent', l:'강조색', t:'color'}
+    ]},
+    {id:'reveal', title:'렌즈 속 장면', fields:[
+      {k:'reveal.src', l:'렌즈 속 이미지', t:'image', def:REVEAL},
+      A('reveal.px','초점 가로',0,100,1,'%'), A('reveal.py','초점 세로',0,100,1,'%'),
+      {k:'reveal.color', l:'바탕색', t:'color'}, A('reveal.imgA','이미지 진하기',0,1,.01,'',{hint:'0이면 바탕색만, 1이면 이미지만 보여요.'}),
+      {k:'reveal.text', l:'글자색', t:'color'}, {k:'reveal.accent', l:'강조색', t:'color'},
+      {k:'head.alt', l:'렌즈 속 제목 (줄바꿈 · **강조**)', t:'textarea', hint:'기본 장면의 제목과 같은 자리에 겹쳐서, 렌즈 안에서만 보여요.'}
+    ]},
+    {id:'head', title:'제목', fields:[
+      {k:'eyebrow.show', l:'작은 제목 표시', t:'toggle'}, {k:'eyebrow.text', l:'작은 제목', t:'text'},
+      A('eyebrow.size','작은 제목 크기',10,24,1,'px'), A('eyebrow.ls','작은 제목 자간',0,.5,.01,'em'),
+      {k:'head.text', l:'제목 (줄바꿈 · **강조**)', t:'textarea'},
+      {k:'head.tag', l:'제목 태그', t:'select', opts:[['h1','h1'],['h2','h2'],['p','p']], hint:'페이지에 다른 h1이 있으면 h2로 바꾸세요.'},
+      {k:'head.font', l:'글꼴', t:'select', opts:fontOpts}, {k:'head.weight', l:'굵기', t:'select', opts:weightOpts},
+      ...sizeFields('head'),
+      A('head.lh','줄 간격',.8,2,.01,'×'), A('head.ls','자간',-.1,.2,.005,'em')
+    ]},
+    {id:'sub', title:'설명 · 버튼', fields:[
+      {k:'sub.show', l:'설명 표시', t:'toggle'}, {k:'sub.text', l:'설명', t:'textarea'},
+      A('sub.size','설명 크기',11,32,1,'px',{r:1}), A('sub.maxW','설명 최대 너비',240,1200,10,'px'),
+      {k:'btn.show', l:'버튼 표시', t:'toggle'}, {k:'btn.text', l:'버튼 문구', t:'text'}, {k:'btn.href', l:'연결 주소', t:'text'},
+      {k:'btn.bg', l:'버튼 색', t:'color'}, {k:'btn.fg', l:'버튼 글자색', t:'color'}
+    ]},
+    {id:'lens', title:'렌즈', fields:[
+      A('lens.size','렌즈 반지름',40,500,1,'px',{r:1}),
+      A('lens.press','누르고 있을 때 커지는 배율',1,3,.05,'×'),
+      A('lens.soft','가장자리 부드럽게',0,60,1,'px'),
+      A('lens.ease','따라오는 속도',.03,1,.01,'',{hint:'작을수록 느긋하게, 1이면 커서에 바로 붙어요.'}),
+      {k:'lens.ring', l:'렌즈 테두리', t:'toggle'}, {k:'lens.ringColor', l:'테두리 색', t:'color'},
+      {k:'lens.idle', l:'커서가 없을 때 렌즈가 천천히 떠다니기', t:'toggle', hint:'터치 화면에서는 이 움직임으로 렌즈 속 장면을 보여줘요.'}
+    ]}
+  ];
+  const fonts = st => [st.head.font, 'Pretendard Variable'];
+  function css(st){
+    const C = '.hw-'+st.id, L = st.layout, B = st.base, V = st.reveal, E = st.eyebrow, H = st.head, S = st.sub, BT = st.btn, LN = st.lens;
+    const items = {left:'flex-start', center:'center', right:'flex-end'}[L.align];
+    return `${C}{position:relative;isolation:isolate;overflow:hidden;min-height:max(${L.minH}px, ${L.vh}svh);margin:0;background:${B.color};font-family:${stack(H.font)};-webkit-font-smoothing:antialiased;touch-action:pan-y}
+${C} *{box-sizing:border-box;margin:0;padding:0}
+${C} .ln-layer{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:0 ${L.side.d}px}
+${C} .ln-img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover}
+${C} .ln-base{z-index:0}
+${C} .ln-base .ln-img{object-position:${B.px}% ${B.py}%}
+${C} .ln-base::before{content:"";position:absolute;inset:0;z-index:1;background:${rgba(B.color, B.a)};pointer-events:none}
+${C} .ln-reveal{z-index:2;background:${V.color};pointer-events:none;--x:-999px;--y:-999px;--r:0px;
+  -webkit-mask-image:radial-gradient(circle at var(--x) var(--y),#000 calc(var(--r) - ${LN.soft}px),transparent var(--r));mask-image:radial-gradient(circle at var(--x) var(--y),#000 calc(var(--r) - ${LN.soft}px),transparent var(--r))}
+${C} .ln-reveal .ln-img{object-position:${V.px}% ${V.py}%;opacity:${V.imgA};mix-blend-mode:multiply}
+${C} .ln-inner{position:relative;z-index:2;width:100%;max-width:${L.maxW}px;display:flex;flex-direction:column;align-items:${items};text-align:${L.align}}
+${C} .ln-eyebrow{margin-bottom:24px;font-size:${E.size}px;font-weight:600;letter-spacing:${E.ls}em;text-transform:uppercase;opacity:.75}
+${C} .ln-head{font-family:${stack(H.font)};font-weight:${H.weight};font-size:${clampF(H)};line-height:${H.lh};letter-spacing:${H.ls}em;word-break:keep-all}
+${C} .ln-head em{font-style:normal}
+${C} .ln-sub{margin-top:28px;max-width:${S.maxW}px;font-size:${S.size.d}px;line-height:1.65;opacity:.8;word-break:keep-all}
+${C} .ln-btn{display:inline-flex;align-items:center;gap:10px;margin-top:40px;height:54px;padding:0 30px;border-radius:999px;font-size:16px;font-weight:700;text-decoration:none;background:${BT.bg};color:${BT.fg};transition:transform .3s cubic-bezier(.22,.61,.36,1)}
+${C} .ln-btn:hover{transform:translateY(-2px)}
+${C} .ln-base .ln-inner{color:${B.text}}
+${C} .ln-base .ln-head em{color:${B.accent}}
+${C} .ln-reveal .ln-inner{color:${V.text}}
+${C} .ln-reveal .ln-head em{color:${V.accent}}
+${C} .ln-reveal .ln-btn{background:${V.text};color:${V.color}}
+${C} .ln-ring{position:absolute;left:0;top:0;z-index:3;width:0;height:0;border-radius:50%;border:1.5px solid ${LN.ringColor};opacity:0;pointer-events:none;${LN.ring ? '' : 'display:none;'}}
+@media (max-width:767px){${C} .ln-layer{padding:0 ${L.side.m}px}${C} .ln-eyebrow{margin-bottom:16px;font-size:${Math.max(10, E.size - 2)}px}${C} .ln-sub{margin-top:18px;font-size:${S.size.m}px}${C} .ln-btn{margin-top:28px;height:48px;padding:0 24px;font-size:15px}}`;
+  }
+  function html(st, {preview=false}={}){
+    const a = k => preview ? ` data-el="${k}"` : '', ed = p => preview ? ` data-edit="${p}"` : '';
+    const src = s => preview ? pv(s) : s, H = st.head, tag = H.tag;
+    // both layers share the same layout, so the lens shows the second scene exactly in place
+    const inner = (alt) => `<div class="ln-inner"${alt ? ' aria-hidden="true"' : a('text')}>
+${st.eyebrow.show ? `      <p class="ln-eyebrow"${alt ? '' : ed('eyebrow.text')}>${esc(st.eyebrow.text)}</p>\n` : ''}      <${alt ? 'p' : tag} class="ln-head"${alt ? '' : ed('head.text')}>${rich(alt ? H.alt : H.text)}</${alt ? 'p' : tag}>
+${st.sub.show ? `      <p class="ln-sub"${alt ? '' : ed('sub.text')}>${esc(st.sub.text)}</p>\n` : ''}${st.btn.show ? `      <${alt ? 'span' : `a href="${esc(st.btn.href)}"`} class="ln-btn"><span${alt ? '' : ed('btn.text')}>${esc(st.btn.text)}</span></${alt ? 'span' : 'a'}>\n` : ''}    </div>`;
+    return `<section class="hw-hero hw-${st.id}"${a('section')}>
+  <div class="ln-layer ln-base"${preview ? ' data-img="base.src"' : ''}>
+    <img class="ln-img" src="${esc(src(st.base.src))}" alt="" aria-hidden="true">
+    ${inner(false)}
+  </div>
+  <div class="ln-layer ln-reveal" aria-hidden="true">
+    <img class="ln-img" src="${esc(src(st.reveal.src))}" alt="">
+    ${inner(true)}
+  </div>
+  <div class="ln-ring" aria-hidden="true"></div>
+</section>`;
+  }
+  // lens: follows the pointer (eased), grows while pressed, drifts by itself when idle; paused off screen
+  function run(root, o){
+    var W = root.ownerDocument.defaultView, rv = root.querySelector('.ln-reveal'), ring = root.querySelector('.ln-ring');
+    if (!rv) return function(){};
+    var reduce = W.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var size = function(){ return W.matchMedia('(max-width:767px)').matches ? o.rm : o.rd; };
+    var w = root.clientWidth, h = root.clientHeight;
+    var x = w * .62, y = h * .5, r = 0, tx = x, ty = y, tr = 0, hover = false, down = false, t0 = W.performance.now(), raf = 0, vis = true, io = null;
+    function paint(){
+      rv.style.setProperty('--x', x.toFixed(1) + 'px'); rv.style.setProperty('--y', y.toFixed(1) + 'px'); rv.style.setProperty('--r', Math.max(0, r).toFixed(1) + 'px');
+      if (ring){ ring.style.width = ring.style.height = (2 * r).toFixed(1) + 'px'; ring.style.transform = 'translate3d(' + (x - r).toFixed(1) + 'px,' + (y - r).toFixed(1) + 'px,0)'; ring.style.opacity = r > 4 ? '.85' : '0'; }
+    }
+    // static lens (animation off · gallery thumbnails)
+    if (o.on === false){ r = size(); paint(); return function(){}; }
+    function idleTarget(){
+      var t = (W.performance.now() - t0) / 1000;
+      tx = w * (.55 + .25 * Math.sin(t * .37)); ty = h * (.5 + .2 * Math.sin(t * .61 + 1.3)); tr = size() * .85;
+    }
+    function loop(){
+      raf = 0;
+      if (!hover){ if (o.idle && !reduce) idleTarget(); else tr = o.idle ? size() * .85 : 0; }
+      var k = reduce ? 1 : o.ease;
+      x += (tx - x) * k; y += (ty - y) * k; r += (tr - r) * (reduce ? 1 : .14);
+      paint();
+      if (vis) raf = W.requestAnimationFrame(loop);
+    }
+    function start(){ if (!raf && vis) raf = W.requestAnimationFrame(loop); }
+    function pos(e){ var b = root.getBoundingClientRect(); tx = e.clientX - b.left; ty = e.clientY - b.top; }
+    var onMove = function(e){ pos(e); hover = true; tr = size() * (down ? o.press : 1); start(); };
+    var onLeave = function(){ hover = false; down = false; start(); };
+    var onDown = function(e){ pos(e); hover = true; down = true; tr = size() * o.press; start(); };
+    var onUp = function(){ down = false; if (hover) tr = size(); };
+    var onResize = function(){ w = root.clientWidth; h = root.clientHeight; };
+    root.addEventListener('pointermove', onMove); root.addEventListener('pointerleave', onLeave);
+    root.addEventListener('pointerdown', onDown); W.addEventListener('pointerup', onUp); W.addEventListener('resize', onResize);
+    if (o.idle){ x = w * .55; y = h * .5; }
+    io = new W.IntersectionObserver(function(es){ vis = es[0].isIntersecting; if (vis) start(); }, {threshold:0});
+    io.observe(root); start();
+    return function(){
+      if (raf) W.cancelAnimationFrame(raf); raf = 0; vis = false; io.disconnect();
+      root.removeEventListener('pointermove', onMove); root.removeEventListener('pointerleave', onLeave);
+      root.removeEventListener('pointerdown', onDown); W.removeEventListener('pointerup', onUp); W.removeEventListener('resize', onResize);
+    };
+  }
+  const cfg = st => ({rd:st.lens.size.d, rm:st.lens.size.m, press:st.lens.press, ease:st.lens.ease, idle:st.lens.idle});
+  return {
+    key:'lens', cat:'hero', group:'hover', no:'H04', title:'Reveal Lens', sub:'커서를 따라오는 렌즈 속에 숨은 두 번째 장면',
+    swatch:'radial-gradient(circle at 62% 50%,#D3D3D3 0 26%,transparent 27%),linear-gradient(135deg,#2D2D2D,#0C0C0C)',
+    defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
+    header:()=>0, bp:()=>767,
+    drag:{}, selectGroup:{section:'base', text:'head'},
+    multiline:/^(head\.text|sub\.text)$/, rich:/^head\.text$/,
+    note:''
+  };
+})();
+
+/* =====================================================================
+   Content 10 · Image Trail (original design)
+   moving the cursor leaves a trail of images that pop in and fade away
+   ===================================================================== */
+const TRAIL = (() => {
+  const stack = f => `'${f}','Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif`;
+  const KINDS = ['photo', 'dark', 'art', 'photo', 'dark', 'art'];
+  const ITEMS = KINDS.map((k, i) => ({img:PH(k, `TRAIL 0${i + 1}`, 600, 750)}));
+  const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<em>$1</em>').replace(/\n/g, '<br>');
+  const defaults = () => ({
+    id: uid(),
+    layout:{bg:'#F2F2F2', vh:90, minH:620, padY:R(120,80), maxW:1000, align:'center'},
+    head:{eyebrow:'IMAGE TRAIL', text:'커서를 움직이면\n이미지가 따라 남아요', font:'Pretendard Variable', color:'#111111', em:'#111111', min:36, vw:5.2, max:104, lh:1.1, ls:-.03},
+    sub:{show:true, text:'마우스를 움직이는 길을 따라 이미지가 하나씩 나타났다가 사라져요.', color:'#555555', size:R(18,15)},
+    items:JSON.parse(JSON.stringify(ITEMS)),
+    trail:{w:R(220,130), ratio:'4/5', radius:6, gap:90, life:1100, rotate:8, gray:true, front:false}
+  });
+  const groups = [
+    {id:'layout', title:'섹션', fields:[
+      {k:'layout.bg', l:'배경색', t:'color'},
+      A('layout.vh','높이 (화면 높이 대비)',30,100,1,'vh'), A('layout.minH','최소 높이',0,1200,10,'px'),
+      A('layout.padY','위아래 여백',0,300,1,'px',{r:1}), A('layout.maxW','문구 최대 너비',320,1600,10,'px'),
+      {k:'layout.align', l:'정렬', t:'align'}
+    ]},
+    {id:'head', title:'제목 · 설명', fields:[
+      {k:'head.eyebrow', l:'작은 제목 (비우면 숨김)', t:'text'},
+      {k:'head.text', l:'제목 (줄바꿈 · **강조**)', t:'textarea'},
+      {k:'head.font', l:'글꼴', t:'select', opts:fontOpts},
+      {k:'head.color', l:'글자색', t:'color'}, {k:'head.em', l:'강조색', t:'color'},
+      ...sizeFields('head'), A('head.lh','줄 간격',.8,2,.01,'×'), A('head.ls','자간',-.1,.2,.005,'em'),
+      {k:'sub.show', l:'설명 표시', t:'toggle'}, {k:'sub.text', l:'설명 (줄바꿈)', t:'textarea'},
+      {k:'sub.color', l:'설명 색', t:'color'}, A('sub.size','설명 크기',11,32,1,'px',{r:1})
+    ]},
+    {id:'items', title:'이미지 목록', fields:[
+      {k:'items', l:'이미지', t:'list', item:'이미지', orig:ITEMS,
+       cols:[{k:'img', l:'이미지', t:'img'}],
+       blank:{img:''}}
+    ]},
+    {id:'trail', title:'따라오는 이미지', fields:[
+      A('trail.w','이미지 너비',60,500,1,'px',{r:1}),
+      {k:'trail.ratio', l:'이미지 비율', t:'select', opts:[['4/5','4:5'],['3/4','3:4'],['1/1','1:1'],['4/3','4:3'],['16/9','16:9']]},
+      A('trail.radius','모서리',0,40,1,'px'),
+      A('trail.gap','이미지 사이 거리',20,300,1,'px',{hint:'커서가 이만큼 움직일 때마다 이미지가 하나씩 나타나요.'}),
+      A('trail.life','머무는 시간',300,3000,50,'ms'), A('trail.rotate','무작위 기울기',0,30,1,'°'),
+      {k:'trail.gray', l:'이미지를 흑백으로', t:'toggle'},
+      {k:'trail.front', l:'이미지가 글자 위로 지나가기', t:'toggle'}
+    ]}
+  ];
+  const fonts = st => [st.head.font, 'Pretendard Variable'];
+  function css(st){
+    const C = '.hw-'+st.id, L = st.layout, H = st.head, S = st.sub, TR = st.trail;
+    const items = {left:'flex-start', center:'center', right:'flex-end'}[L.align];
+    const img = w => `width:${w}px;aspect-ratio:${TR.ratio}`;
+    return `${C}{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:max(${L.minH}px, ${L.vh}svh);margin:0;padding:${L.padY.d}px 24px;background:${L.bg};font-family:${stack(H.font)};-webkit-font-smoothing:antialiased;touch-action:pan-y}
+${C} *{box-sizing:border-box;margin:0;padding:0}
+${C} .tr-stage{position:absolute;inset:0;z-index:${TR.front ? 3 : 0};pointer-events:none}
+${C} .tr-stage img{position:absolute;left:0;top:0;${img(TR.w.d)};max-width:none;height:auto;object-fit:cover;border-radius:${TR.radius}px;opacity:0;will-change:transform,opacity;${TR.gray ? 'filter:grayscale(1);' : ''}}
+${C} .tr-pool{display:none}
+${C} .tr-inner{position:relative;z-index:2;width:100%;max-width:${L.maxW}px;display:flex;flex-direction:column;align-items:${items};text-align:${L.align};pointer-events:none}
+${C} .tr-inner a,${C} .tr-inner [data-edit]{pointer-events:auto}
+${C} .tr-eyebrow{margin-bottom:20px;font-size:13px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:${H.color};opacity:.6}
+${C} .tr-title{font-family:${stack(H.font)};font-size:${clampF(H)};font-weight:800;line-height:${H.lh};letter-spacing:${H.ls}em;color:${H.color};word-break:keep-all}
+${C} .tr-title em{font-style:normal;color:${H.em}}
+${C} .tr-sub{margin-top:24px;font-size:${S.size.d}px;line-height:1.65;color:${S.color};word-break:keep-all}
+@media (max-width:767px){${C}{padding:${L.padY.m}px 20px}${C} .tr-stage img{${img(TR.w.m)}}${C} .tr-eyebrow{margin-bottom:14px}${C} .tr-sub{margin-top:16px;font-size:${S.size.m}px}}`;
+  }
+  function html(st, {preview=false}={}){
+    const a = k => preview ? ` data-el="${k}"` : '', ed = p => preview ? ` data-edit="${p}"` : '';
+    const src = s => preview ? pv(s) : s, H = st.head;
+    const pool = st.items.filter(it => it.img).map(it => `<img src="${esc(src(it.img))}" alt="">`).join('');
+    return `<section class="hw-hero hw-${st.id}"${a('section')}>
+  <div class="tr-stage" aria-hidden="true"></div>
+  <div class="tr-pool" aria-hidden="true">${pool}</div>
+  <div class="tr-inner"${a('text')}>
+${H.eyebrow ? `    <p class="tr-eyebrow"${ed('head.eyebrow')}>${esc(H.eyebrow)}</p>\n` : ''}    <h2 class="tr-title"${ed('head.text')}>${rich(H.text)}</h2>
+${st.sub.show ? `    <p class="tr-sub"${ed('sub.text')}>${rich(st.sub.text)}</p>\n` : ''}  </div>
+</section>`;
+  }
+  // a small pool of <img> is reused round-robin; each spawn plays a short pop-in / fade-out
+  function run(root, o){
+    var W = root.ownerDocument.defaultView, stage = root.querySelector('.tr-stage');
+    var srcs = Array.prototype.slice.call(root.querySelectorAll('.tr-pool img')).map(function(i){ return i.getAttribute('src'); });
+    if (!stage || !srcs.length) return function(){};
+    var reduce = W.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var N = Math.max(12, srcs.length * 2), els = [], k = 0, s = 0, z = 1, lx = null, ly = null;
+    for (var i = 0; i < N; i++){ var im = root.ownerDocument.createElement('img'); im.alt = ''; stage.appendChild(im); els.push(im); }
+    function place(el, x, y, rot){ el.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0) translate(-50%,-50%) rotate(' + rot.toFixed(1) + 'deg)'; }
+    // static trail (animation off · gallery thumbnails)
+    if (o.on === false){
+      var w = root.clientWidth, h = root.clientHeight, m = Math.min(5, N);
+      for (var j = 0; j < m; j++){
+        var el = els[j]; el.src = srcs[j % srcs.length]; el.style.zIndex = j + 1; el.style.opacity = String(.35 + .65 * (j + 1) / m);
+        place(el, w * (.14 + .17 * j), h * (.72 - .1 * j - .04 * Math.sin(j)), (j % 2 ? -1 : 1) * o.rotate * .6);
+      }
+      return function(){ els.forEach(function(e){ e.remove(); }); };
+    }
+    function spawn(x, y){
+      var el = els[k], base; k = (k + 1) % N;
+      el.src = srcs[s]; s = (s + 1) % srcs.length;
+      el.style.zIndex = String(z++);
+      var rot = (Math.random() * 2 - 1) * o.rotate;
+      place(el, x, y, rot); base = el.style.transform;
+      if (el.getAnimations) el.getAnimations().forEach(function(a){ a.cancel(); });
+      if (!el.animate){ el.style.opacity = '1'; return; }
+      el.animate(reduce ? [{opacity:0}, {opacity:1, offset:.15}, {opacity:1, offset:.7}, {opacity:0}] : [
+        {opacity:0, transform:base + ' scale(.55)'},
+        {opacity:1, transform:base + ' scale(1)', offset:.18},
+        {opacity:1, transform:base + ' scale(1)', offset:.68},
+        {opacity:0, transform:base + ' translateY(24px) scale(.9)'}
+      ], {duration:o.life, easing:'cubic-bezier(.22,.61,.36,1)', fill:'forwards'});
+    }
+    var move = function(e){
+      var b = root.getBoundingClientRect(), x = e.clientX - b.left, y = e.clientY - b.top;
+      if (lx === null){ lx = x; ly = y; spawn(x, y); return; }
+      var dx = x - lx, dy = y - ly, d = Math.sqrt(dx * dx + dy * dy);
+      if (d >= o.gap){ lx = x; ly = y; spawn(x, y); }
+    };
+    var down = function(e){ var b = root.getBoundingClientRect(); lx = e.clientX - b.left; ly = e.clientY - b.top; spawn(lx, ly); };
+    var leave = function(){ lx = ly = null; };
+    root.addEventListener('pointermove', move); root.addEventListener('pointerdown', down); root.addEventListener('pointerleave', leave);
+    return function(){
+      root.removeEventListener('pointermove', move); root.removeEventListener('pointerdown', down); root.removeEventListener('pointerleave', leave);
+      els.forEach(function(e){ e.remove(); });
+    };
+  }
+  const cfg = st => ({gap:st.trail.gap, life:st.trail.life, rotate:st.trail.rotate});
+  return {
+    key:'trail', cat:'content', group:'hover', no:'C10', title:'Image Trail', sub:'커서가 지나간 길을 따라 이미지가 나타났다 사라지는 섹션',
+    swatch:'linear-gradient(135deg,#F2F2F2 0 30%,#BDBDBD 30% 46%,#F2F2F2 46% 54%,#7A7A7A 54% 70%,#F2F2F2 70%)',
+    defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
+    header:()=>0, bp:()=>767,
+    drag:{}, selectGroup:{section:'trail', text:'head'},
+    multiline:/^(head\.text|sub\.text)$/, rich:/^(head\.text|sub\.text)$/,
+    note:''
+  };
+})();
+
+/* =====================================================================
+   Content 11 · Tilt Cards (original design)
+   cards tilt toward the cursor in 3D with a moving glare; the other cards step back
+   ===================================================================== */
+const TILT = (() => {
+  const stack = f => `'${f}','Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif`;
+  const ITEMS = [1,2,3].map(i => ({img:PH('art', `CARD 0${i}`, 800, 600), tag:`카테고리 0${i}`, title:`카드 제목 0${i}`, desc:'카드를 설명하는 첫 번째 줄\n두 번째 줄 설명을 입력하세요.', href:''}));
+  const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<em>$1</em>').replace(/\n/g, '<br>');
+  const defaults = () => ({
+    id: uid(),
+    layout:{bg:'#F2F2F2', padT:R(120,72), padB:R(120,72), maxW:1280, side:R(40,20)},
+    head:{show:true, eyebrow:'TILT CARDS', text:'움직임에 반응하는\n**입체 카드**', font:'Pretendard Variable', color:'#111111', accent:'#111111', min:28, vw:3, max:52, mb:R(64,36), align:'center'},
+    items:JSON.parse(JSON.stringify(ITEMS)),
+    card:{cols:3, gap:R(28,16), radius:24, bg:'#FFFFFF', title:'#111111', desc:'#555555', tagBg:'#EDEDED', tagFg:'#111111', ratio:'4/3', pad:28},
+    tilt:{max:10, scale:1.03, depth:12, glare:true, glareA:.35, dim:true, ease:.14}
+  });
+  const groups = [
+    {id:'layout', title:'섹션', fields:[
+      {k:'layout.bg', l:'배경색', t:'color'},
+      A('layout.padT','위 여백',0,300,1,'px',{r:1}), A('layout.padB','아래 여백',0,300,1,'px',{r:1}),
+      A('layout.maxW','최대 너비',600,2000,10,'px'), A('layout.side','좌우 여백',0,120,1,'px',{r:1})
+    ]},
+    {id:'head', title:'제목', fields:[
+      {k:'head.show', l:'제목 표시', t:'toggle'}, {k:'head.eyebrow', l:'작은 제목', t:'text'},
+      {k:'head.text', l:'제목 (줄바꿈 · **강조**)', t:'textarea'},
+      {k:'head.font', l:'글꼴', t:'select', opts:fontOpts},
+      {k:'head.color', l:'글자색', t:'color'}, {k:'head.accent', l:'강조색', t:'color'},
+      ...sizeFields('head'), A('head.mb','제목과 카드 간격',0,160,1,'px',{r:1}), {k:'head.align', l:'정렬', t:'align'}
+    ]},
+    {id:'items', title:'카드 목록', fields:[
+      {k:'items', l:'카드', t:'list', item:'카드', orig:ITEMS,
+       cols:[{k:'img', l:'이미지', t:'img'}, {k:'tag', l:'태그 (비우면 숨김)', t:'text'}, {k:'title', l:'제목', t:'text'},
+             {k:'desc', l:'설명 (줄바꿈 · **굵게**)', t:'textarea'}, {k:'href', l:'연결 주소 (비우면 링크 없음)', t:'text'}],
+       blank:{img:'', tag:'카테고리', title:'새 카드', desc:'설명을 입력하세요.', href:''}}
+    ]},
+    {id:'card', title:'카드 디자인', fields:[
+      A('card.cols','한 줄에 카드 수',1,4,1,'개'), A('card.gap','카드 간격',0,80,1,'px',{r:1}),
+      A('card.radius','모서리',0,48,1,'px'), A('card.pad','안쪽 여백',12,60,1,'px'),
+      {k:'card.ratio', l:'이미지 비율', t:'select', opts:[['4/3','4:3'],['3/2','3:2'],['1/1','1:1'],['16/9','16:9'],['3/4','3:4']]},
+      {k:'card.bg', l:'카드 색', t:'color'}, {k:'card.title', l:'제목 색', t:'color'}, {k:'card.desc', l:'설명 색', t:'color'},
+      {k:'card.tagBg', l:'태그 바탕', t:'color'}, {k:'card.tagFg', l:'태그 글자', t:'color'}
+    ]},
+    {id:'tilt', title:'기울기 효과', fields:[
+      A('tilt.max','최대 기울기',0,30,1,'°'), A('tilt.scale','올렸을 때 크기',1,1.15,.005,'×'),
+      A('tilt.depth','이미지 안쪽 움직임',0,40,1,'px',{hint:'카드가 기울 때 이미지가 프레임 안에서 반대쪽으로 살짝 움직여요.'}),
+      {k:'tilt.glare', l:'빛 반사', t:'toggle'}, A('tilt.glareA','빛 반사 세기',0,1,.01,''),
+      {k:'tilt.dim', l:'다른 카드 흐리게', t:'toggle'},
+      A('tilt.ease','따라오는 속도',.04,1,.01,'')
+    ]}
+  ];
+  const fonts = st => [st.head.font, 'Pretendard Variable'];
+  function css(st){
+    const C = '.hw-'+st.id, L = st.layout, H = st.head, K = st.card, T_ = st.tilt;
+    return `${C}{background:${L.bg};margin:0;padding:${L.padT.d}px 0 ${L.padB.d}px;font-family:${stack(H.font)};-webkit-font-smoothing:antialiased}
+${C} *{box-sizing:border-box;margin:0;padding:0}
+${C} .tc-inner{max-width:${L.maxW}px;margin:0 auto;padding:0 ${L.side.d}px}
+${C} .tc-head{margin-bottom:${H.mb.d}px;text-align:${H.align};color:${H.color}}
+${C} .tc-eyebrow{margin-bottom:14px;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:${H.color};opacity:.6}
+${C} .tc-title{font-family:${stack(H.font)};font-size:${clampF(H)};font-weight:800;line-height:1.2;letter-spacing:-.02em;word-break:keep-all}
+${C} .tc-title em{font-style:normal;color:${H.accent}}
+${C} .tc-grid{display:grid;grid-template-columns:repeat(${K.cols},minmax(0,1fr));gap:${K.gap.d}px;perspective:1200px}
+${C} .tc-card{position:relative;display:block;border-radius:${K.radius}px;background:${K.bg};color:inherit;text-decoration:none;will-change:transform;backface-visibility:hidden;
+  transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) scale(var(--s,1));
+  box-shadow:calc(var(--sx,0) * 1px) calc(18px + var(--sy,0) * 1px) 40px -18px rgba(19,19,19,.28);transition:opacity .4s,filter .4s}
+${C} .tc-media{position:relative;display:block;margin:${K.pad * .5}px ${K.pad * .5}px 0;border-radius:${Math.max(0, K.radius - K.pad * .5)}px;overflow:hidden;aspect-ratio:${K.ratio};background:#E5E5E5;isolation:isolate}
+${C} .tc-media img{display:block;width:100%;height:100%;max-width:none;object-fit:cover;transform:translate3d(var(--ix,0px),var(--iy,0px),0) scale(${T_.depth ? (1 + T_.depth / 110).toFixed(3) : 1})}
+${C} .tc-body{padding:${K.pad * .8}px ${K.pad}px ${K.pad}px}
+${C} .tc-tag{display:inline-block;margin-bottom:12px;padding:5px 10px;border-radius:999px;background:${K.tagBg};color:${K.tagFg};font-size:12px;font-weight:700}
+${C} .tc-ctitle{font-size:22px;font-weight:800;line-height:1.3;letter-spacing:-.01em;color:${K.title}}
+${C} .tc-desc{margin-top:8px;font-size:15px;line-height:1.6;color:${K.desc};word-break:keep-all}
+${C} .tc-desc em{font-style:normal;font-weight:700;color:${K.title}}
+${C} .tc-glare{position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:var(--go,0);background:radial-gradient(circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,${T_.glareA}),rgba(255,255,255,0) 60%);${T_.glare ? '' : 'display:none;'}}
+${T_.dim ? `${C} .tc-grid.is-hover .tc-card:not(.is-on){opacity:.55;filter:saturate(.6)}` : ''}
+@media (max-width:1023px){${C} .tc-grid{grid-template-columns:repeat(${Math.min(K.cols, 2)},minmax(0,1fr))}}
+@media (max-width:767px){${C}{padding:${L.padT.m}px 0 ${L.padB.m}px}${C} .tc-inner{padding:0 ${L.side.m}px}${C} .tc-head{margin-bottom:${H.mb.m}px}${C} .tc-grid{grid-template-columns:1fr;gap:${K.gap.m}px}}`;
+  }
+  function html(st, {preview=false}={}){
+    const a = k => preview ? ` data-el="${k}"` : '', ed = p => preview ? ` data-edit="${p}"` : '';
+    const src = s => preview ? pv(s) : s, H = st.head;
+    const cards = st.items.map((it, i) => {
+      const tag = it.href ? `a href="${esc(it.href)}"` : 'div';
+      return `<${tag} class="tc-card">
+      <div class="tc-media">${it.img ? `<img src="${esc(src(it.img))}" alt=""${preview ? ` data-img="items.${i}.img"` : ''}>` : ''}</div>
+      <div class="tc-body">
+        ${it.tag ? `<span class="tc-tag"${ed('items.'+i+'.tag')}>${esc(it.tag)}</span>` : ''}
+        <h3 class="tc-ctitle"${ed('items.'+i+'.title')}>${esc(it.title)}</h3>
+        <p class="tc-desc"${ed('items.'+i+'.desc')}>${rich(it.desc)}</p>
+      </div>
+      <div class="tc-glare" aria-hidden="true"></div>
+    </${it.href ? 'a' : 'div'}>`;
+    }).join('\n    ');
+    return `<section class="hw-hero hw-${st.id}"${a('section')}>
+  <div class="tc-inner">
+${H.show ? `    <div class="tc-head"${a('head')}>${H.eyebrow ? `<p class="tc-eyebrow"${ed('head.eyebrow')}>${esc(H.eyebrow)}</p>` : ''}<h2 class="tc-title"${ed('head.text')}>${rich(H.text)}</h2></div>\n` : ''}    <div class="tc-grid"${a('items')}>
+    ${cards}
+    </div>
+  </div>
+</section>`;
+  }
+  // each card eases toward a tilt computed from the pointer position; mouse / pen only
+  function run(root, o){
+    var W = root.ownerDocument.defaultView, grid = root.querySelector('.tc-grid');
+    var cards = Array.prototype.slice.call(root.querySelectorAll('.tc-card'));
+    if (!grid || !cards.length || W.matchMedia('(prefers-reduced-motion: reduce)').matches) return function(){};
+    var st = cards.map(function(){ return {rx:0, ry:0, s:1, g:0, ix:0, iy:0, tx:0, ty:0, ts:1, tg:0, tix:0, tiy:0, gx:50, gy:50}; });
+    var raf = 0, offs = [];
+    function frame(){
+      raf = 0; var busy = false;
+      cards.forEach(function(c, i){
+        var q = st[i], k = o.ease;
+        q.rx += (q.tx - q.rx) * k; q.ry += (q.ty - q.ry) * k; q.s += (q.ts - q.s) * k; q.g += (q.tg - q.g) * k;
+        q.ix += (q.tix - q.ix) * k; q.iy += (q.tiy - q.iy) * k;
+        if (Math.abs(q.tx - q.rx) + Math.abs(q.ty - q.ry) + Math.abs(q.ts - q.s) * 50 + Math.abs(q.tg - q.g) > .02) busy = true;
+        c.style.setProperty('--rx', q.rx.toFixed(2) + 'deg'); c.style.setProperty('--ry', q.ry.toFixed(2) + 'deg');
+        c.style.setProperty('--s', q.s.toFixed(4)); c.style.setProperty('--go', q.g.toFixed(3));
+        c.style.setProperty('--gx', q.gx.toFixed(1) + '%'); c.style.setProperty('--gy', q.gy.toFixed(1) + '%');
+        c.style.setProperty('--sx', (-q.ry * 1.4).toFixed(1)); c.style.setProperty('--sy', (q.rx * 1.4).toFixed(1));
+        c.style.setProperty('--ix', q.ix.toFixed(2) + 'px'); c.style.setProperty('--iy', q.iy.toFixed(2) + 'px');
+      });
+      if (busy) raf = W.requestAnimationFrame(frame);
+    }
+    function kick(){ if (!raf) raf = W.requestAnimationFrame(frame); }
+    cards.forEach(function(c, i){
+      var q = st[i];
+      var move = function(e){
+        if (e.pointerType === 'touch') return;
+        var b = c.getBoundingClientRect(), px = (e.clientX - b.left) / b.width, py = (e.clientY - b.top) / b.height;
+        q.tx = (.5 - py) * 2 * o.max; q.ty = (px - .5) * 2 * o.max; q.ts = o.scale; q.tg = 1; q.gx = px * 100; q.gy = py * 100;
+        q.tix = -(px - .5) * 2 * o.depth; q.tiy = -(py - .5) * 2 * o.depth;
+        c.classList.add('is-on'); grid.classList.add('is-hover'); kick();
+      };
+      var leave = function(){ q.tx = 0; q.ty = 0; q.ts = 1; q.tg = 0; q.tix = 0; q.tiy = 0; c.classList.remove('is-on'); kick(); };
+      c.addEventListener('pointermove', move); c.addEventListener('pointerleave', leave);
+      offs.push(function(){ c.removeEventListener('pointermove', move); c.removeEventListener('pointerleave', leave); });
+    });
+    var out = function(){ grid.classList.remove('is-hover'); };
+    grid.addEventListener('pointerleave', out); offs.push(function(){ grid.removeEventListener('pointerleave', out); });
+    return function(){ if (raf) W.cancelAnimationFrame(raf); offs.forEach(function(f){ f(); }); };
+  }
+  const cfg = st => ({max:st.tilt.max, scale:st.tilt.scale, ease:st.tilt.ease, depth:st.tilt.depth});
+  return {
+    key:'tilt', cat:'content', group:'hover', no:'C11', title:'Tilt Cards', sub:'커서 쪽으로 기울어지는 입체 카드 + 빛 반사',
+    swatch:'linear-gradient(160deg,#F4F4F4 0 30%,#FFFFFF 30% 70%,#606060 70%)',
+    defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
+    header:()=>0, bp:()=>767,
+    drag:{}, selectGroup:{section:'layout', head:'head', items:'items'},
+    multiline:/^(head\.text|items\.\d+\.desc)$/, rich:/^(head\.text|items\.\d+\.desc)$/,
+    note:''
+  };
+})();
+
+/* =====================================================================
+   Content 12 · Hover List (original design)
+   large text rows; the hovered row fills in and a preview image follows the cursor
+   ===================================================================== */
+const HLIST = (() => {
+  const stack = f => `'${f}','Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif`;
+  const KINDS = ['photo', 'dark', 'art', 'photo', 'dark'];
+  const ITEMS = [1,2,3,4,5].map(i => ({title:`프로젝트 이름 0${i}`, meta:`카테고리 · 202${6 - (i % 3)}`, img:PH(KINDS[i-1], `PREVIEW 0${i}`, 800, 1000), href:'#'}));
+  const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<em>$1</em>').replace(/\n/g, '<br>');
+  const defaults = () => ({
+    id: uid(),
+    layout:{bg:'#F2F2F2', padT:R(120,72), padB:R(120,72), maxW:1440, side:R(40,20)},
+    head:{show:true, eyebrow:'SELECTED WORKS', text:'호버하면 미리보기가\n**따라오는** 리스트', font:'Pretendard Variable', color:'#141414', accent:'#141414', min:28, vw:3, max:52, mb:R(56,32)},
+    items:JSON.parse(JSON.stringify(ITEMS)),
+    row:{size:R(56,26), weight:'700', color:'#141414', meta:'#757575', line:'#141414', lineA:.2, padY:R(26,18), fill:'#141414', fillFg:'#F2F2F2', shift:28, numbers:true},
+    preview:{show:true, w:300, h:380, radius:14, ease:.15, tilt:true}
+  });
+  const groups = [
+    {id:'layout', title:'섹션', fields:[
+      {k:'layout.bg', l:'배경색', t:'color'},
+      A('layout.padT','위 여백',0,300,1,'px',{r:1}), A('layout.padB','아래 여백',0,300,1,'px',{r:1}),
+      A('layout.maxW','최대 너비',600,2000,10,'px'), A('layout.side','좌우 여백',0,120,1,'px',{r:1})
+    ]},
+    {id:'head', title:'제목', fields:[
+      {k:'head.show', l:'제목 표시', t:'toggle'}, {k:'head.eyebrow', l:'작은 제목', t:'text'},
+      {k:'head.text', l:'제목 (줄바꿈 · **강조**)', t:'textarea'},
+      {k:'head.font', l:'글꼴', t:'select', opts:fontOpts},
+      {k:'head.color', l:'글자색', t:'color'}, {k:'head.accent', l:'강조색', t:'color'},
+      ...sizeFields('head'), A('head.mb','제목과 목록 간격',0,160,1,'px',{r:1})
+    ]},
+    {id:'items', title:'목록', fields:[
+      {k:'items', l:'항목', t:'list', item:'항목', orig:ITEMS,
+       cols:[{k:'title', l:'이름', t:'text'}, {k:'meta', l:'보조 정보 (분류 · 연도 등)', t:'text'}, {k:'img', l:'미리보기 이미지', t:'img'}, {k:'href', l:'연결 주소', t:'text'}],
+       blank:{title:'새 항목', meta:'카테고리 · 2026', img:'', href:'#'}}
+    ]},
+    {id:'row', title:'줄 디자인', fields:[
+      A('row.size','이름 크기',14,120,1,'px',{r:1}), {k:'row.weight', l:'이름 굵기', t:'select', opts:weightOpts},
+      {k:'row.color', l:'이름 색', t:'color'}, {k:'row.meta', l:'보조 정보 색', t:'color'},
+      {k:'row.line', l:'구분선 색', t:'color'}, A('row.lineA','구분선 진하기',0,1,.01,''),
+      A('row.padY','줄 위아래 여백',4,80,1,'px',{r:1}),
+      {sub:'마우스를 올렸을 때'},
+      {k:'row.fill', l:'채워지는 색', t:'color'}, {k:'row.fillFg', l:'채워졌을 때 글자색', t:'color'},
+      A('row.shift','이름이 밀려나는 거리',0,120,1,'px'),
+      {k:'row.numbers', l:'번호 표시', t:'toggle'}
+    ]},
+    {id:'preview', title:'따라오는 미리보기', fields:[
+      {k:'preview.show', l:'미리보기 이미지 표시', t:'toggle', hint:'터치 화면에서는 줄마다 작은 이미지로 보여요.'},
+      A('preview.w','너비',120,600,1,'px'), A('preview.h','높이',120,700,1,'px'), A('preview.radius','모서리',0,48,1,'px'),
+      A('preview.ease','따라오는 속도',.04,1,.01,''), {k:'preview.tilt', l:'움직이는 방향으로 살짝 기울이기', t:'toggle'}
+    ]}
+  ];
+  const fonts = st => [st.head.font, 'Pretendard Variable'];
+  function css(st){
+    const C = '.hw-'+st.id, L = st.layout, H = st.head, RW = st.row, P = st.preview;
+    const ease = 'cubic-bezier(.65,.05,.25,1)';
+    return `${C}{position:relative;overflow:hidden;background:${L.bg};margin:0;padding:${L.padT.d}px 0 ${L.padB.d}px;font-family:${stack(H.font)};-webkit-font-smoothing:antialiased}
+${C} *{box-sizing:border-box;margin:0;padding:0}
+${C} .hl-inner{max-width:${L.maxW}px;margin:0 auto;padding:0 ${L.side.d}px}
+${C} .hl-head{margin-bottom:${H.mb.d}px;color:${H.color}}
+${C} .hl-eyebrow{margin-bottom:14px;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:${H.color};opacity:.6}
+${C} .hl-title{font-family:${stack(H.font)};font-size:${clampF(H)};font-weight:800;line-height:1.2;letter-spacing:-.02em;word-break:keep-all}
+${C} .hl-title em{font-style:normal;color:${H.accent}}
+${C} .hl-list{list-style:none;border-bottom:1px solid ${rgba(RW.line, RW.lineA)}}
+${C} .hl-row{position:relative;isolation:isolate;display:grid;grid-template-columns:${RW.numbers ? 'auto ' : ''}minmax(0,1fr) auto auto;align-items:center;gap:28px;padding:${RW.padY.d}px 20px;border-top:1px solid ${rgba(RW.line, RW.lineA)};color:${RW.color};text-decoration:none;overflow:hidden}
+${C} .hl-row::before{content:"";position:absolute;inset:0;z-index:-1;background:${RW.fill};transform:scaleY(0);transform-origin:50% 100%;transition:transform .55s ${ease}}
+${C} .hl-num{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:14px;color:${RW.meta};transition:color .35s}
+${C} .hl-name{font-family:${stack(H.font)};font-size:${RW.size.d}px;font-weight:${RW.weight};line-height:1.1;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:transform .55s ${ease},color .35s}
+${C} .hl-meta{font-size:15px;color:${RW.meta};white-space:nowrap;transition:color .35s}
+${C} .hl-arrow{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;border:1px solid currentColor;transform:rotate(-45deg);transition:transform .55s ${ease},color .35s}
+${C} .hl-arrow svg{width:20px;height:20px}
+${C} .hl-thumb{display:none}
+@media (hover:hover){
+${C} .hl-row:hover::before,${C} .hl-row:focus-visible::before{transform:scaleY(1);transform-origin:50% 0}
+${C} .hl-row:hover,${C} .hl-row:focus-visible{color:${RW.fillFg}}
+${C} .hl-row:hover .hl-num,${C} .hl-row:hover .hl-meta{color:${rgba(RW.fillFg, .7)}}
+${C} .hl-row:hover .hl-name{transform:translateX(${RW.shift}px)}
+${C} .hl-row:hover .hl-arrow{transform:rotate(0)}
+}
+${C} .hl-float{position:absolute;left:0;top:0;z-index:5;width:${P.w}px;height:${P.h}px;border-radius:${P.radius}px;overflow:hidden;background:${rgba(RW.line, .12)};pointer-events:none;opacity:0;transform:translate3d(-999px,-999px,0);box-shadow:0 30px 60px -20px rgba(0,0,0,.45);${P.show ? '' : 'display:none;'}}
+${C} .hl-float img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;opacity:0;transform:scale(1.15);transition:opacity .35s,transform .6s ${ease}}
+${C} .hl-float img.is-on{opacity:1;transform:scale(1)}
+@media (hover:none),(max-width:767px){
+${C} .hl-float{display:none}
+${P.show ? `${C} .hl-thumb{display:block;width:56px;height:70px;border-radius:${Math.min(P.radius, 10)}px;object-fit:cover;max-width:none}` : ''}
+}
+@media (max-width:767px){
+${C}{padding:${L.padT.m}px 0 ${L.padB.m}px}
+${C} .hl-inner{padding:0 ${L.side.m}px}
+${C} .hl-head{margin-bottom:${H.mb.m}px}
+${C} .hl-row{grid-template-columns:${RW.numbers ? 'auto ' : ''}minmax(0,1fr) auto;gap:14px;padding:${RW.padY.m}px 4px}
+${C} .hl-name{font-size:${RW.size.m}px}
+${C} .hl-meta{grid-column:${RW.numbers ? 2 : 1};grid-row:2;font-size:13px;margin-top:-6px}
+${C} .hl-arrow{display:none}
+}`;
+  }
+  function html(st, {preview=false}={}){
+    const a = k => preview ? ` data-el="${k}"` : '', ed = p => preview ? ` data-edit="${p}"` : '';
+    const src = s => preview ? pv(s) : s, H = st.head, RW = st.row;
+    const ARROW = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`;
+    const rows = st.items.map((it, i) => `<li><a class="hl-row" href="${esc(it.href || '#')}" data-i="${i}">
+      ${RW.numbers ? `<span class="hl-num">${String(i + 1).padStart(2, '0')}</span>` : ''}<span class="hl-name"${ed('items.'+i+'.title')}>${esc(it.title)}</span>
+      <span class="hl-meta"${ed('items.'+i+'.meta')}>${esc(it.meta)}</span>
+      ${it.img ? `<img class="hl-thumb" src="${esc(src(it.img))}" alt="">` : ''}<span class="hl-arrow">${ARROW}</span>
+    </a></li>`).join('\n    ');
+    const imgs = st.items.map((it, i) => it.img ? `<img src="${esc(src(it.img))}" alt="" data-i="${i}"${preview ? ` data-img="items.${i}.img"` : ''}>` : '').join('');
+    return `<section class="hw-hero hw-${st.id}"${a('section')}>
+  <div class="hl-inner">
+${H.show ? `    <div class="hl-head"${a('head')}>${H.eyebrow ? `<p class="hl-eyebrow"${ed('head.eyebrow')}>${esc(H.eyebrow)}</p>` : ''}<h2 class="hl-title"${ed('head.text')}>${rich(H.text)}</h2></div>\n` : ''}    <ul class="hl-list"${a('items')}>
+    ${rows}
+    </ul>
+  </div>
+  <div class="hl-float" aria-hidden="true">${imgs}</div>
+</section>`;
+  }
+  // the preview eases toward the cursor, leans with its speed, and swaps image per row (fine pointers only)
+  function run(root, o){
+    var W = root.ownerDocument.defaultView, list = root.querySelector('.hl-list'), fl = root.querySelector('.hl-float');
+    if (!list || !fl || !W.matchMedia('(hover: hover) and (pointer: fine)').matches) return function(){};
+    var imgs = Array.prototype.slice.call(fl.querySelectorAll('img'));
+    var reduce = W.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var x = 0, y = 0, tx = 0, ty = 0, s = 0, ts = 0, rot = 0, raf = 0, placed = false, offs = [];
+    function frame(){
+      raf = 0;
+      var k = reduce ? 1 : o.ease, px = x;
+      x += (tx - x) * k; y += (ty - y) * k; s += (ts - s) * (reduce ? 1 : .18);
+      rot += ((o.tilt ? Math.max(-14, Math.min(14, (x - px) * .6)) : 0) - rot) * .2;
+      fl.style.opacity = s > .01 ? '1' : '0';
+      fl.style.transform = 'translate3d(' + (x - o.w / 2).toFixed(1) + 'px,' + (y - o.h / 2).toFixed(1) + 'px,0) rotate(' + rot.toFixed(2) + 'deg) scale(' + s.toFixed(3) + ')';
+      if (Math.abs(tx - x) + Math.abs(ty - y) + Math.abs(ts - s) * 100 + Math.abs(rot) > .05) raf = W.requestAnimationFrame(frame);
+    }
+    function kick(){ if (!raf) raf = W.requestAnimationFrame(frame); }
+    function show(i){ imgs.forEach(function(im){ im.classList.toggle('is-on', +im.dataset.i === i); }); }
+    var move = function(e){
+      if (e.pointerType === 'touch') return;
+      var b = root.getBoundingClientRect(); tx = e.clientX - b.left; ty = e.clientY - b.top;
+      if (!placed){ x = tx; y = ty; placed = true; }
+      var row = e.target.closest && e.target.closest('.hl-row');
+      if (row){ show(+row.dataset.i); ts = imgs.some(function(im){ return +im.dataset.i === +row.dataset.i; }) ? 1 : 0; }
+      kick();
+    };
+    var leave = function(){ ts = 0; placed = s > .05; kick(); };
+    list.addEventListener('pointermove', move); list.addEventListener('pointerleave', leave);
+    offs.push(function(){ list.removeEventListener('pointermove', move); list.removeEventListener('pointerleave', leave); });
+    return function(){ if (raf) W.cancelAnimationFrame(raf); offs.forEach(function(f){ f(); }); };
+  }
+  const cfg = st => ({w:st.preview.w, h:st.preview.h, ease:st.preview.ease, tilt:st.preview.tilt});
+  return {
+    key:'hlist', cat:'content', group:'hover', no:'C12', title:'Hover List', sub:'줄이 채워지고 미리보기 이미지가 커서를 따라오는 목록',
+    swatch:'linear-gradient(180deg,#F1F1F1 0 20%,#141414 20% 22%,#F1F1F1 22% 40%,#141414 40% 62%,#F1F1F1 62% 80%,#141414 80% 82%,#F1F1F1 82%)',
+    defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
+    header:()=>0, bp:()=>767,
+    drag:{}, selectGroup:{section:'layout', head:'head', items:'items'},
+    multiline:/^head\.text$/, rich:/^head\.text$/,
+    note:''
+  };
+})();
+
+/* =====================================================================
+   Content 13 · Dot Field (original design)
+   a canvas grid of dots grows, recolors and moves away around the cursor; the button leans toward the cursor
+   ===================================================================== */
+const DOTS = (() => {
+  const stack = f => `'${f}','Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif`;
+  const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<em>$1</em>').replace(/\n/g, '<br>');
+  const defaults = () => ({
+    id: uid(),
+    layout:{bg:'#080808', vh:80, minH:560, padY:R(120,80), maxW:900, align:'center'},
+    dots:{color:'#333333', accent:'#FFFFFF', gap:26, size:1.6, grow:4.5, radius:170, push:16, wave:true},
+    head:{eyebrow:'DOT FIELD', text:'커서가 지나가면\n**점들이 반응**해요', font:'Pretendard Variable', color:'#FFFFFF', accent:'#FFFFFF', min:32, vw:4.2, max:72, lh:1.18},
+    sub:{show:true, text:'배경의 점들이 마우스 위치에 따라 커지고 색이 바뀌어요.\n설명 문구를 입력하세요.', color:'#A6A6A6', size:R(18,15)},
+    btn:{show:true, text:'시작하기', href:'#', bg:'#FFFFFF', fg:'#080808', magnet:true, strength:.35}
+  });
+  const groups = [
+    {id:'layout', title:'섹션', fields:[
+      {k:'layout.bg', l:'배경색', t:'color'},
+      A('layout.vh','높이 (화면 높이 대비)',30,100,1,'vh'), A('layout.minH','최소 높이',0,1200,10,'px'),
+      A('layout.padY','위아래 여백',0,300,1,'px',{r:1}), A('layout.maxW','문구 최대 너비',320,1600,10,'px'),
+      {k:'layout.align', l:'정렬', t:'align'}
+    ]},
+    {id:'dots', title:'점 배경', fields:[
+      {k:'dots.color', l:'점 색', t:'color'}, {k:'dots.accent', l:'커서 근처 점 색', t:'color'},
+      A('dots.gap','점 간격',10,80,1,'px'), A('dots.size','점 크기',.5,6,.1,'px'), A('dots.grow','커서 근처에서 커지는 배율',1,12,.1,'×'),
+      A('dots.radius','반응 범위',40,500,1,'px'), A('dots.push','밀려나는 거리',0,60,1,'px'),
+      {k:'dots.wave', l:'가만히 있을 때 잔잔한 물결', t:'toggle'}
+    ]},
+    {id:'head', title:'제목', fields:[
+      {k:'head.eyebrow', l:'작은 제목 (비우면 숨김)', t:'text'},
+      {k:'head.text', l:'제목 (줄바꿈 · **강조**)', t:'textarea'},
+      {k:'head.font', l:'글꼴', t:'select', opts:fontOpts},
+      {k:'head.color', l:'글자색', t:'color'}, {k:'head.accent', l:'강조색', t:'color'},
+      ...sizeFields('head'), A('head.lh','줄 간격',.8,2,.01,'×')
+    ]},
+    {id:'sub', title:'설명 · 버튼', fields:[
+      {k:'sub.show', l:'설명 표시', t:'toggle'}, {k:'sub.text', l:'설명 (줄바꿈)', t:'textarea'},
+      {k:'sub.color', l:'설명 색', t:'color'}, A('sub.size','설명 크기',11,32,1,'px',{r:1}),
+      {k:'btn.show', l:'버튼 표시', t:'toggle'}, {k:'btn.text', l:'버튼 문구', t:'text'}, {k:'btn.href', l:'연결 주소', t:'text'},
+      {k:'btn.bg', l:'버튼 색', t:'color'}, {k:'btn.fg', l:'버튼 글자색', t:'color'},
+      {k:'btn.magnet', l:'버튼이 커서 쪽으로 끌려오기', t:'toggle'}, A('btn.strength','끌려오는 세기',.05,1,.01,'')
+    ]}
+  ];
+  const fonts = st => [st.head.font, 'Pretendard Variable'];
+  function css(st){
+    const C = '.hw-'+st.id, L = st.layout, H = st.head, S = st.sub, B = st.btn;
+    const items = {left:'flex-start', center:'center', right:'flex-end'}[L.align];
+    return `${C}{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:max(${L.minH}px, ${L.vh}svh);margin:0;padding:${L.padY.d}px 24px;background:${L.bg};font-family:${stack(H.font)};-webkit-font-smoothing:antialiased}
+${C} *{box-sizing:border-box;margin:0;padding:0}
+${C} .df-canvas{position:absolute;inset:0;z-index:-1;width:100%;height:100%;display:block}
+${C} .df-inner{width:100%;max-width:${L.maxW}px;display:flex;flex-direction:column;align-items:${items};text-align:${L.align}}
+${C} .df-eyebrow{margin-bottom:20px;font-size:13px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:${H.color};opacity:.6}
+${C} .df-title{font-family:${stack(H.font)};font-size:${clampF(H)};font-weight:800;line-height:${H.lh};letter-spacing:-.03em;color:${H.color};word-break:keep-all}
+${C} .df-title em{font-style:normal;color:${H.accent}}
+${C} .df-sub{margin-top:24px;font-size:${S.size.d}px;line-height:1.65;color:${S.color};word-break:keep-all}
+${C} .df-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;margin-top:44px;height:58px;padding:0 34px;border-radius:999px;background:${B.bg};color:${B.fg};font-size:16px;font-weight:700;text-decoration:none;transition:transform .5s cubic-bezier(.22,.61,.36,1),box-shadow .3s;will-change:transform}
+${C} .df-btn span{display:inline-block;transition:transform .5s cubic-bezier(.22,.61,.36,1)}
+${C} .df-btn:hover{box-shadow:0 0 0 6px ${rgba(st.dots.accent, .25)}}
+${C} .df-btn.is-pull,${C} .df-btn.is-pull span{transition:transform .12s linear}
+@media (max-width:767px){${C}{padding:${L.padY.m}px 20px}${C} .df-eyebrow{margin-bottom:14px}${C} .df-sub{margin-top:16px;font-size:${S.size.m}px}${C} .df-btn{margin-top:32px;height:50px;padding:0 26px;font-size:15px}}`;
+  }
+  function html(st, {preview=false}={}){
+    const a = k => preview ? ` data-el="${k}"` : '', ed = p => preview ? ` data-edit="${p}"` : '';
+    const H = st.head;
+    return `<section class="hw-hero hw-${st.id}"${a('section')}>
+  <canvas class="df-canvas" aria-hidden="true"></canvas>
+  <div class="df-inner"${a('text')}>
+${H.eyebrow ? `    <p class="df-eyebrow"${ed('head.eyebrow')}>${esc(H.eyebrow)}</p>\n` : ''}    <h2 class="df-title"${ed('head.text')}>${rich(H.text)}</h2>
+${st.sub.show ? `    <p class="df-sub"${ed('sub.text')}>${rich(st.sub.text)}</p>\n` : ''}${st.btn.show ? `    <a class="df-btn" href="${esc(st.btn.href)}"><span${ed('btn.text')}>${esc(st.btn.text)}</span></a>\n` : ''}  </div>
+</section>`;
+  }
+  // canvas dot grid: each dot reacts to its distance from the cursor; runs only while on screen
+  function run(root, o){
+    var W = root.ownerDocument.defaultView, cv = root.querySelector('.df-canvas');
+    if (!cv || !cv.getContext) return function(){};
+    var ctx = cv.getContext('2d'), dpr = Math.min(2, W.devicePixelRatio || 1), reduce = W.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var hex = function(h){ h = h.replace('#', ''); if (h.length === 3) h = h.replace(/./g, '$&$&'); return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]; };
+    var c0 = hex(o.color), c1 = hex(o.accent), w = 0, h = 0, pts = [], mx = -9999, my = -9999, act = 0, tact = 0, raf = 0, vis = true, t0 = W.performance.now();
+    function build(){
+      var b = root.getBoundingClientRect(); w = b.width; h = b.height;
+      cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+      pts = []; var g = o.gap, ox = (w % g) / 2, oy = (h % g) / 2;
+      for (var y = oy; y <= h; y += g) for (var x = ox; x <= w; x += g) pts.push(x, y);
+    }
+    function draw(t){
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
+      var R = o.radius, waveOn = o.wave && !reduce && o.on !== false;
+      for (var i = 0; i < pts.length; i += 2){
+        var x = pts[i], y = pts[i + 1], dx = x - mx, dy = y - my, d = Math.sqrt(dx * dx + dy * dy), f = 0;
+        if (act > 0 && d < R){ f = 1 - d / R; f = f * f * (3 - 2 * f) * act; }
+        var sz = o.size * (1 + (o.grow - 1) * f);
+        if (waveOn) sz *= 1 + .35 * Math.sin(t * 1.6 - (x + y) * .012);
+        if (f > 0 && d > 0){ x += dx / d * o.push * f; y += dy / d * o.push * f; }
+        ctx.fillStyle = f > .01 ? 'rgb(' + Math.round(c0[0] + (c1[0] - c0[0]) * f) + ',' + Math.round(c0[1] + (c1[1] - c0[1]) * f) + ',' + Math.round(c0[2] + (c1[2] - c0[2]) * f) + ')' : o.color;
+        ctx.beginPath(); ctx.arc(x, y, Math.max(.3, sz), 0, 6.2832); ctx.fill();
+      }
+    }
+    function loop(){
+      raf = 0; act += (tact - act) * .08;
+      draw((W.performance.now() - t0) / 1000);
+      if (vis && (o.wave && !reduce || Math.abs(tact - act) > .002 || tact > 0)) raf = W.requestAnimationFrame(loop);
+    }
+    function start(){ if (!raf && vis) raf = W.requestAnimationFrame(loop); }
+    build();
+    // static frame (animation off · gallery thumbnails): show the reaction at a fixed point
+    if (o.on === false){ mx = w * .68; my = h * .42; act = 1; draw(0); return function(){}; }
+    var btn = o.magnet ? root.querySelector('.df-btn') : null, inner = btn && btn.querySelector('span');
+    var move = function(e){
+      var b = root.getBoundingClientRect(); mx = e.clientX - b.left; my = e.clientY - b.top; tact = 1; start();
+      if (btn){
+        var r = btn.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, dx = e.clientX - cx, dy = e.clientY - cy;
+        if (Math.abs(dx) < r.width / 2 + 70 && Math.abs(dy) < r.height / 2 + 70){
+          btn.classList.add('is-pull');
+          btn.style.transform = 'translate(' + (dx * o.strength).toFixed(1) + 'px,' + (dy * o.strength).toFixed(1) + 'px)';
+          inner.style.transform = 'translate(' + (dx * o.strength * .45).toFixed(1) + 'px,' + (dy * o.strength * .45).toFixed(1) + 'px)';
+        } else release();
+      }
+    };
+    function release(){ if (!btn) return; btn.classList.remove('is-pull'); btn.style.transform = ''; inner.style.transform = ''; }
+    var leave = function(){ tact = 0; release(); start(); };
+    var ro = new W.ResizeObserver(function(){ build(); start(); if (!raf) draw(0); });
+    var io = new W.IntersectionObserver(function(es){ vis = es[0].isIntersecting; if (vis) start(); }, {threshold:0});
+    root.addEventListener('pointermove', move); root.addEventListener('pointerleave', leave);
+    ro.observe(root); io.observe(root); draw(0); start();
+    return function(){
+      if (raf) W.cancelAnimationFrame(raf); vis = false; ro.disconnect(); io.disconnect(); release();
+      root.removeEventListener('pointermove', move); root.removeEventListener('pointerleave', leave);
+    };
+  }
+  const cfg = st => ({color:st.dots.color, accent:st.dots.accent, gap:st.dots.gap, size:st.dots.size, grow:st.dots.grow, radius:st.dots.radius, push:st.dots.push, wave:st.dots.wave, magnet:st.btn.magnet, strength:st.btn.strength});
+  return {
+    key:'dots', cat:'content', group:'hover', no:'C13', title:'Dot Field', sub:'커서 주변 점들이 커지고 밀려나는 배경 + 끌려오는 버튼',
+    swatch:'radial-gradient(circle at 65% 45%,#7D7D7D 0 3px,transparent 4px) 0 0/14px 14px,radial-gradient(circle,#323232 0 1.5px,transparent 2px) 0 0/10px 10px,#080808',
+    defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
+    header:()=>0, bp:()=>767,
+    drag:{}, selectGroup:{section:'dots', text:'head'},
+    multiline:/^(head\.text|sub\.text)$/, rich:/^(head\.text|sub\.text)$/,
+    note:''
+  };
+})();
+
+/* =====================================================================
+   Content 14 · Bento Grid (original design)
+   tiles of different sizes; each tile is an image, a text block or a number
+   ===================================================================== */
+const BENTO = (() => {
+  const stack = f => `'${f}','Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif`;
+  const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+  const ITEMS = [
+    {kind:'image', size:'2x2', dark:true, img:PH('photo', 'TILE 01', 1200, 1200), title:'대표 이미지 타일', text:'큰 이미지와 함께 가장 중요한 메시지를 보여주세요.', href:''},
+    {kind:'number', size:'1x1', dark:false, img:'', title:'120+', text:'숫자 타일 설명', href:''},
+    {kind:'text', size:'1x1', dark:true, img:'', title:'짧은 소개 문구', text:'한두 줄로 된 설명을 입력하세요.', href:''},
+    {kind:'image', size:'1x2', dark:true, img:PH('dark', 'TILE 04', 600, 1200), title:'세로 이미지', text:'세로로 긴 사진에 어울려요.', href:''},
+    {kind:'text', size:'2x1', dark:false, img:'', title:'두 칸을 차지하는 텍스트 타일', text:'조금 더 긴 설명을 넣을 수 있어요.\n두 번째 줄 설명을 입력하세요.', href:'#'},
+    {kind:'number', size:'1x1', dark:true, img:'', title:'98%', text:'숫자 타일 설명', href:''},
+    {kind:'image', size:'1x1', dark:true, img:PH('art', 'TILE 07', 600, 600), title:'작은 이미지', text:'', href:''}
+  ];
+  const defaults = () => ({
+    id: uid(),
+    layout:{bg:'#F2F2F2', padT:R(120,72), padB:R(120,72), maxW:1280, side:R(40,20)},
+    head:{show:true, eyebrow:'BENTO GRID', text:'여러 가지 콘텐츠를\n한 화면에 담는 타일', font:'Pretendard Variable', color:'#111111', min:28, vw:3, max:52, mb:R(56,32), align:'left'},
+    items:JSON.parse(JSON.stringify(ITEMS)),
+    tile:{count:7, auto:true, cols:4, rowH:R(240,200), gap:R(16,12), radius:20, light:'#FFFFFF', lightFg:'#111111', dark:'#111111', darkFg:'#FFFFFF', pad:28, tsize:R(24,20), nsize:R(64,48), hover:true}
+  });
+  const groups = [
+    {id:'layout', title:'섹션', fields:[
+      {k:'layout.bg', l:'배경색', t:'color'},
+      A('layout.padT','위 여백',0,300,1,'px',{r:1}), A('layout.padB','아래 여백',0,300,1,'px',{r:1}),
+      A('layout.maxW','최대 너비',600,2000,10,'px'), A('layout.side','좌우 여백',0,120,1,'px',{r:1})
+    ]},
+    {id:'head', title:'제목', fields:[
+      {k:'head.show', l:'제목 표시', t:'toggle'}, {k:'head.eyebrow', l:'작은 제목', t:'text'},
+      {k:'head.text', l:'제목 (줄바꿈)', t:'textarea'}, {k:'head.font', l:'글꼴', t:'select', opts:fontOpts},
+      {k:'head.color', l:'글자색', t:'color'}, ...sizeFields('head'),
+      A('head.mb','제목과 타일 간격',0,160,1,'px',{r:1}), {k:'head.align', l:'정렬', t:'align'}
+    ]},
+    {id:'items', title:'타일 목록', fields:[
+      {k:'tile.count', l:'타일 개수', t:'align', num:true, relist:true, opts:[['4','4개'],['5','5개'],['6','6개'],['7','7개']],
+       hint:'개수를 줄였다가 다시 늘리면 숨겨 두었던 타일 내용이 그대로 돌아와요.'},
+      {k:'items', l:'타일', t:'list', item:'타일', orig:ITEMS, countKey:'tile.count',
+       cols:[{k:'kind', l:'종류', t:'select', opts:[['image','이미지'],['text','글'],['number','숫자']]},
+             {k:'size', l:'크기 (자동 배치를 끄면 적용)', t:'select', opts:[['1x1','1×1'],['2x1','2×1 (가로로 길게)'],['1x2','1×2 (세로로 길게)'],['2x2','2×2 (크게)']]},
+             {k:'dark', l:'어두운 타일', t:'toggle'}, {k:'img', l:'이미지 (종류가 이미지일 때)', t:'img'},
+             {k:'title', l:'제목 (숫자 타일은 숫자)', t:'text'}, {k:'text', l:'설명 (줄바꿈 · **굵게**)', t:'textarea'},
+             {k:'href', l:'연결 주소 (비우면 링크 없음)', t:'text'}],
+       blank:{kind:'text', size:'1x1', dark:false, img:'', title:'새 타일', text:'설명을 입력하세요.', href:''}}
+    ]},
+    {id:'tile', title:'타일 디자인', fields:[
+      {k:'tile.auto', l:'타일 개수에 맞춰 크기 자동 배치', t:'toggle', hint:'4~7개 어느 개수든 빈칸 없이 꽉 차게 배치돼요. 첫 번째 타일이 가장 크게 보여요. 끄면 타일마다 고른 크기를 써요.'},
+      A('tile.cols','넓은 화면의 칸 수',2,6,1,'칸',{hint:'자동 배치는 4칸 기준이에요.'}), A('tile.rowH','한 칸 높이',100,480,1,'px',{r:1}),
+      A('tile.gap','타일 간격',0,48,1,'px',{r:1}), A('tile.radius','모서리',0,48,1,'px'), A('tile.pad','안쪽 여백',12,60,1,'px'),
+      {k:'tile.light', l:'밝은 타일 색', t:'color'}, {k:'tile.lightFg', l:'밝은 타일 글자색', t:'color'},
+      {k:'tile.dark', l:'어두운 타일 색', t:'color'}, {k:'tile.darkFg', l:'어두운 타일 글자색', t:'color'},
+      A('tile.tsize','제목 크기',14,48,1,'px',{r:1}), A('tile.nsize','숫자 크기',24,140,1,'px',{r:1}),
+      {k:'tile.hover', l:'마우스를 올리면 살짝 떠오르기', t:'toggle'}
+    ]}
+  ];
+  const fonts = st => [st.head.font, 'Pretendard Variable'];
+  function css(st){
+    const C = '.hw-'+st.id, L = st.layout, H = st.head, T_ = st.tile;
+    const ease = 'cubic-bezier(.22,.61,.36,1)';
+    return `${C}{background:${L.bg};margin:0;padding:${L.padT.d}px 0 ${L.padB.d}px;font-family:${stack(H.font)};-webkit-font-smoothing:antialiased}
+${C} *{box-sizing:border-box;margin:0;padding:0}
+${C} .bn-inner{max-width:${L.maxW}px;margin:0 auto;padding:0 ${L.side.d}px}
+${C} .bn-head{margin-bottom:${H.mb.d}px;text-align:${H.align};color:${H.color}}
+${C} .bn-eyebrow{margin-bottom:14px;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
+${C} .bn-title{font-size:${clampF(H)};font-weight:800;line-height:1.2;letter-spacing:-.02em;white-space:pre-line;word-break:keep-all}
+${C} .bn-grid{display:grid;grid-template-columns:repeat(${T_.cols},minmax(0,1fr));grid-auto-rows:${T_.rowH.d}px;grid-auto-flow:dense;gap:${T_.gap.d}px}
+${C} .bn-t{position:relative;display:flex;flex-direction:column;justify-content:space-between;min-width:0;overflow:hidden;border-radius:${T_.radius}px;padding:${T_.pad}px;background:${T_.light};color:${T_.lightFg};text-decoration:none;transition:transform .45s ${ease},box-shadow .45s ${ease}}
+${C} .bn-t.is-dark{background:${T_.dark};color:${T_.darkFg}}
+${C} .bn-2x1{grid-column:span 2}${C} .bn-1x2{grid-row:span 2}${C} .bn-2x2{grid-column:span 2;grid-row:span 2}
+${C} .bn-img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;transition:transform .8s ${ease}}
+${C} .bn-image{justify-content:flex-end;color:#FFFFFF}
+${C} .bn-image::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.62));pointer-events:none}
+${C} .bn-copy{position:relative;z-index:1}
+${C} .bn-tt{font-size:${T_.tsize.d}px;font-weight:700;line-height:1.3;letter-spacing:-.01em;word-break:keep-all}
+${C} .bn-tx{margin-top:8px;font-size:15px;line-height:1.6;opacity:.75;word-break:keep-all}
+${C} .bn-num{font-size:${T_.nsize.d}px;font-weight:800;line-height:1;letter-spacing:-.04em}
+${C} .bn-t.has-link:not(.bn-image) .bn-tt,${C} .bn-t.has-link .bn-num{padding-right:48px}
+${C} .bn-arrow{position:absolute;right:${T_.pad}px;top:${T_.pad}px;z-index:1;width:36px;height:36px;border-radius:50%;border:1px solid currentColor;display:grid;place-items:center;opacity:.6;transition:transform .45s ${ease},opacity .3s}
+${C} .bn-arrow svg{width:16px;height:16px}
+${T_.hover ? `@media (hover:hover){${C} .bn-t:hover{transform:translateY(-4px);box-shadow:0 18px 40px -24px rgba(0,0,0,.45)}${C} .bn-t:hover .bn-img{transform:scale(1.05)}${C} .bn-t:hover .bn-arrow{transform:rotate(-45deg);opacity:1}}` : ''}
+@media (max-width:1023px){${C} .bn-grid{grid-template-columns:repeat(${Math.min(T_.cols, 2)},minmax(0,1fr))}}
+@media (max-width:767px){${C}{padding:${L.padT.m}px 0 ${L.padB.m}px}${C} .bn-inner{padding:0 ${L.side.m}px}${C} .bn-head{margin-bottom:${H.mb.m}px}${C} .bn-grid{grid-template-columns:1fr;grid-auto-rows:${T_.rowH.m}px;gap:${T_.gap.m}px}${C} .bn-2x1,${C} .bn-2x2{grid-column:span 1}${C} .bn-t{padding:${Math.round(T_.pad * .8)}px}${C} .bn-tt{font-size:${T_.tsize.m}px}${C} .bn-num{font-size:${T_.nsize.m}px}}`;
+  }
+  function html(st, {preview=false}={}){
+    const a = k => preview ? ` data-el="${k}"` : '', ed = p => preview ? ` data-edit="${p}"` : '';
+    const src = s => preview ? pv(s) : s, H = st.head;
+    const ARROW = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`;
+    // automatic sizes per tile count: every layout fills whole rows of a 4-column grid
+    const AUTO = {4:['2x2','2x1','1x1','1x1'], 5:['2x2','1x1','1x1','1x1','1x1'], 6:['2x2','2x1','1x1','1x1','2x1','2x1'], 7:['2x2','1x1','1x1','1x2','2x1','1x1','1x1']};
+    const count = Math.min(7, Math.max(4, +st.tile.count || 7));
+    const list = Array.from({length:count}, (_, i) => st.items[i] || ITEMS[i]), auto = st.tile.auto && AUTO[count];
+    const tiles = list.map((it, i) => {
+      const tag = it.href ? `a href="${esc(it.href)}"` : 'div', end = it.href ? 'a' : 'div';
+      const cls = `bn-t bn-${auto ? auto[i] : it.size} bn-${it.kind}${it.dark ? ' is-dark' : ''}${it.href ? ' has-link' : ''}`;
+      const arrow = it.href ? `<span class="bn-arrow">${ARROW}</span>` : '';
+      if (it.kind === 'image') return `<${tag} class="${cls}">${it.img ? `<img class="bn-img" src="${esc(src(it.img))}" alt=""${preview ? ` data-img="items.${i}.img"` : ''}>` : ''}${arrow}
+        <div class="bn-copy">${it.title ? `<h3 class="bn-tt"${ed('items.'+i+'.title')}>${esc(it.title)}</h3>` : ''}${it.text ? `<p class="bn-tx"${ed('items.'+i+'.text')}>${rich(it.text)}</p>` : ''}</div></${end}>`;
+      if (it.kind === 'number') return `<${tag} class="${cls}">${arrow}<span class="bn-num"${ed('items.'+i+'.title')}>${esc(it.title)}</span>
+        <p class="bn-tx"${ed('items.'+i+'.text')}>${rich(it.text)}</p></${end}>`;
+      return `<${tag} class="${cls}">${arrow}<h3 class="bn-tt"${ed('items.'+i+'.title')}>${esc(it.title)}</h3>
+        <p class="bn-tx"${ed('items.'+i+'.text')}>${rich(it.text)}</p></${end}>`;
+    }).join('\n    ');
+    return `<section class="hw-hero hw-${st.id}"${a('section')}>
+  <div class="bn-inner">
+${H.show ? `    <div class="bn-head"${a('head')}>${H.eyebrow ? `<p class="bn-eyebrow"${ed('head.eyebrow')}>${esc(H.eyebrow)}</p>` : ''}<h2 class="bn-title"${ed('head.text')}>${esc(H.text)}</h2></div>\n` : ''}    <div class="bn-grid"${a('items')}>
+    ${tiles}
+    </div>
+  </div>
+</section>`;
+  }
+  return {
+    key:'bento', cat:'content', group:'cards', no:'C14', title:'Bento Grid', sub:'크기가 다른 타일에 이미지 · 글 · 숫자를 섞어 담는 그리드',
+    swatch:'linear-gradient(90deg,#111111 0 48%,#F2F2F2 48% 52%,#FFFFFF 52% 74%,#F2F2F2 74% 76%,#111111 76%)',
+    defaults, groups, fonts, css, html, run:null, cfg:()=>({}),
+    header:()=>0, bp:()=>767,
+    drag:{}, selectGroup:{section:'layout', head:'head', items:'items'},
+    multiline:/^(head\.text|items\.\d+\.text)$/, rich:/^items\.\d+\.text$/,
+    note:''
+  };
+})();
+
+/* =====================================================================
+   Content 15 · Media & Text (original design)
+   rows of image + text that alternate sides, each row rises in when it reaches the screen
+   ===================================================================== */
+const ZIGZAG = (() => {
+  const stack = f => `'${f}','Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif`;
+  const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+  const KINDS = ['photo', 'dark', 'art'];
+  const ITEMS = [1,2,3].map(i => ({img:PH(KINDS[i-1], `IMAGE 0${i}`, 1200, 900), eyebrow:`POINT 0${i}`, title:`소개할 내용의 제목 0${i}`,
+    text:'이미지 옆에 놓일 설명을 입력하세요. **굵게** 강조할 수도 있어요.\n두 번째 줄 설명을 입력하세요.', btn:'자세히 보기', href:'#'}));
+  const defaults = () => ({
+    id: uid(),
+    layout:{bg:'#FFFFFF', padT:R(120,72), padB:R(120,72), maxW:1200, side:R(40,20)},
+    head:{show:true, eyebrow:'MEDIA & TEXT', text:'이미지와 글을\n번갈아 보여주는 소개', font:'Pretendard Variable', color:'#111111', min:28, vw:3, max:52, mb:R(80,40), align:'center'},
+    items:JSON.parse(JSON.stringify(ITEMS)),
+    row:{start:'left', ratio:'4/3', radius:16, gap:R(80,24), space:R(120,64), split:52, color:'#111111', sub:'#555555', tsize:R(36,24), btn:'outline'},
+    anim:{reveal:true}
+  });
+  const groups = [
+    {id:'layout', title:'섹션', fields:[
+      {k:'layout.bg', l:'배경색', t:'color'},
+      A('layout.padT','위 여백',0,300,1,'px',{r:1}), A('layout.padB','아래 여백',0,300,1,'px',{r:1}),
+      A('layout.maxW','최대 너비',600,2000,10,'px'), A('layout.side','좌우 여백',0,120,1,'px',{r:1})
+    ]},
+    {id:'head', title:'제목', fields:[
+      {k:'head.show', l:'제목 표시', t:'toggle'}, {k:'head.eyebrow', l:'작은 제목', t:'text'},
+      {k:'head.text', l:'제목 (줄바꿈)', t:'textarea'}, {k:'head.font', l:'글꼴', t:'select', opts:fontOpts},
+      {k:'head.color', l:'글자색', t:'color'}, ...sizeFields('head'),
+      A('head.mb','제목과 내용 간격',0,200,1,'px',{r:1}), {k:'head.align', l:'정렬', t:'align'}
+    ]},
+    {id:'items', title:'줄 목록', fields:[
+      {k:'items', l:'줄', t:'list', item:'줄', orig:ITEMS,
+       cols:[{k:'img', l:'이미지', t:'img'}, {k:'eyebrow', l:'작은 제목 (비우면 숨김)', t:'text'}, {k:'title', l:'제목', t:'text'},
+             {k:'text', l:'설명 (줄바꿈 · **굵게**)', t:'textarea'}, {k:'btn', l:'버튼 문구 (비우면 숨김)', t:'text'}, {k:'href', l:'연결 주소', t:'text'}],
+       blank:{img:'', eyebrow:'POINT', title:'새 줄 제목', text:'설명을 입력하세요.', btn:'', href:'#'}}
+    ]},
+    {id:'row', title:'줄 디자인', fields:[
+      {k:'row.start', l:'첫 줄 이미지 위치', t:'select', opts:[['left','왼쪽부터'],['right','오른쪽부터']]},
+      {k:'row.ratio', l:'이미지 비율', t:'select', opts:[['4/3','4:3'],['3/2','3:2'],['1/1','1:1'],['16/9','16:9'],['3/4','3:4']]},
+      A('row.radius','이미지 모서리',0,48,1,'px'), A('row.split','이미지 너비 비율',30,70,1,'%'),
+      A('row.gap','이미지와 글 간격',0,200,1,'px',{r:1}), A('row.space','줄 사이 간격',0,300,1,'px',{r:1}),
+      {k:'row.color', l:'제목 색', t:'color'}, {k:'row.sub', l:'설명 색', t:'color'},
+      A('row.tsize','제목 크기',16,64,1,'px',{r:1}),
+      {k:'row.btn', l:'버튼 모양', t:'select', opts:[['outline','테두리'],['fill','채움'],['link','밑줄 링크']]},
+      {k:'anim.reveal', l:'화면에 들어오면 떠오르기', t:'toggle'}
+    ]}
+  ];
+  const fonts = st => [st.head.font, 'Pretendard Variable'];
+  function css(st){
+    const C = '.hw-'+st.id, L = st.layout, H = st.head, RW = st.row;
+    const ease = 'cubic-bezier(.22,.61,.36,1)';
+    const btn = {outline:`border:1px solid ${RW.color};color:${RW.color};background:transparent`, fill:`border:1px solid ${RW.color};background:${RW.color};color:${L.bg}`,
+      link:`border:0;border-bottom:1px solid currentColor;border-radius:0;height:auto;padding:0 0 3px;color:${RW.color};background:transparent`}[RW.btn];
+    return `${C}{background:${L.bg};margin:0;padding:${L.padT.d}px 0 ${L.padB.d}px;font-family:${stack(H.font)};-webkit-font-smoothing:antialiased}
+${C} *{box-sizing:border-box;margin:0;padding:0}
+${C} .zz-inner{max-width:${L.maxW}px;margin:0 auto;padding:0 ${L.side.d}px}
+${C} .zz-head{margin-bottom:${H.mb.d}px;text-align:${H.align};color:${H.color}}
+${C} .zz-eyebrow{margin-bottom:14px;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
+${C} .zz-title{font-size:${clampF(H)};font-weight:800;line-height:1.2;letter-spacing:-.02em;white-space:pre-line;word-break:keep-all}
+${C} .zz-row{display:grid;grid-template-columns:${RW.split}fr ${100 - RW.split}fr;align-items:center;gap:${RW.gap.d}px}
+${C} .zz-row + .zz-row{margin-top:${RW.space.d}px}
+${C} .zz-row.is-flip .zz-media{order:2}
+${C} .zz-media{border-radius:${RW.radius}px;overflow:hidden;aspect-ratio:${RW.ratio};background:#E5E5E5}
+${C} .zz-media img{display:block;width:100%;height:100%;max-width:none;object-fit:cover}
+${C} .zz-kicker{margin-bottom:12px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:13px;letter-spacing:.08em;color:${RW.sub}}
+${C} .zz-rt{font-size:${RW.tsize.d}px;font-weight:800;line-height:1.25;letter-spacing:-.02em;color:${RW.color};word-break:keep-all}
+${C} .zz-tx{margin-top:16px;font-size:17px;line-height:1.7;color:${RW.sub};word-break:keep-all}
+${C} .zz-tx strong{color:${RW.color}}
+${C} .zz-btn{display:inline-flex;align-items:center;gap:8px;margin-top:28px;height:48px;padding:0 24px;border-radius:999px;font-size:15px;font-weight:700;text-decoration:none;${btn};transition:transform .3s ${ease}}
+${C} .zz-btn:hover{transform:translateX(3px)}
+${C} .zz-media,${C} .zz-copy{transition:opacity .9s ${ease},transform .9s ${ease}}
+${C} .zz-copy{transition-delay:.12s}
+${C} .zz-row.zz-wait .zz-media,${C} .zz-row.zz-wait .zz-copy{opacity:0;transform:translateY(40px)}
+@media (max-width:767px){${C}{padding:${L.padT.m}px 0 ${L.padB.m}px}${C} .zz-inner{padding:0 ${L.side.m}px}${C} .zz-head{margin-bottom:${H.mb.m}px}
+${C} .zz-row{grid-template-columns:1fr;gap:${RW.gap.m}px}${C} .zz-row.is-flip .zz-media{order:0}${C} .zz-row + .zz-row{margin-top:${RW.space.m}px}${C} .zz-rt{font-size:${RW.tsize.m}px}${C} .zz-tx{font-size:15px}}
+@media (prefers-reduced-motion:reduce){${C} .zz-row.zz-wait .zz-media,${C} .zz-row.zz-wait .zz-copy{opacity:1;transform:none}}`;
+  }
+  function html(st, {preview=false}={}){
+    const a = k => preview ? ` data-el="${k}"` : '', ed = p => preview ? ` data-edit="${p}"` : '';
+    const src = s => preview ? pv(s) : s, H = st.head, flip0 = st.row.start === 'right';
+    const rows = st.items.map((it, i) => `<div class="zz-row${(i % 2 === 1) !== flip0 ? ' is-flip' : ''}">
+      <div class="zz-media">${it.img ? `<img src="${esc(src(it.img))}" alt=""${preview ? ` data-img="items.${i}.img"` : ''}>` : ''}</div>
+      <div class="zz-copy">
+        ${it.eyebrow ? `<p class="zz-kicker"${ed('items.'+i+'.eyebrow')}>${esc(it.eyebrow)}</p>` : ''}<h3 class="zz-rt"${ed('items.'+i+'.title')}>${esc(it.title)}</h3>
+        <p class="zz-tx"${ed('items.'+i+'.text')}>${rich(it.text)}</p>
+        ${it.btn ? `<a class="zz-btn" href="${esc(it.href)}"><span${ed('items.'+i+'.btn')}>${esc(it.btn)}</span> →</a>` : ''}
+      </div>
+    </div>`).join('\n    ');
+    return `<section class="hw-hero hw-${st.id}"${a('section')}>
+  <div class="zz-inner">
+${H.show ? `    <div class="zz-head"${a('head')}>${H.eyebrow ? `<p class="zz-eyebrow"${ed('head.eyebrow')}>${esc(H.eyebrow)}</p>` : ''}<h2 class="zz-title"${ed('head.text')}>${esc(H.text)}</h2></div>\n` : ''}    <div class="zz-list"${a('items')}>
+    ${rows}
+    </div>
+  </div>
+</section>`;
+  }
+  // rows start hidden and rise in once each one reaches the screen
+  function run(root, o){
+    var W = root.ownerDocument.defaultView;
+    if (!o.reveal || o.on === false || W.matchMedia('(prefers-reduced-motion: reduce)').matches) return function(){};
+    var rows = Array.prototype.slice.call(root.querySelectorAll('.zz-row'));
+    rows.forEach(function(r){ r.classList.add('zz-wait'); });
+    var io = new W.IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting){ e.target.classList.remove('zz-wait'); io.unobserve(e.target); } }); }, {threshold:.2});
+    rows.forEach(function(r){ io.observe(r); });
+    return function(){ io.disconnect(); rows.forEach(function(r){ r.classList.remove('zz-wait'); }); };
+  }
+  const cfg = st => ({reveal:st.anim.reveal});
+  return {
+    key:'zigzag', cat:'content', group:'feature', no:'C15', title:'Media & Text', sub:'이미지와 글이 좌우로 번갈아 나오는 소개 목록',
+    swatch:'linear-gradient(180deg,#FFFFFF 0 8%,transparent 8% 92%,#FFFFFF 92%),linear-gradient(90deg,#BDBDBD 0 50%,#FFFFFF 50%)',
+    defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
+    header:()=>0, bp:()=>767,
+    drag:{}, selectGroup:{section:'layout', head:'head', items:'items'},
+    multiline:/^(head\.text|items\.\d+\.text)$/, rich:/^items\.\d+\.text$/,
+    note:''
+  };
+})();
+
+/* =====================================================================
+   Content 16 · Tabbed Content (original design)
+   tabs, each with an image, a title, body text (paragraphs and "- " lists) and a button
+   ===================================================================== */
+const TABS = (() => {
+  const stack = f => `'${f}','Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif`;
+  const KINDS = ['photo', 'dark', 'art', 'photo'];
+  const ITEMS = [1,2,3,4].map(i => ({label:`탭 이름 0${i}`, img:PH(KINDS[i-1], `TAB 0${i}`, 1200, 900), title:`탭 0${i}의 제목을 입력하세요`,
+    text:'탭 내용을 설명하는 문단입니다. **굵게** 강조할 수 있어요.\n- 목록 항목 하나\n- 목록 항목 둘\n- 목록 항목 셋', btn:'자세히 보기', href:'#'}));
+  // paragraphs + "- " bullet lists
+  const body = s => {
+    const out = []; let list = [];
+    const flush = () => { if (list.length){ out.push(`<ul>${list.join('')}</ul>`); list = []; } };
+    s.split('\n').forEach(l => {
+      const h = esc(l.replace(/^- /, '')).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      if (/^- /.test(l)) list.push(`<li>${h}</li>`); else { flush(); if (l.trim()) out.push(`<p>${h}</p>`); }
+    });
+    flush(); return out.join('');
+  };
+  const defaults = () => ({
+    id: uid(),
+    layout:{bg:'#FFFFFF', padT:R(120,72), padB:R(120,72), maxW:1200, side:R(40,20)},
+    head:{show:true, eyebrow:'TABBED CONTENT', text:'탭을 눌러\n내용을 바꿔 보세요', font:'Pretendard Variable', color:'#111111', min:28, vw:3, max:52, mb:R(48,28), align:'left'},
+    items:JSON.parse(JSON.stringify(ITEMS)),
+    tab:{style:'line', pos:'top', align:'left', size:16, color:'#111111', sub:'#8A8A8A', line:'#E0E0E0', track:'#F0F0F0', auto:false, interval:6000},
+    panel:{ratio:'4/3', radius:16, gap:R(64,24), split:55, tsize:R(32,24), text:'#555555', btn:'#111111'}
+  });
+  const groups = [
+    {id:'layout', title:'섹션', fields:[
+      {k:'layout.bg', l:'배경색', t:'color'},
+      A('layout.padT','위 여백',0,300,1,'px',{r:1}), A('layout.padB','아래 여백',0,300,1,'px',{r:1}),
+      A('layout.maxW','최대 너비',600,2000,10,'px'), A('layout.side','좌우 여백',0,120,1,'px',{r:1})
+    ]},
+    {id:'head', title:'제목', fields:[
+      {k:'head.show', l:'제목 표시', t:'toggle'}, {k:'head.eyebrow', l:'작은 제목', t:'text'},
+      {k:'head.text', l:'제목 (줄바꿈)', t:'textarea'}, {k:'head.font', l:'글꼴', t:'select', opts:fontOpts},
+      {k:'head.color', l:'글자색', t:'color'}, ...sizeFields('head'),
+      A('head.mb','제목과 탭 간격',0,160,1,'px',{r:1}), {k:'head.align', l:'정렬', t:'align'}
+    ]},
+    {id:'items', title:'탭 목록', fields:[
+      {k:'items', l:'탭', t:'list', item:'탭', orig:ITEMS,
+       cols:[{k:'label', l:'탭 이름', t:'text'}, {k:'img', l:'이미지 (비우면 글만)', t:'img'}, {k:'title', l:'제목', t:'text'},
+             {k:'text', l:'본문 (줄바꿈 · **굵게** · "- "로 시작하면 목록)', t:'textarea'},
+             {k:'btn', l:'버튼 문구 (비우면 숨김)', t:'text'}, {k:'href', l:'연결 주소', t:'text'}],
+       blank:{label:'새 탭', img:'', title:'새 탭 제목', text:'본문을 입력하세요.', btn:'', href:'#'}}
+    ]},
+    {id:'tab', title:'탭 디자인 · 동작', fields:[
+      {k:'tab.pos', l:'탭 위치', t:'select', opts:[['top','위쪽 (가로)'],['left','왼쪽 (세로)']]},
+      {k:'tab.style', l:'탭 모양', t:'select', opts:[['line','밑줄'],['pill','알약'],['segment','세그먼트 (회색 바탕 위 흰 알약)'],['fill','채움 (사각 버튼)'],['outline','테두리 알약'],['text','글자만']]},
+      {k:'tab.align', l:'탭 정렬 (위쪽 탭일 때)', t:'select', opts:[['left','왼쪽'],['center','가운데']]},
+      A('tab.size','탭 글자 크기',12,22,1,'px'),
+      {k:'tab.color', l:'선택한 탭 색', t:'color'}, {k:'tab.sub', l:'다른 탭 글자색', t:'color'}, {k:'tab.line', l:'구분선 · 테두리 색', t:'color'}, {k:'tab.track', l:'알약 · 채움 · 세그먼트 바탕색', t:'color'},
+      {k:'tab.auto', l:'자동으로 다음 탭 넘기기', t:'toggle', hint:'마우스를 올리거나 탭을 누르면 멈춰요.'}, A('tab.interval','넘기는 간격',2000,15000,500,'ms')
+    ]},
+    {id:'panel', title:'내용 디자인', fields:[
+      {k:'panel.ratio', l:'이미지 비율', t:'select', opts:[['4/3','4:3'],['3/2','3:2'],['1/1','1:1'],['16/9','16:9']]},
+      A('panel.radius','이미지 모서리',0,48,1,'px'), A('panel.split','이미지 너비 비율',30,70,1,'%'),
+      A('panel.gap','이미지와 글 간격',0,160,1,'px',{r:1}), A('panel.tsize','제목 크기',16,56,1,'px',{r:1}),
+      {k:'panel.text', l:'본문 색', t:'color'}, {k:'panel.btn', l:'버튼 색', t:'color'}
+    ]}
+  ];
+  const fonts = st => [st.head.font, 'Pretendard Variable'];
+  function css(st){
+    const C = '.hw-'+st.id, L = st.layout, H = st.head, TB = st.tab, P = st.panel, left = TB.pos === 'left';
+    const ease = 'cubic-bezier(.22,.61,.36,1)';
+    // tab look per style; v = vertical list (tabs on the left)
+    const filled = ['pill', 'fill', 'outline'].includes(TB.style);
+    const tabRules = v => {
+      const S_ = TB.style;
+      const list = {
+        line: v ? `flex-direction:column;border-left:1px solid ${TB.line}` : `gap:4px;border-bottom:1px solid ${TB.line}`,
+        segment: `${v ? 'flex-direction:column;border-radius:22px' : 'border-radius:999px;width:fit-content;max-width:100%'};gap:2px;padding:4px;background:${TB.track}`,
+        text: v ? 'flex-direction:column;gap:2px' : 'gap:10px'
+      }[S_] || (v ? 'flex-direction:column;gap:8px' : 'gap:8px');
+      const pad = {line: v ? '14px 20px' : '14px 18px', text: v ? '10px 0' : '12px 4px', segment:'10px 20px'}[S_] || '11px 22px';
+      const radius = {pill:'999px', outline:'999px', segment:'999px', fill:'8px'}[S_] || '0';
+      const idle = {pill:`background:${TB.track}`, fill:`background:${TB.track}`, outline:`box-shadow:inset 0 0 0 1px ${TB.line}`}[S_] || '';
+      const on = {
+        line:`color:${TB.color};box-shadow:inset ${v ? '2px 0 0' : '0 -2px 0'} ${TB.color}`,
+        segment:`background:#FFFFFF;color:${TB.color};box-shadow:0 1px 3px rgba(0,0,0,.14)`,
+        text:`color:${TB.color};font-weight:800`
+      }[S_] || `background:${TB.color};color:${L.bg};box-shadow:none`;
+      const center = !v && TB.align === 'center';
+      return `${C} .tb-list{display:flex;${list};overflow-x:auto;scrollbar-width:none;${center ? (TB.style === 'segment' ? 'margin-left:auto;margin-right:auto;' : 'justify-content:safe center;') : ''}}
+${C} .tb-tab{padding:${pad};border-radius:${radius};${idle}}
+${C} .tb-tab[aria-selected="true"]{${on}}`;
+    };
+    return `${C}{background:${L.bg};margin:0;padding:${L.padT.d}px 0 ${L.padB.d}px;font-family:${stack(H.font)};-webkit-font-smoothing:antialiased}
+${C} *{box-sizing:border-box;margin:0;padding:0}
+${C} .tb-inner{max-width:${L.maxW}px;margin:0 auto;padding:0 ${L.side.d}px}
+${C} .tb-head{margin-bottom:${H.mb.d}px;text-align:${H.align};color:${H.color}}
+${C} .tb-eyebrow{margin-bottom:14px;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
+${C} .tb-title{font-size:${clampF(H)};font-weight:800;line-height:1.2;letter-spacing:-.02em;white-space:pre-line;word-break:keep-all}
+${C} .tb-wrap{${left ? 'display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px;align-items:start' : ''}}
+${C} .tb-list::-webkit-scrollbar{display:none}
+${C} .tb-tab{position:relative;flex:none;overflow:hidden;border:0;background:transparent;font:inherit;font-size:${TB.size}px;font-weight:600;color:${TB.sub};cursor:pointer;white-space:nowrap;text-align:${left && TB.style !== 'segment' ? 'left' : 'center'};transition:color .25s,background .25s,box-shadow .25s}
+${C} .tb-tab:hover{color:${TB.color}}
+${tabRules(left)}
+${left ? '' : `${C} .tb-list{margin-bottom:40px}`}
+${C} .tb-tab:focus-visible{outline:2px solid ${TB.color};outline-offset:2px}
+${C} .tb-bar{position:absolute;left:0;bottom:0;height:2px;width:100%;background:${filled ? L.bg : TB.color};transform:scaleX(0);transform-origin:0 50%;opacity:.35}
+${C}.is-auto .tb-tab[aria-selected="true"] .tb-bar{animation:tbBar-${st.id} var(--iv) linear forwards}
+${C}.is-paused .tb-tab[aria-selected="true"] .tb-bar{animation-play-state:paused}
+@keyframes tbBar-${st.id}{to{transform:scaleX(1)}}
+${C} .tb-panel{display:grid;grid-template-columns:${P.split}fr ${100 - P.split}fr;gap:${P.gap.d}px;align-items:center}
+${C} .tb-panel.no-img{grid-template-columns:1fr}
+${C} .tb-panel[hidden]{display:none}
+${C} .tb-panel:not([hidden]){animation:tbIn-${st.id} .55s ${ease}}
+@keyframes tbIn-${st.id}{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+${C} .tb-media{border-radius:${P.radius}px;overflow:hidden;aspect-ratio:${P.ratio};background:#E5E5E5}
+${C} .tb-media img{display:block;width:100%;height:100%;max-width:none;object-fit:cover}
+${C} .tb-pt{font-size:${P.tsize.d}px;font-weight:800;line-height:1.25;letter-spacing:-.02em;color:${H.color};word-break:keep-all}
+${C} .tb-body{margin-top:16px;font-size:16px;line-height:1.75;color:${P.text};word-break:keep-all}
+${C} .tb-body p + p,${C} .tb-body p + ul,${C} .tb-body ul + p{margin-top:12px}
+${C} .tb-body ul{list-style:none;display:grid;gap:8px}
+${C} .tb-body li{position:relative;padding-left:20px}
+${C} .tb-body li::before{content:"";position:absolute;left:2px;top:.75em;width:8px;height:1.5px;background:currentColor}
+${C} .tb-body strong{color:${H.color}}
+${C} .tb-btn{display:inline-flex;align-items:center;gap:8px;margin-top:28px;height:48px;padding:0 24px;border-radius:999px;background:${P.btn};color:${L.bg};font-size:15px;font-weight:700;text-decoration:none}
+@media (prefers-reduced-motion:reduce){${C} .tb-panel:not([hidden]){animation:none}}
+@media (max-width:767px){${C}{padding:${L.padT.m}px 0 ${L.padB.m}px}${C} .tb-inner{padding:0 ${L.side.m}px}${C} .tb-head{margin-bottom:${H.mb.m}px}
+${C} .tb-wrap{display:block}
+${tabRules(false)}
+${C} .tb-list{margin-bottom:28px}${C} .tb-tab{font-size:${Math.max(12, TB.size - 1)}px}
+${C} .tb-panel{grid-template-columns:1fr;gap:${P.gap.m}px}${C} .tb-pt{font-size:${P.tsize.m}px}${C} .tb-body{font-size:15px}}`;
+  }
+  function html(st, {preview=false, slide}={}){
+    const a = k => preview ? ` data-el="${k}"` : '', ed = p => preview ? ` data-edit="${p}"` : '';
+    const src = s => preview ? pv(s) : s, H = st.head, id = st.id;
+    const on = Math.min(st.items.length - 1, Math.max(0, preview && slide > 0 ? slide : 0));
+    const tabs = st.items.map((it, i) => `<button type="button" class="tb-tab" role="tab" id="tb-${id}-t${i}" aria-controls="tb-${id}-p${i}" aria-selected="${i === on}" tabindex="${i === on ? 0 : -1}"><span${ed('items.'+i+'.label')}>${esc(it.label)}</span><span class="tb-bar" aria-hidden="true"></span></button>`).join('');
+    const panels = st.items.map((it, i) => `<div class="tb-panel${it.img ? '' : ' no-img'}" role="tabpanel" id="tb-${id}-p${i}" aria-labelledby="tb-${id}-t${i}"${i === on ? '' : ' hidden'}>
+        ${it.img ? `<div class="tb-media"><img src="${esc(src(it.img))}" alt=""${preview ? ` data-img="items.${i}.img"` : ''}></div>` : ''}
+        <div class="tb-copy"><h3 class="tb-pt"${ed('items.'+i+'.title')}>${esc(it.title)}</h3><div class="tb-body"${ed('items.'+i+'.text')}>${body(it.text)}</div>
+        ${it.btn ? `<a class="tb-btn" href="${esc(it.href)}"><span${ed('items.'+i+'.btn')}>${esc(it.btn)}</span> →</a>` : ''}</div>
+      </div>`).join('\n      ');
+    return `<section class="hw-hero hw-${id}"${a('section')}>
+  <div class="tb-inner">
+${H.show ? `    <div class="tb-head"${a('head')}>${H.eyebrow ? `<p class="tb-eyebrow"${ed('head.eyebrow')}>${esc(H.eyebrow)}</p>` : ''}<h2 class="tb-title"${ed('head.text')}>${esc(H.text)}</h2></div>\n` : ''}    <div class="tb-wrap"${a('items')}>
+      <div class="tb-list" role="tablist" aria-label="${esc(H.eyebrow || '탭')}">${tabs}</div>
+      <div class="tb-panels">
+      ${panels}
+      </div>
+    </div>
+  </div>
+</section>`;
+  }
+  // accessible tabs (click, arrow keys, Home/End) + optional auto-advance that pauses on hover / focus
+  function run(root, o){
+    var W = root.ownerDocument.defaultView;
+    var tabs = Array.prototype.slice.call(root.querySelectorAll('[role="tab"]')), panels = Array.prototype.slice.call(root.querySelectorAll('[role="tabpanel"]'));
+    if (!tabs.length) return function(){};
+    var cur = Math.max(0, tabs.findIndex(function(t){ return t.getAttribute('aria-selected') === 'true'; })), timer = 0, paused = false, offs = [];
+    var vertical = o.pos === 'left' && W.matchMedia('(min-width:768px)').matches;
+    function sel(i, focus){
+      cur = i;
+      tabs.forEach(function(t, k){ t.setAttribute('aria-selected', String(k === i)); t.tabIndex = k === i ? 0 : -1; });
+      panels.forEach(function(p, k){ p.hidden = k !== i; });
+      if (focus) tabs[i].focus();
+      if (auto){ var b = tabs[i].querySelector('.tb-bar'); if (b){ b.style.animation = 'none'; void b.offsetWidth; b.style.animation = ''; } schedule(); }
+    }
+    var auto = o.auto && o.on !== false && tabs.length > 1 && !W.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function schedule(){ W.clearTimeout(timer); if (auto && !paused) timer = W.setTimeout(function(){ sel((cur + 1) % tabs.length); }, o.interval); }
+    tabs.forEach(function(t, i){
+      var click = function(){ sel(i); if (auto){ auto = false; root.classList.remove('is-auto'); W.clearTimeout(timer); } };
+      var key = function(e){
+        var n = tabs.length, k = e.key, next = (vertical ? k === 'ArrowDown' : k === 'ArrowRight'), prev = (vertical ? k === 'ArrowUp' : k === 'ArrowLeft');
+        if (next){ e.preventDefault(); sel((i + 1) % n, true); } else if (prev){ e.preventDefault(); sel((i - 1 + n) % n, true); }
+        else if (k === 'Home'){ e.preventDefault(); sel(0, true); } else if (k === 'End'){ e.preventDefault(); sel(n - 1, true); }
+      };
+      t.addEventListener('click', click); t.addEventListener('keydown', key);
+      offs.push(function(){ t.removeEventListener('click', click); t.removeEventListener('keydown', key); });
+    });
+    if (auto){
+      root.style.setProperty('--iv', o.interval + 'ms'); root.classList.add('is-auto');
+      var pause = function(){ paused = true; root.classList.add('is-paused'); W.clearTimeout(timer); };
+      var resume = function(){ paused = false; root.classList.remove('is-paused'); schedule(); };
+      root.addEventListener('pointerenter', pause); root.addEventListener('pointerleave', resume);
+      root.addEventListener('focusin', pause); root.addEventListener('focusout', resume);
+      offs.push(function(){ root.removeEventListener('pointerenter', pause); root.removeEventListener('pointerleave', resume); root.removeEventListener('focusin', pause); root.removeEventListener('focusout', resume); });
+      schedule();
+    }
+    return function(){ W.clearTimeout(timer); root.classList.remove('is-auto', 'is-paused'); offs.forEach(function(f){ f(); }); };
+  }
+  const cfg = st => ({auto:st.tab.auto, interval:st.tab.interval, pos:st.tab.pos});
+  return {
+    key:'tabs', cat:'content', group:'feature', no:'C16', title:'Tabbed Content', sub:'탭마다 이미지 · 제목 · 본문 · 목록 · 버튼을 담는 탭 콘텐츠',
+    swatch:'linear-gradient(180deg,#FFFFFF 0 22%,#111111 22% 24%,#FFFFFF 24% 30%,#BDBDBD 30%)',
+    defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
+    header:()=>0, bp:()=>767,
+    drag:{}, selectGroup:{section:'layout', head:'head', items:'items'},
+    multiline:/^(head\.text|items\.\d+\.text)$/,
+    note:''
+  };
+})();
+
+/* =====================================================================
+   Content 17 · Timeline (original design)
+   dated milestones along a vertical line that fills while scrolling
+   ===================================================================== */
+const TIMELINE = (() => {
+  const stack = f => `'${f}','Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif`;
+  const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+  const ITEMS = [2022, 2023, 2024, 2025, 2026].map((y, i) => ({date:String(y), title:`주요 이정표 0${i + 1}`, text:'이 시기에 있었던 일을 한두 줄로 설명하세요.', img:i === 2 ? PH('photo', 'MILESTONE', 960, 600) : ''}));
+  const defaults = () => ({
+    id: uid(),
+    layout:{bg:'#FFFFFF', padT:R(120,72), padB:R(120,72), maxW:1100, side:R(40,20)},
+    head:{show:true, eyebrow:'TIMELINE', text:'우리가 걸어온 길', font:'Pretendard Variable', color:'#111111', min:28, vw:3, max:52, mb:R(80,40), align:'center'},
+    items:JSON.parse(JSON.stringify(ITEMS)),
+    line:{layout:'alternate', color:'#111111', track:'#E0E0E0', dot:14, space:R(72,44), date:R(40,28), sub:'#555555', radius:12, fill:true}
+  });
+  const groups = [
+    {id:'layout', title:'섹션', fields:[
+      {k:'layout.bg', l:'배경색', t:'color'},
+      A('layout.padT','위 여백',0,300,1,'px',{r:1}), A('layout.padB','아래 여백',0,300,1,'px',{r:1}),
+      A('layout.maxW','최대 너비',600,2000,10,'px'), A('layout.side','좌우 여백',0,120,1,'px',{r:1})
+    ]},
+    {id:'head', title:'제목', fields:[
+      {k:'head.show', l:'제목 표시', t:'toggle'}, {k:'head.eyebrow', l:'작은 제목', t:'text'},
+      {k:'head.text', l:'제목 (줄바꿈)', t:'textarea'}, {k:'head.font', l:'글꼴', t:'select', opts:fontOpts},
+      {k:'head.color', l:'글자색', t:'color'}, ...sizeFields('head'),
+      A('head.mb','제목과 연혁 간격',0,200,1,'px',{r:1}), {k:'head.align', l:'정렬', t:'align'}
+    ]},
+    {id:'items', title:'항목 목록', fields:[
+      {k:'items', l:'항목', t:'list', item:'항목', orig:ITEMS,
+       cols:[{k:'date', l:'날짜 · 단계 (예: 2026.03, STEP 01)', t:'text'}, {k:'title', l:'제목', t:'text'},
+             {k:'text', l:'설명 (줄바꿈 · **굵게**)', t:'textarea'}, {k:'img', l:'이미지 (선택)', t:'img'}],
+       blank:{date:'2027', title:'새 이정표', text:'설명을 입력하세요.', img:''}}
+    ]},
+    {id:'line', title:'연혁 디자인', fields:[
+      {k:'line.layout', l:'배치', t:'select', opts:[['alternate','가운데 선 · 좌우 번갈아'],['left','왼쪽 선 · 한쪽 정렬']], hint:'좁은 화면에서는 항상 왼쪽 선으로 보여요.'},
+      {k:'line.color', l:'선 · 점 · 글자색', t:'color'}, {k:'line.track', l:'채워지기 전 선 색', t:'color'}, {k:'line.sub', l:'설명 색', t:'color'},
+      A('line.dot','점 크기',6,32,1,'px'), A('line.space','항목 사이 간격',8,200,1,'px',{r:1}),
+      A('line.date','날짜 크기',14,80,1,'px',{r:1}), A('line.radius','이미지 모서리',0,40,1,'px'),
+      {k:'line.fill', l:'스크롤하면 선이 채워지기', t:'toggle'}
+    ]}
+  ];
+  const fonts = st => [st.head.font, 'Pretendard Variable'];
+  function css(st){
+    const C = '.hw-'+st.id, L = st.layout, H = st.head, LN = st.line, alt = LN.layout === 'alternate';
+    const ease = 'cubic-bezier(.22,.61,.36,1)';
+    const one = `${C} .tl-list::before,${C} .tl-list::after{left:${LN.dot / 2}px}
+${C} .tl-item{grid-template-columns:${LN.dot}px minmax(0,1fr);gap:0 28px}
+${C} .tl-dot{grid-column:1;grid-row:1 / span 2}
+${C} .tl-date,${C} .tl-item:nth-child(even) .tl-date{grid-column:2;grid-row:1;text-align:left}
+${C} .tl-copy,${C} .tl-item:nth-child(even) .tl-copy{grid-column:2;grid-row:2;text-align:left}`;
+    return `${C}{background:${L.bg};margin:0;padding:${L.padT.d}px 0 ${L.padB.d}px;font-family:${stack(H.font)};-webkit-font-smoothing:antialiased}
+${C} *{box-sizing:border-box;margin:0;padding:0}
+${C} .tl-inner{max-width:${L.maxW}px;margin:0 auto;padding:0 ${L.side.d}px}
+${C} .tl-head{margin-bottom:${H.mb.d}px;text-align:${H.align};color:${H.color}}
+${C} .tl-eyebrow{margin-bottom:14px;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
+${C} .tl-title{font-size:${clampF(H)};font-weight:800;line-height:1.2;letter-spacing:-.02em;white-space:pre-line;word-break:keep-all}
+${C} .tl-list{position:relative;list-style:none}
+${C} .tl-list::before,${C} .tl-list::after{content:"";position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;${alt ? 'left:50%;' : ''}}
+${C} .tl-list::before{background:${LN.track}}
+${C} .tl-list::after{background:${LN.color};transform:scaleY(${LN.fill ? 'var(--p,1)' : 1});transform-origin:50% 0}
+${C} .tl-item{position:relative;display:grid;grid-template-columns:minmax(0,1fr) ${LN.dot}px minmax(0,1fr);gap:0 48px;align-items:start}
+${C} .tl-item + .tl-item{margin-top:${LN.space.d}px}
+${C} .tl-dot{grid-column:2;grid-row:1;position:relative;z-index:1;width:${LN.dot}px;height:${LN.dot}px;margin-top:calc(${LN.date.d}px * .6 - ${LN.dot / 2}px);border-radius:50%;background:${L.bg};border:2px solid ${LN.color};transition:background .4s,transform .4s ${ease}}
+${C} .tl-item.is-on .tl-dot{background:${LN.color};transform:scale(1.15)}
+${C} .tl-date{grid-column:1;grid-row:1;text-align:right;font-size:${LN.date.d}px;font-weight:800;line-height:1.2;letter-spacing:-.03em;color:${LN.color};font-variant-numeric:tabular-nums}
+${C} .tl-copy{grid-column:3;grid-row:1}
+${C} .tl-item:nth-child(even) .tl-date{grid-column:3;text-align:left}
+${C} .tl-item:nth-child(even) .tl-copy{grid-column:1;grid-row:1;text-align:right}
+${C} .tl-it{font-size:20px;font-weight:700;line-height:1.4;color:${LN.color};word-break:keep-all}
+${C} .tl-tx{margin-top:8px;font-size:16px;line-height:1.7;color:${LN.sub};word-break:keep-all}
+${C} .tl-img{display:block;width:100%;max-width:420px;height:auto;margin-top:16px;border-radius:${LN.radius}px}
+${C} .tl-item:nth-child(even) .tl-img{margin-left:auto}
+${C} .tl-item:not(.is-on) .tl-copy,${C} .tl-item:not(.is-on) .tl-date{opacity:.35}
+${C} .tl-copy,${C} .tl-date{transition:opacity .5s}
+${alt ? '' : one}
+@media (max-width:767px){${C}{padding:${L.padT.m}px 0 ${L.padB.m}px}${C} .tl-inner{padding:0 ${L.side.m}px}${C} .tl-head{margin-bottom:${H.mb.m}px}
+${one.split('\n').join('\n')}
+${C} .tl-item + .tl-item{margin-top:${LN.space.m}px}${C} .tl-date{font-size:${LN.date.m}px}${C} .tl-dot{margin-top:calc(${LN.date.m}px * .6 - ${LN.dot / 2}px)}${C} .tl-item:nth-child(even) .tl-img{margin-left:0}${C} .tl-it{font-size:18px}${C} .tl-tx{font-size:15px}}`;
+  }
+  function html(st, {preview=false}={}){
+    const a = k => preview ? ` data-el="${k}"` : '', ed = p => preview ? ` data-edit="${p}"` : '';
+    const src = s => preview ? pv(s) : s, H = st.head;
+    const items = st.items.map((it, i) => `<li class="tl-item is-on">
+      <span class="tl-dot" aria-hidden="true"></span>
+      <p class="tl-date"${ed('items.'+i+'.date')}>${esc(it.date)}</p>
+      <div class="tl-copy"><h3 class="tl-it"${ed('items.'+i+'.title')}>${esc(it.title)}</h3><p class="tl-tx"${ed('items.'+i+'.text')}>${rich(it.text)}</p>${it.img ? `<img class="tl-img" src="${esc(src(it.img))}" alt=""${preview ? ` data-img="items.${i}.img"` : ''}>` : ''}</div>
+    </li>`).join('\n    ');
+    return `<section class="hw-hero hw-${st.id}"${a('section')}>
+  <div class="tl-inner">
+${H.show ? `    <div class="tl-head"${a('head')}>${H.eyebrow ? `<p class="tl-eyebrow"${ed('head.eyebrow')}>${esc(H.eyebrow)}</p>` : ''}<h2 class="tl-title"${ed('head.text')}>${esc(H.text)}</h2></div>\n` : ''}    <ol class="tl-list"${a('items')}>
+    ${items}
+    </ol>
+  </div>
+</section>`;
+  }
+  // the line fills up to 60% of the screen height; items above that point light up
+  function run(root, o){
+    var W = root.ownerDocument.defaultView, list = root.querySelector('.tl-list');
+    var items = Array.prototype.slice.call(root.querySelectorAll('.tl-item'));
+    if (!list || !o.fill || o.on === false || W.matchMedia('(prefers-reduced-motion: reduce)').matches) return function(){};
+    var raf = 0;
+    function update(){
+      raf = 0;
+      var b = list.getBoundingClientRect(), mid = W.innerHeight * .6;
+      var p = Math.min(1, Math.max(0, (mid - b.top) / Math.max(1, b.height)));
+      list.style.setProperty('--p', p.toFixed(4));
+      items.forEach(function(it){ var d = it.querySelector('.tl-dot').getBoundingClientRect(); it.classList.toggle('is-on', d.top < mid); });
+    }
+    var on = function(){ if (!raf) raf = W.requestAnimationFrame(update); };
+    W.addEventListener('scroll', on, {passive:true}); W.addEventListener('resize', on);
+    update();
+    return function(){ if (raf) W.cancelAnimationFrame(raf); W.removeEventListener('scroll', on); W.removeEventListener('resize', on);
+      list.style.removeProperty('--p'); items.forEach(function(it){ it.classList.add('is-on'); }); };
+  }
+  const cfg = st => ({fill:st.line.fill});
+  return {
+    key:'timeline', cat:'content', group:'story', no:'C17', title:'Timeline', sub:'날짜 · 단계별 이정표를 잇는 세로 연혁, 스크롤하면 선이 채워짐',
+    swatch:'linear-gradient(90deg,#FFFFFF 0 49%,#111111 49% 51%,#FFFFFF 51%)',
+    defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
+    header:()=>0, bp:()=>767,
+    drag:{}, selectGroup:{section:'layout', head:'head', items:'items'},
+    multiline:/^(head\.text|items\.\d+\.text)$/, rich:/^items\.\d+\.text$/,
+    note:''
+  };
+})();
+
+/* =====================================================================
+   Content 18 · Testimonials (original design)
+   reviews of any length in staggered columns, with rating, photo, name and role
+   ===================================================================== */
+const REVIEWS = (() => {
+  const stack = f => `'${f}','Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif`;
+  const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+  const Q = ['짧은 후기 한 줄을 입력하세요.',
+    '조금 더 긴 후기입니다. 서비스를 이용하며 좋았던 점을 두세 줄 정도로 적어 주세요. **굵게** 강조할 수도 있어요.',
+    '후기 문구를 입력하세요.\n줄을 바꿔서 쓸 수도 있어요.',
+    '가장 긴 후기 예시입니다. 길이가 서로 다른 후기도 카드 높이가 자연스럽게 맞춰져서 엇갈린 벽돌처럼 쌓여요. 고객의 실제 목소리를 그대로 옮겨 보세요.',
+    '두 줄 정도의 후기를 입력하세요. 짧고 분명한 문장이 잘 읽혀요.',
+    '마지막 후기 예시입니다.'];
+  const ITEMS = Q.map((q, i) => ({quote:q, name:`이름 0${i + 1}`, role:`직함 · 회사 0${i + 1}`, avatar:PH('photo', '', 160, 160), rating:5}));
+  const defaults = () => ({
+    id: uid(),
+    layout:{bg:'#F2F2F2', padT:R(120,72), padB:R(120,72), maxW:1280, side:R(40,20)},
+    head:{show:true, eyebrow:'TESTIMONIALS', text:'고객이 직접 전하는\n이야기', font:'Pretendard Variable', color:'#111111', min:28, vw:3, max:52, mb:R(56,32), align:'center'},
+    items:JSON.parse(JSON.stringify(ITEMS)),
+    card:{w:R(380,290), gap:R(20,12), radius:20, bg:'#FFFFFF', color:'#111111', sub:'#757575', pad:28, qsize:R(17,15), mark:true, stars:true, avatar:true},
+    move:{speed:R(40,32), pause:true, fade:true}
+  });
+  const groups = [
+    {id:'layout', title:'섹션', fields:[
+      {k:'layout.bg', l:'배경색', t:'color'},
+      A('layout.padT','위 여백',0,300,1,'px',{r:1}), A('layout.padB','아래 여백',0,300,1,'px',{r:1}),
+      A('layout.maxW','제목 최대 너비',600,2000,10,'px'), A('layout.side','좌우 여백',0,120,1,'px',{r:1})
+    ]},
+    {id:'head', title:'제목', fields:[
+      {k:'head.show', l:'제목 표시', t:'toggle'}, {k:'head.eyebrow', l:'작은 제목', t:'text'},
+      {k:'head.text', l:'제목 (줄바꿈)', t:'textarea'}, {k:'head.font', l:'글꼴', t:'select', opts:fontOpts},
+      {k:'head.color', l:'글자색', t:'color'}, ...sizeFields('head'),
+      A('head.mb','제목과 후기 간격',0,160,1,'px',{r:1}), {k:'head.align', l:'정렬', t:'align'}
+    ]},
+    {id:'items', title:'후기 목록', fields:[
+      {k:'items', l:'후기', t:'list', item:'후기', orig:ITEMS,
+       cols:[{k:'quote', l:'후기 (줄바꿈 · **굵게**)', t:'textarea'}, {k:'name', l:'이름', t:'text'}, {k:'role', l:'직함 · 회사', t:'text'},
+             {k:'avatar', l:'사진', t:'img'}, {k:'rating', l:'별점 (0~5, 0이면 숨김)', t:'num', step:1}],
+       blank:{quote:'후기를 입력하세요.', name:'이름', role:'직함', avatar:'', rating:5}}
+    ]},
+    {id:'move', title:'흐르는 움직임', fields:[
+      A('move.speed','흐르는 속도 (1초에 움직이는 거리)',5,200,1,'px',{r:1}),
+      {k:'move.pause', l:'마우스를 올리면 멈추기', t:'toggle'},
+      {k:'move.fade', l:'양쪽 끝을 흐리게', t:'toggle'}
+    ]},
+    {id:'card', title:'카드 디자인', fields:[
+      A('card.w','카드 너비',200,640,1,'px',{r:1}), A('card.gap','카드 간격',0,64,1,'px',{r:1}),
+      A('card.radius','모서리',0,40,1,'px'), A('card.pad','안쪽 여백',12,60,1,'px'),
+      {k:'card.bg', l:'카드 색', t:'color'}, {k:'card.color', l:'글자색', t:'color'}, {k:'card.sub', l:'직함 색', t:'color'},
+      A('card.qsize','후기 글자 크기',12,28,1,'px',{r:1}),
+      {k:'card.mark', l:'큰따옴표 표시', t:'toggle'}, {k:'card.stars', l:'별점 표시', t:'toggle'}, {k:'card.avatar', l:'사진 표시', t:'toggle'}
+    ]}
+  ];
+  const fonts = st => [st.head.font, 'Pretendard Variable'];
+  // each half of the track repeats the cards until it is wider than a large screen, so the loop never shows a gap
+  const reps = (st, w, g) => Math.max(1, Math.ceil(2400 / Math.max(1, st.items.length * (w + g))));
+  function css(st, {anim}={}){
+    const C = '.hw-'+st.id, L = st.layout, H = st.head, K = st.card, M = st.move, n = Math.max(1, st.items.length);
+    const r = Math.max(reps(st, K.w.d, K.gap.d), reps(st, K.w.m, K.gap.m)); // same repeat count as the markup
+    const dur = (w, g, v) => (n * r * (w + g) / Math.max(1, v)).toFixed(2);
+    const fade = M.fade ? '-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);' : '';
+    return `${C}{background:${L.bg};margin:0;padding:${L.padT.d}px 0 ${L.padB.d}px;font-family:${stack(H.font)};-webkit-font-smoothing:antialiased;overflow:hidden}
+${C} *{box-sizing:border-box;margin:0;padding:0}
+${C} .rv-inner{max-width:${L.maxW}px;margin:0 auto;padding:0 ${L.side.d}px}
+${C} .rv-head{margin-bottom:${H.mb.d}px;text-align:${H.align};color:${H.color}}
+${C} .rv-eyebrow{margin-bottom:14px;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
+${C} .rv-title{font-size:${clampF(H)};font-weight:800;line-height:1.2;letter-spacing:-.02em;white-space:pre-line;word-break:keep-all}
+${C} .rv-marquee{position:relative;overflow:hidden;${fade}}
+${C} .rv-track{display:flex;width:max-content;animation:rvMarquee-${st.id} ${dur(K.w.d, K.gap.d, M.speed.d)}s linear infinite;${anim === false ? 'animation-play-state:paused;' : ''}will-change:transform}
+${M.pause ? `${C} .rv-marquee:hover .rv-track,${C} .rv-marquee:focus-within .rv-track{animation-play-state:paused}` : ''}
+@keyframes rvMarquee-${st.id}{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+${C} .rv-set{display:flex;flex:none;gap:${K.gap.d}px;padding-right:${K.gap.d}px;list-style:none}
+${C} .rv-card{flex:none;width:${K.w.d}px;padding:${K.pad}px;border-radius:${K.radius}px;background:${K.bg};color:${K.color};display:flex;flex-direction:column;gap:18px}
+${C} .rv-mark{display:block;height:28px;font-family:Georgia,'Times New Roman',serif;font-size:64px;line-height:.9;opacity:.18}
+${C} .rv-stars{font-size:14px;letter-spacing:3px}
+${C} .rv-stars i{font-style:normal;opacity:.2}
+${C} .rv-q{font-size:${K.qsize.d}px;line-height:1.7;word-break:keep-all}
+${C} .rv-who{display:flex;align-items:center;gap:12px;margin-top:auto;padding-top:4px}
+${C} .rv-who img{width:44px;height:44px;border-radius:50%;object-fit:cover;max-width:none;background:#E5E5E5}
+${C} .rv-name{font-size:15px;font-weight:700}
+${C} .rv-role{font-size:13px;color:${K.sub};margin-top:2px}
+@media (max-width:767px){${C}{padding:${L.padT.m}px 0 ${L.padB.m}px}${C} .rv-inner{padding:0 ${L.side.m}px}${C} .rv-head{margin-bottom:${H.mb.m}px}
+${C} .rv-track{animation-duration:${dur(K.w.m, K.gap.m, M.speed.m)}s}${C} .rv-set{gap:${K.gap.m}px;padding-right:${K.gap.m}px}${C} .rv-card{width:${K.w.m}px;padding:${Math.round(K.pad * .8)}px}${C} .rv-q{font-size:${K.qsize.m}px}}
+@media (prefers-reduced-motion:reduce){${C} .rv-track{animation:none}${C} .rv-marquee{overflow-x:auto}${C} .rv-set[aria-hidden]{display:none}}`;
+  }
+  function html(st, {preview=false}={}){
+    const a = k => preview ? ` data-el="${k}"` : '', ed = p => preview ? ` data-edit="${p}"` : '';
+    const src = s => preview ? pv(s) : s, H = st.head, K = st.card;
+    const stars = r => { r = Math.max(0, Math.min(5, Math.round(+r || 0))); return r ? `<p class="rv-stars" aria-label="별점 ${r}점">${'★'.repeat(r)}${r < 5 ? `<i>${'★'.repeat(5 - r)}</i>` : ''}</p>` : ''; };
+    // only the first copy is editable / read by screen readers; the repeats are decoration for the loop
+    const card = (it, i, live) => {
+      const e = p => live ? ed(p) : '';
+      return `<li class="rv-card">
+        ${K.mark ? '<span class="rv-mark" aria-hidden="true">“</span>' : ''}${K.stars ? stars(it.rating) : ''}
+        <blockquote class="rv-q"${e('items.'+i+'.quote')}>${rich(it.quote)}</blockquote>
+        <div class="rv-who">${K.avatar && it.avatar ? `<img src="${esc(src(it.avatar))}" alt=""${live && preview ? ` data-img="items.${i}.avatar"` : ''}>` : ''}<div><p class="rv-name"${e('items.'+i+'.name')}>${esc(it.name)}</p><p class="rv-role"${e('items.'+i+'.role')}>${esc(it.role)}</p></div></div>
+      </li>`;
+    };
+    const r = Math.max(reps(st, K.w.d, K.gap.d), reps(st, K.w.m, K.gap.m));
+    const run = first => Array.from({length:r}, (_, k) => st.items.map((it, i) => card(it, i, first && k === 0)).join('')).join('');
+    return `<section class="hw-hero hw-${st.id}"${a('section')}>
+${H.show ? `  <div class="rv-inner"><div class="rv-head"${a('head')}>${H.eyebrow ? `<p class="rv-eyebrow"${ed('head.eyebrow')}>${esc(H.eyebrow)}</p>` : ''}<h2 class="rv-title"${ed('head.text')}>${esc(H.text)}</h2></div></div>\n` : ''}  <div class="rv-marquee"${a('items')}>
+    <div class="rv-track">
+      <ul class="rv-set">${run(true)}</ul>
+      <ul class="rv-set" aria-hidden="true">${run(false)}</ul>
+    </div>
+  </div>
+</section>`;
+  }
+  return {
+    key:'reviews', cat:'content', group:'review', no:'C18', title:'Testimonials', sub:'후기 카드가 오른쪽에서 왼쪽으로 끊김 없이 흐르는 추천사',
+    swatch:'linear-gradient(90deg,#FFFFFF 0 31%,#F2F2F2 31% 34%,#FFFFFF 34% 65%,#F2F2F2 65% 68%,#FFFFFF 68%)',
+    defaults, groups, fonts, css, html, run:null, cfg:()=>({}),
+    header:()=>0, bp:()=>767,
+    drag:{}, selectGroup:{section:'layout', head:'head', items:'items'},
+    multiline:/^(head\.text|items\.\d+\.quote)$/, rich:/^items\.\d+\.quote$/,
+    note:''
+  };
+})();
+
 /* ================= widget registry ================= */
-const WIDGETS = [DASOT, MLAB, DONGNAM, QUOTE, IMGMSG, POTS, CHOICE, FAQ, TABFAQ, STICKY, STATS, LOGOS];
+const WIDGETS = [DASOT, MLAB, DONGNAM, LENS, QUOTE, IMGMSG, POTS, CHOICE, FAQ, TABFAQ, STICKY, STATS, LOGOS, BENTO, ZIGZAG, TABS, TIMELINE, REVIEWS, TRAIL, TILT, HLIST, DOTS];
 // widgets of the same nature are listed together in the picker
 const GROUP_OF = {dasot:'split', mlab:'typo', dongnam:'video', quote:'text', pots:'gallery', choice:'cards', faq:'faq', tabfaq:'faq', sticky:'feature'};
 WIDGETS.forEach(w => { w.group = w.group || GROUP_OF[w.key] || 'etc'; w.source = ''; });
 const GROUPS_UI = {
-  hero:[['split','분할형'],['typo','타이포그래피'],['video','영상 슬라이드']],
-  content:[['text','텍스트 · 인용'],['stats','숫자 · 지표'],['feature','서비스 · 기능 소개'],['cards','카드 · 비교'],['gallery','제품 · 갤러리'],['partners','파트너 · 로고'],['faq','FAQ · 자주 묻는 질문']]
+  hero:[['split','분할형'],['typo','타이포그래피'],['video','영상 슬라이드'],['hover','마우스 반응']],
+  content:[['text','텍스트 · 인용'],['stats','숫자 · 지표'],['feature','서비스 · 기능 소개'],['cards','카드 · 비교'],['gallery','제품 · 갤러리'],['partners','파트너 · 로고'],['faq','FAQ · 자주 묻는 질문'],['story','연혁 · 과정'],['review','후기 · 추천사'],['hover','마우스 반응']]
 };
 const groupName = (c, g) => ((GROUPS_UI[c] || []).find(x => x[0] === g) || [g, '기타'])[1];
 const TPL = Object.fromEntries(WIDGETS.map(t => [t.key, t]));
@@ -2963,6 +4387,15 @@ function refreshLists(){
   if ($('dnslides')) $('dnslides').innerHTML = dnSlidesHTML();
   if ($('slides')) $('slides').innerHTML = slidesHTML();
   rail.querySelectorAll('[data-list]').forEach(el => el.innerHTML = listHTML(FIELD[el.dataset.list]));
+  listLimits();
+}
+// lists with a min / max item count: show the count and lock the add button at the maximum
+function listLimits(){
+  rail.querySelectorAll('[data-lcount]').forEach(el => {
+    const f = FIELD[el.dataset.lcount], n = (getRaw(f.k) || []).length;
+    el.textContent = `${f.item} ${n}개 · ${f.min || 1}~${f.max || '∞'}개까지 넣을 수 있어요.`;
+    const add = rail.querySelector(`[data-lact="add"][data-lk="${f.k}"]`); if (add) add.disabled = !!f.max && n >= f.max;
+  });
 }
 function rawFor(path){
   const m = path.match(/^(.*)#(\d+)$/);
@@ -3230,7 +4663,7 @@ function fieldHTML(f){
     case 'select': return `<div class="f"><label for="${id}">${f.l}${ol}</label><select id="${id}" data-k="${f.k}">${f.opts.map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}</select>${hint}</div>`;
     case 'toggle': return `<div class="f"><label class="tog" for="${id}">${f.l}<input type="checkbox" id="${id}" data-k="${f.k}"></label>${hint}</div>`;
     case 'align': return `<div class="f"><span class="lab">${f.l}</span><div class="seg full" role="group" aria-label="${f.l}">
-      ${[['left','왼쪽'],['center','가운데'],['right','오른쪽']].map(([v,l])=>`<button type="button" data-k="${f.k}" data-v="${v}" aria-pressed="false">${l}</button>`).join('')}</div></div>`;
+      ${(f.opts || [['left','왼쪽'],['center','가운데'],['right','오른쪽']]).map(([v,l])=>`<button type="button" data-k="${f.k}" data-v="${v}" aria-pressed="false">${l}</button>`).join('')}</div>${f.hint ? `<div class="hint">${f.hint}</div>` : ''}</div>`;
     case 'image': return `<div class="f"><span class="lab">${f.l}</span><div class="img-f">
       <img class="thumb" data-thumb="${f.k}" alt="">
       <div class="img-actions">
@@ -3239,7 +4672,7 @@ function fieldHTML(f){
         <button type="button" class="btn sm ghost" data-default="${f.k}">기본 이미지</button></div>
       </div></div><div class="hint" data-imghint="${f.k}"></div></div>`;
     case 'list': return `<div class="f"><div class="slides" data-list="${f.k}">${listHTML(f)}</div>
-      <div class="row"><button type="button" class="btn sm" data-lact="add" data-lk="${f.k}">${f.item} 추가</button>
+      ${f.min || f.max ? `<div class="hint" data-lcount="${f.k}"></div>` : ''}<div class="row">${f.countKey ? '' : `<button type="button" class="btn sm" data-lact="add" data-lk="${f.k}">${f.item} 추가</button>`}
       <button type="button" class="btn sm ghost" data-lact="orig" data-lk="${f.k}">기본 목록으로</button></div>
       <div class="hint">카드의 "보기"를 누르면 그 ${f.item}을 가운데에 띄워 멈춘 상태로 보여줘요. 미리보기에서 이미지를 더블클릭해도 바꿀 수 있어요.</div></div>`;
     case 'dnslides': return `<div class="f"><div class="slides" id="dnslides"></div>
@@ -3269,12 +4702,15 @@ function slidesHTML(){
 }
 function listHTML(f){
   const L = getRaw(f.k) || [];
-  return L.map((it,i) => `<div class="slide dn${i===showSlide?' on':''}" data-i="${i}" data-lk="${f.k}">
+  // count-driven list (e.g. Bento Grid "타일 개수"): keep enough items, show only the chosen number
+  const n = f.countKey ? Math.max(1, +getRaw(f.countKey) || L.length) : L.length;
+  if (f.countKey) while (L.length < n) L.push(JSON.parse(JSON.stringify(f.orig[L.length] || f.blank)));
+  return L.slice(0, n).map((it,i) => `<div class="slide dn${i===showSlide?' on':''}" data-i="${i}" data-lk="${f.k}">
     <div class="dn-head"><b>${f.item} ${String(i+1).padStart(2,'0')}</b>
       <button type="button" class="btn sm ghost" data-lact="show">보기</button>
       <button type="button" class="btn sm ghost" data-lact="up" ${i?'':'disabled'} aria-label="앞으로">↑</button>
-      <button type="button" class="btn sm ghost" data-lact="down" ${i<L.length-1?'':'disabled'} aria-label="뒤로">↓</button>
-      <button type="button" class="btn sm ghost" data-lact="del" ${L.length>1?'':'disabled'}>삭제</button></div>
+      <button type="button" class="btn sm ghost" data-lact="down" ${i<n-1?'':'disabled'} aria-label="뒤로">↓</button>
+      ${f.countKey ? '' : `<button type="button" class="btn sm ghost" data-lact="del" ${L.length>(f.min||1)?'':'disabled'}>삭제</button>`}</div>
     ${f.cols.map(c => {
       const v = it[c.k] ?? '';
       if (c.t === 'img') return `<div class="img-f"><img class="thumb" src="${esc(pv(v))}" alt="">
@@ -3314,14 +4750,14 @@ function buildRail(fresh=false){
   rail.innerHTML = head + T.groups.map((g,i) => `<details data-g="${g.id}" ${open.includes(g.id)||(!open.length&&i===0)?'open':''}>
     <summary><span class="dot"></span>${g.title}</summary><div class="fields">${g.fields.map(fieldHTML).join('')}</div></details>`).join('');
   if (fresh) rail.scrollTop = 0;
-  sync();
+  sync(); listLimits();
   select(selected, false);
 }
 function sync(except){
   rail.querySelectorAll('[data-k]').forEach(el => {
     if (el===except) return;
     const k = el.dataset.k, v = get(k), f = FIELD[k];
-    if (f.t==='align') el.setAttribute('aria-pressed', String(el.dataset.v===v));
+    if (f.t==='align') el.setAttribute('aria-pressed', String(el.dataset.v===String(v)));
     else if (el.type==='checkbox') el.checked = !!v;
     else if (el.dataset.url!==undefined) el.value = String(v).startsWith('data:') ? '' : v;
     else el.value = v;
@@ -3380,12 +4816,12 @@ rail.addEventListener('click', e => {
     if (a==='show'){ showSlide = i; if (moving) setMoving(false); else render(); refreshLists(); return; }
     if (a==='up'){ [L[i-1], L[i]] = [L[i], L[i-1]]; showSlide = i-1; }
     if (a==='down'){ [L[i+1], L[i]] = [L[i], L[i+1]]; showSlide = i+1; }
-    if (a==='del'){ L.splice(i,1); showSlide = Math.min(showSlide, L.length-1); }
-    if (a==='add'){ L.push(JSON.parse(JSON.stringify(f.blank))); showSlide = L.length-1; }
+    if (a==='del'){ if (L.length <= (f.min || 1)) return; L.splice(i,1); showSlide = Math.min(showSlide, L.length-1); }
+    if (a==='add'){ if (f.max && L.length >= f.max){ toast(`${f.item}는 최대 ${f.max}개까지예요`); return; } L.push(JSON.parse(JSON.stringify(f.blank))); showSlide = L.length-1; }
     if (a==='orig'){ setPath(k, JSON.parse(JSON.stringify(f.orig))); showSlide = 0; }
     refreshLists(); render(); save(); return;
   }
-  if (b.dataset.v){ set(b.dataset.k, b.dataset.v); render(); sync(); save(); return; }
+  if (b.dataset.v){ const f = FIELD[b.dataset.k]; set(b.dataset.k, f && f.num ? +b.dataset.v : b.dataset.v); if (f && f.relist){ showSlide = 0; refreshLists(); } render(); sync(); save(); return; }
   if (b.dataset.default){ set(b.dataset.default, FIELD[b.dataset.default].def); render(); sync(); save(); return; }
   const act = b.dataset.act; if (!act) return;
   if (act.startsWith('dn-')){
