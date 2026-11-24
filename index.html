@@ -463,8 +463,8 @@ function PH(kind, label, w, h){
   const t = `<text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" letter-spacing="2"`;
   const size = Math.round(Math.min(w, h) * .07);
   const sub = `<text x="50%" y="${50 + Math.round(size * 1.4 / h * 100)}%" text-anchor="middle" dominant-baseline="middle" font-family="Arial,Helvetica,sans-serif" font-size="${Math.round(size * .55)}"`;
-  if (kind === 'photo') return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="#E4E7EC"/><path d="M0 ${h} L${w*.32} ${h*.52} L${w*.5} ${h*.74} L${w*.68} ${h*.42} L${w} ${h} Z" fill="#D2D6DD"/><circle cx="${w*.8}" cy="${h*.24}" r="${Math.min(w,h)*.07}" fill="#D2D6DD"/>${t} font-size="${size}" fill="#8A909C">${label}</text>${sub} fill="#A2A7B1">${w} × ${h}</text></svg>`);
-  if (kind === 'dark') return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><defs><radialGradient id="g" cx=".35" cy=".25" r="1"><stop offset="0" stop-color="#4A4F58"/><stop offset=".55" stop-color="#22252B"/><stop offset="1" stop-color="#0E1013"/></radialGradient></defs><rect width="${w}" height="${h}" fill="url(#g)"/>${t} font-size="${size}" fill="rgba(255,255,255,.28)">${label}</text>${sub} fill="rgba(255,255,255,.2)">${w} × ${h}</text></svg>`);
+  if (kind === 'photo') return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="#E7E7E7"/><path d="M0 ${h} L${w*.32} ${h*.52} L${w*.5} ${h*.74} L${w*.68} ${h*.42} L${w} ${h} Z" fill="#D6D6D6"/><circle cx="${w*.8}" cy="${h*.24}" r="${Math.min(w,h)*.07}" fill="#D6D6D6"/>${t} font-size="${size}" fill="#909090">${label}</text>${sub} fill="#A7A7A7">${w} × ${h}</text></svg>`);
+  if (kind === 'dark') return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><defs><radialGradient id="g" cx=".35" cy=".25" r="1"><stop offset="0" stop-color="#4F4F4F"/><stop offset=".55" stop-color="#252525"/><stop offset="1" stop-color="#101010"/></radialGradient></defs><rect width="${w}" height="${h}" fill="url(#g)"/>${t} font-size="${size}" fill="rgba(255,255,255,.28)">${label}</text>${sub} fill="rgba(255,255,255,.2)">${w} × ${h}</text></svg>`);
   if (kind === 'cutout') return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect x="${w*.14}" y="${h*.12}" width="${w*.72}" height="${h*.76}" rx="${Math.min(w,h)*.12}" fill="rgba(255,255,255,.16)" stroke="rgba(255,255,255,.7)" stroke-width="3" stroke-dasharray="14 10"/>${t} font-size="${size}" fill="rgba(255,255,255,.9)">${label}</text>${sub} fill="rgba(255,255,255,.65)">PNG · ${w} × ${h}</text></svg>`);
   if (kind === 'art') return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="3">${[.42,.32,.22,.12].map((r,i) => `<ellipse cx="${w/2}" cy="${h/2}" rx="${w*r}" ry="${h*r*.8}" stroke-dasharray="${i % 2 ? '10 12' : '0'}"/>`).join('')}<text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="${Math.round(w*.05)}" fill="rgba(255,255,255,.85)" stroke="none">${label}</text></svg>`);
   if (kind === 'logo') return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect x="4" y="${h*.22}" width="${h*.56}" height="${h*.56}" rx="${h*.14}" fill="none" stroke="#FFFFFF" stroke-width="6"/><circle cx="${4+h*.28}" cy="${h/2}" r="${h*.1}" fill="#FFFFFF"/><text x="${h*.56+24}" y="50%" dominant-baseline="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="${h*.36}" letter-spacing="3" fill="#FFFFFF">${label}</text></svg>`);
@@ -472,7 +472,7 @@ function PH(kind, label, w, h){
     let seed = 7, dots = '';
     const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
     for (let i = 0; i < 260; i++) dots += `<circle cx="${(rnd()*w).toFixed(1)}" cy="${(rnd()*h).toFixed(1)}" r="${(rnd()*1.3+.3).toFixed(2)}" fill="rgba(255,255,255,${(rnd()*.6+.2).toFixed(2)})"/>`;
-    return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="#050507"/>${dots}</svg>`);
+    return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="#050505"/>${dots}</svg>`);
   }
   return '';
 }
@@ -491,16 +491,16 @@ const DASOT = (() => {
   const defaults = () => ({
     id: uid(),
     layout:{vh:100, minus:69, minH:0, split:50, swap:false, fullBleed:false, bp:860, mLeftMin:340, mRightMin:420},
-    left:{bg:'#04006F', pad:R(40,24)},
+    left:{bg:'#111111', pad:R(40,24)},
     pot:{slides:POTS.map(src=>({src})), alt:'제품 이미지', auto:true, interval:1600, dur:.4, scale:.88, ease:'bounce',
          w:88, maxW:720, ratio:'3/2', ox:R(0,0), oy:R(0,0)},
-    top:{text:'BRAND COPY TOP', font:'Black Han Sans', weight:'700', color:'#FFFCF7', min:20, vw:6, max:50, lh:1.2, ls:-.01,
+    top:{text:'BRAND COPY TOP', font:'Black Han Sans', weight:'700', color:'#FCFCFC', min:20, vw:6, max:50, lh:1.2, ls:-.01,
          x:R(40,24), y:R(40,24), anim:true, dist:70, adur:.9, delay:.2},
-    bottom:{text:'BRAND COPY BOTTOM', font:'Black Han Sans', weight:'700', color:'#FFFCF7', min:20, vw:6, max:50, lh:1.2, ls:-.01,
+    bottom:{text:'BRAND COPY BOTTOM', font:'Black Han Sans', weight:'700', color:'#FCFCFC', min:20, vw:6, max:50, lh:1.2, ls:-.01,
          x:R(40,24), y:R(40,24), anim:true, dist:70, adur:.9, delay:.35},
     right:{src:RIGHT, alt:'라이프스타일 사진', px:50, py:50, dim:0},
-    head:{tag:'h1', lines:'메인 헤드라인을\n입력하세요', font:'Black Han Sans', weight:'700', color:'#FFFCF7', stroke:'#04006F', sw:1.5,
-          sh:'#04006F', shx:3, shy:3, min:34, vw:5.2, max:74, lh:1.3, ls:-.02, align:'center', pad:40, ox:R(0,0), oy:R(0,0)},
+    head:{tag:'h1', lines:'메인 헤드라인을\n입력하세요', font:'Black Han Sans', weight:'700', color:'#FFFFFF', stroke:'#111111', sw:1.5,
+          sh:'#111111', shx:3, shy:3, min:34, vw:5.2, max:74, lh:1.3, ls:-.02, align:'center', pad:40, ox:R(0,0), oy:R(0,0)},
     type:{on:true, speed:100, pause:250, start:400, cursor:true, cchar:'|', blink:.9}
   });
 
@@ -677,7 +677,7 @@ ${st.right.dim ? '    <div class="hw-dim"></div>\n' : ''}    <div class="hw-cont
 
   return {
     key:'dasot', cat:'hero', no:'H01', title:'Split Showcase', sub:'제품 슬라이드 + 사진 위 타이핑',
-    source:'pearljng.github.io/dasot', swatch:'linear-gradient(90deg,#04006F 0 50%,#E9C98F 50%)',
+    source:'pearljng.github.io/dasot', swatch:'linear-gradient(90deg,#090909 0 50%,#CCCCCC 50%)',
     defaults, groups, fonts, css, html, run, cfg,
     header:st => st.layout.minus, bp:st => st.layout.bp, multiline:/^head\.lines$/,
     drag:{pot:['pot.ox','pot.oy',1,1], head:['head.ox','head.oy',1,1], top:['top.x','top.y',1,1], bottom:['bottom.x','bottom.y',-1,-1]},
@@ -697,9 +697,9 @@ const MLAB = (() => {
     id: uid(),
     layout:{vh:100, padTop:R(108,84), bg:'#020202', fullBleed:false, bp:720},
     bg:{src:BG, px:50, py:50, opacity:.78, bright:.6, contrast:1.15, sat:.9, d1:.28, d2:.44, d3:.78},
-    spot:{on:true, color:'#83FE75', alpha:.45, size:280, opacity:.5, x:50, y:42},
-    eyebrow:{text:'Eyebrow Text Here', font:'Pretendard Variable', weight:'600', color:'#C9FFBC', size:13, ls:.12, upper:true, mb:24},
-    head:{tag:'h1', lines:'Main headline\n*with highlight line.', font:'Pretendard Variable', weight:'600', color:'#FFFFFF', hl:'#83FE75',
+    spot:{on:true, color:'#FFFFFF', alpha:.45, size:280, opacity:.5, x:50, y:42},
+    eyebrow:{text:'Eyebrow Text Here', font:'Pretendard Variable', weight:'600', color:'#CCCCCC', size:13, ls:.12, upper:true, mb:24},
+    head:{tag:'h1', lines:'Main headline\n*with highlight line.', font:'Pretendard Variable', weight:'600', color:'#FFFFFF', hl:'#FFFFFF',
           min:32, vw:7.5, max:88, lh:1.12, ls:-.02, gap:8, align:'center'},
     inner:{padT:80, padB:140, ox:R(0,0), oy:R(0,0)},
     wm:{on:true, text:'BRAND NAME', font:'Pretendard Variable', weight:'800', color:'#FFFFFF', alpha:.04, min:56, vw:13, max:220, ls:-.03, oy:R(0,0)},
@@ -847,7 +847,7 @@ ${st.wm.on ? `  <div class="ml-wm" aria-hidden="true"${a('wm')}${ed('wm.text')}>
 
   return {
     key:'mlab', cat:'hero', alwaysRun:true, no:'H02', title:'Spotlight Statement', sub:'풀스크린 사진 + 글자 타이핑 + 스포트라이트',
-    source:'pearljng.github.io/marketinglab', swatch:'radial-gradient(circle at 50% 45%,#83FE75 0,#1b3a17 28%,#020202 62%)',
+    source:'pearljng.github.io/marketinglab', swatch:'radial-gradient(circle at 50% 45%,#DADADA 0,#313131 28%,#020202 62%)',
     defaults, groups, fonts, css, html, run, cfg:()=>({}),
     header:() => 0, bp:st => st.layout.bp,
     drag:{inner:['inner.ox','inner.oy',1,1], head:['inner.ox','inner.oy',1,1], eyebrow:['inner.ox','inner.oy',1,1], wm:[null,'wm.oy',0,1]},
@@ -987,7 +987,7 @@ ${C} .dn-circle i{position:absolute;left:50%;top:0;width:8px;height:14px;backgro
 @keyframes dnFade-${id}{0%,100%{opacity:.45}50%{opacity:.9}}
 ${C} .dn-bar{height:2px;background:rgba(255,255,255,.35);margin-top:70px;position:relative;z-index:6}
 ${C} .dn-bar i{display:block;width:0;height:100%;background:#FFF;will-change:width}
-${C} .dn-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 90% at 30% 20%,#4A505A 0,#22262D 45%,#0E1014 100%);color:rgba(255,255,255,.38);font:500 13px/1.4 ui-monospace,Menlo,monospace;letter-spacing:.04em;text-align:center}`;
+${C} .dn-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 90% at 30% 20%,#4F4F4F 0,#262626 45%,#101010 100%);color:rgba(255,255,255,.38);font:500 13px/1.4 ui-monospace,Menlo,monospace;letter-spacing:.04em;text-align:center}`;
     if (anim && AN.on) c += `
 @keyframes dnUp-${id}{0%{opacity:0;transform:translateY(${AN.rise}px)}60%{opacity:1;transform:translateY(${+(AN.rise/15).toFixed(2)}px)}100%{opacity:1;transform:translateY(0)}}
 ${C} .dn-txt.is-anim h2{animation:dnUp-${id} ${AN.dur}s cubic-bezier(.16,.84,.32,1) both}
@@ -1105,7 +1105,7 @@ ${U.bar ? `    <div class="dn-bar"${a('bar')}><i></i></div>\n` : ''}  </div>
 
   return {
     key:'dongnam', cat:'hero', no:'H03', title:'Cinematic Reel', sub:'풀스크린 영상 슬라이드 + 진행 바',
-    source:'dongnamad.co.kr/DONGNAM', swatch:'linear-gradient(180deg,#5A606B 0,#1B1E24 70%,#1B1E24 86%,#FFF 86%,#FFF 89%,#1B1E24 89%)',
+    source:'dongnamad.co.kr/DONGNAM', swatch:'linear-gradient(180deg,#606060 0,#1E1E1E 70%,#1E1E1E 86%,#FFF 86%,#FFF 89%,#1E1E1E 89%)',
     defaults, groups, fonts, css, html, run, cfg,
     header:st => st.layout.minus, bp:st => st.layout.bp,
     drag:{cover:['pos.ox','pos.oy',1,1], title:['title.ox','title.oy',1,1], desc:['desc.ox','desc.oy',1,1], info:['ui.ix','ui.iy',1,1], scroll:['ui.sx','ui.sy',1,1]},
@@ -1125,9 +1125,9 @@ const QUOTE = (() => {
   const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<em>$1</em>');
   const defaults = () => ({
     id: uid(),
-    layout:{bg:'#FFFCF7', padT:R(64,40), padB:R(64,40), maxW:900, gutter:20},
+    layout:{bg:'#FCFCFC', padT:R(64,40), padB:R(64,40), maxW:900, gutter:20},
     text:{tag:'h2', lines:'인용 문구의 첫 번째 줄을 입력하세요.\n두 번째 줄에는 **강조 문구**를 넣을 수 있어요.\n세 번째 줄로 문장을 마무리합니다.', font:'GmarketSansMedium', weight:'500',
-          color:'#010000', em:'#04006F', min:20, vw:2.6, max:28, lh:1.6, ls:0, align:'center', ox:R(0,0), oy:R(0,0)}
+          color:'#000000', em:'#000000', min:20, vw:2.6, max:28, lh:1.6, ls:0, align:'center', ox:R(0,0), oy:R(0,0)}
   });
   const groups = [
     {id:'layout', title:'섹션', fields:[
@@ -1166,7 +1166,7 @@ ${C} .pq-text em{font-style:normal;color:${X.em}}
   }
   return {
     key:'quote', cat:'content', no:'C01', title:'Pull Quote', sub:'가운데 정렬 인용 문구', source:'pearljng.github.io/dasot',
-    swatch:'linear-gradient(180deg,#FFFCF7 0 38%,#010000 38% 42%,#FFFCF7 42% 52%,#04006F 52% 56%,#FFFCF7 56%)',
+    swatch:'linear-gradient(180deg,#FCFCFC 0 38%,#000000 38% 42%,#FCFCFC 42% 52%,#090909 52% 56%,#FCFCFC 56%)',
     defaults, groups, fonts, css, html, run:null, cfg:()=>({}),
     header:()=>0, bp:()=>640,
     drag:{text:['text.ox','text.oy',1,1]},
@@ -1187,12 +1187,12 @@ const POTS = (() => {
 
   const defaults = () => ({
     id: uid(),
-    layout:{bg:'#EEAC02', padT:R(64,40), padB:R(64,40), bp:860},
-    head:{text:'Our Products', font:'Black Han Sans', weight:'400', color:'#FFFCF7', min:32, vw:5, max:56, ls:-.02, mb:40, ox:R(0,0), oy:R(0,0)},
+    layout:{bg:'#161616', padT:R(64,40), padB:R(64,40), bp:860},
+    head:{text:'Our Products', font:'Black Han Sans', weight:'400', color:'#FCFCFC', min:32, vw:5, max:56, ls:-.02, mb:40, ox:R(0,0), oy:R(0,0)},
     items:JSON.parse(JSON.stringify(ITEMS)),
-    car:{half:'2', auto:true, interval:3200, gap:24, side:24, dim:.4, scale:.78, blur:2, grow:1.65, ratio:'388/360', arrows:true, arrowBg:'#FFFCF7', arrowFg:'#010000'},
-    cap:{font:'GmarketSansBold', color:'#FFFCF7', min:22, vw:3, max:32, dsize:18, dcolor:'#FFFCF7', mt:40, ox:R(0,0), oy:R(0,0)},
-    btn:{on:true, text:'LEARN MORE', href:'#', bg:'#FFFCF7', fg:'#010000', hover:'#EEAC02', font:'Black Han Sans'}
+    car:{half:'2', auto:true, interval:3200, gap:24, side:24, dim:.4, scale:.78, blur:2, grow:1.65, ratio:'388/360', arrows:true, arrowBg:'#FCFCFC', arrowFg:'#000000'},
+    cap:{font:'GmarketSansBold', color:'#FCFCFC', min:22, vw:3, max:32, dsize:18, dcolor:'#FCFCFC', mt:40, ox:R(0,0), oy:R(0,0)},
+    btn:{on:true, text:'LEARN MORE', href:'#', bg:'#FFFFFF', fg:'#000000', hover:'#D9D9D9', font:'Black Han Sans'}
   });
   const groups = [
     {id:'layout', title:'섹션', fields:[
@@ -1262,8 +1262,8 @@ ${C} .bp-arrow svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-w
 ${C} .bp-cap{text-align:center;margin-top:${P.mt}px;translate:${P.ox.d}px ${P.oy.d}px}
 ${C} .bp-cap h3{margin:0 0 12px;font-family:${stack(P.font)};font-weight:700;font-size:${clampF(P)};letter-spacing:-0.02em;color:${P.color};line-height:1.6}
 ${C} .bp-cap p{margin:0 0 24px;font-size:${P.dsize}px;line-height:1.5;color:${P.dcolor}}
-${C} .bp-btn{display:inline-flex;align-items:center;justify-content:center;height:44px;padding:10px 22px;border-radius:9999px;font-family:${stack(B.font)};font-size:15px;font-weight:400;letter-spacing:-0.01em;text-transform:uppercase;border:none;cursor:pointer;white-space:nowrap;text-decoration:none;background:${B.bg};color:${B.fg};box-shadow:3px 3px 0 #010000;transition:background-color .15s ease,box-shadow .15s ease,transform .15s ease}
-${C} .bp-btn:hover{background:${B.hover};box-shadow:4px 4px 0 #010000;transform:translate(-1px,-1px)}
+${C} .bp-btn{display:inline-flex;align-items:center;justify-content:center;height:44px;padding:10px 22px;border-radius:9999px;font-family:${stack(B.font)};font-size:15px;font-weight:400;letter-spacing:-0.01em;text-transform:uppercase;border:none;cursor:pointer;white-space:nowrap;text-decoration:none;background:${B.bg};color:${B.fg};box-shadow:3px 3px 0 #000000;transition:background-color .15s ease,box-shadow .15s ease,transform .15s ease}
+${C} .bp-btn:hover{background:${B.hover};box-shadow:4px 4px 0 #000000;transform:translate(-1px,-1px)}
 @media (max-width:${L.bp}px){${C} .bp-slot{display:none}${C} .bp-slot.is-center{display:flex;flex:1 1 auto}}
 @media (max-width:640px){${C}{padding:${L.padT.m}px 0 ${L.padB.m}px}${C} .bp-head h2{translate:${H.ox.m}px ${H.oy.m}px}${C} .bp-cap{translate:${P.ox.m}px ${P.oy.m}px}}`;
   }
@@ -1327,7 +1327,7 @@ ${st.btn.on ? `    <a class="bp-btn" href="${esc(st.btn.href)}"${ed('btn.text')}
 
   return {
     key:'pots', cat:'content', no:'C02', title:'Product Carousel', sub:'가운데가 커지는 제품 캐러셀 + 설명', source:'pearljng.github.io/dasot',
-    swatch:'radial-gradient(circle at 50% 46%,#E9831F 0 17%,transparent 18%),radial-gradient(circle at 18% 46%,#F2C3C8 0 9%,transparent 10%),radial-gradient(circle at 82% 46%,#3E4A2A 0 9%,transparent 10%),#EEAC02',
+    swatch:'radial-gradient(circle at 50% 46%,#919191 0 17%,transparent 18%),radial-gradient(circle at 18% 46%,#CDCDCD 0 9%,transparent 10%),radial-gradient(circle at 82% 46%,#454545 0 9%,transparent 10%),#AEAEAE',
     defaults, groups, fonts, css, html, run, cfg,
     header:()=>0, bp:()=>640,
     drag:{head:['head.ox','head.oy',1,1], cap:['cap.ox','cap.oy',1,1]},
@@ -1359,7 +1359,7 @@ const CHOICE = (() => {
      video:'', poster:PH('art', 'ART 01', 1080, 1080), left:59, top:-1, width:57, rot:0, flip:true, gray:false, opacity:.5, blend:'screen', rate:1.2, tTop:9, mRight:-46.6, mTop:3, mW:190},
     {title:'서비스 B 제목', desc:'서비스 B를 소개하는 첫 번째 줄\n두 번째 줄 설명을 입력하세요',
      tags:'태그 문구 01\n태그 02\n조금 더 긴 태그 문구 03\n태그 문구 04\n태그 문구 05\n태그 06',
-     href:'#', hover:'자세히 보기', bg:'#2B5FFF', bga:1, accent:'#2B5FFF',
+     href:'#', hover:'자세히 보기', bg:'#3A3A3A', bga:1, accent:'#3A3A3A',
      video:'', poster:PH('art', 'ART 02', 702, 720), left:40.8, top:-17.4, width:85, rot:-30, flip:false, gray:true, opacity:1, blend:'screen', rate:2, tTop:1, mRight:-92.5, mTop:-25, mW:277}
   ];
   const defaults = () => ({
@@ -1399,7 +1399,7 @@ const CHOICE = (() => {
              {k:'opacity', l:'장식 진하기 (0~1)', t:'num', step:.05}, {k:'rate', l:'영상 속도 배율', t:'num', step:.1},
              {k:'blend', l:'장식 합성 방식', t:'select', opts:[['screen','screen (검정 배경 지우기)'],['normal','그대로'],['lighten','lighten']]},
              {k:'flip', l:'장식 좌우 뒤집기', t:'toggle'}, {k:'gray', l:'장식 흑백으로', t:'toggle'}],
-       blank:{title:'새 카드', desc:'설명을 입력하세요', tags:'태그 1\n태그 2\n태그 3', href:'#', hover:'바로가기', bg:'#1E1E28', bga:1, accent:'#000000',
+       blank:{title:'새 카드', desc:'설명을 입력하세요', tags:'태그 1\n태그 2\n태그 3', href:'#', hover:'바로가기', bg:'#1F1F1F', bga:1, accent:'#000000',
               video:'', poster:'', left:55, top:0, width:60, rot:0, flip:false, gray:false, opacity:1, blend:'normal', rate:1, tTop:5, mRight:-60, mTop:0, mW:200}}
     ]},
     {id:'grid', title:'카드 배치', fields:[
@@ -1660,7 +1660,7 @@ ${C} .cc-arrow{opacity:1;transform:rotate(45deg);filter:brightness(0) invert(1)}
 
   return {
     key:'choice', cat:'content', no:'C03', title:'Choice Cards', sub:'제목 + 카드 2장, 떨어지는 태그 캡슐', source:'plan-et.co.kr',
-    swatch:'linear-gradient(90deg,#000 0 8%,#15161A 8% 47%,#000 47% 53%,#2B5FFF 53% 92%,#000 92%)',
+    swatch:'linear-gradient(90deg,#000 0 8%,#161616 8% 47%,#000 47% 53%,#5F5F5F 53% 92%,#000 92%)',
     defaults, groups, fonts, css, html, run, cfg, libs:[LIB.gsap, LIB.matter],
     header:()=>0, bp:()=>767,
     drag:{title:['title.ox','title.oy',1,1]},
@@ -1678,10 +1678,10 @@ const FAQ = (() => {
   const ITEMS = [1,2,3,4,5].map(i => ({q:`자주 묻는 질문 0${i}을 입력하세요?`, a:`질문 0${i}에 대한 답변을 입력하세요. 두세 문장으로 핵심을 설명하면 좋아요.`, open:false}));
   const defaults = () => ({
     id: uid(),
-    layout:{bg:'#F5F6F8', fill:true, padY:120, maxW:1280},
-    title:{text:'자주 묻는 **질문들**', tag:'h2', font:'Pretendard Variable', weight:'700', color:'#000000', em:'#2B5FFF', size:60, msize:32, ls:-1.5, lh:1.1, ox:R(0,0), oy:R(0,0)},
+    layout:{bg:'#F6F6F6', fill:true, padY:120, maxW:1280},
+    title:{text:'자주 묻는 **질문들**', tag:'h2', font:'Pretendard Variable', weight:'700', color:'#000000', em:'#000000', size:60, msize:32, ls:-1.5, lh:1.1, ox:R(0,0), oy:R(0,0)},
     items:JSON.parse(JSON.stringify(ITEMS)),
-    style:{gap:16, mt:97, radius:15, bg:'#FFFFFF', openBg:'#2B5FFF', q:'#444444', qOpen:'#FFFFFF', qHover:'#2B5FFF', qSize:20, aSize:16, a:'#FFFFFF', aAlpha:.8, icon:'#2B5FFF'},
+    style:{gap:16, mt:97, radius:15, bg:'#FFFFFF', openBg:'#111111', q:'#444444', qOpen:'#FFFFFF', qHover:'#000000', qSize:20, aSize:16, a:'#FFFFFF', aAlpha:.8, icon:'#111111'},
     anim:{on:true, single:true, pull:true}
   });
   const groups = [
@@ -1744,7 +1744,7 @@ ${C} .fq-item.is-open .fq-minus{opacity:1;transform:none}
 ${C} .fq-a{overflow:hidden;cursor:pointer}
 ${C} .fq-a[hidden]{display:none}
 ${C} .fq-a p{margin:-4px 0 0;padding:0 40px 30px;font-family:${stack(Ti.font)};font-size:${Y.aSize}px;font-weight:400;line-height:1.5;letter-spacing:-0.4px;color:${rgba(Y.a, Y.aAlpha)};white-space:pre-line}
-@media (hover:hover){${C} .fq-item:not(.is-open):hover{box-shadow:0 12px 32px rgba(40,59,104,.08)}${C} .fq-item:not(.is-open):hover .fq-q-text{color:${Y.qHover}}}
+@media (hover:hover){${C} .fq-item:not(.is-open):hover{box-shadow:0 12px 32px rgba(0,0,0,.08)}${C} .fq-item:not(.is-open):hover .fq-q-text{color:${Y.qHover}}}
 ${C} .fq-q:focus-visible{outline:2px solid ${Y.openBg};outline-offset:-2px;border-radius:${Y.radius}px}
 @media (max-width:767px){
 ${C}{--mpx:clamp(1px, calc(1px + (100vw - 375px) * 0.3 / 392), 1.3px);min-height:0;padding:calc(${L.padY} * var(--mpx)) 0}
@@ -1839,7 +1839,7 @@ ${C} .fq-a p{margin-top:-2px;padding:0 calc(16 * var(--mpx)) calc(16 * var(--mpx
   const cfg = st => ({on:st.anim.on, single:st.anim.single, pull:st.anim.pull});
   return {
     key:'faq', cat:'content', no:'C04', title:'FAQ Accordion', sub:'눌러서 펼치는 질문 목록', source:'plan-et.co.kr',
-    swatch:'linear-gradient(180deg,#F5F6F8 0 20%,#fff 20% 36%,#F5F6F8 36% 44%,#2B5FFF 44% 66%,#F5F6F8 66% 74%,#fff 74% 90%,#F5F6F8 90%)',
+    swatch:'linear-gradient(180deg,#F6F6F6 0 20%,#fff 20% 36%,#F6F6F6 36% 44%,#5F5F5F 44% 66%,#F6F6F6 66% 74%,#fff 74% 90%,#F6F6F6 90%)',
     defaults, groups, fonts, css, html, run, cfg, libs:[LIB.gsap], alwaysRun:true,
     header:()=>0, bp:()=>767,
     drag:{title:['title.ox','title.oy',1,1]},
@@ -1860,12 +1860,12 @@ const TABFAQ = (() => {
   const stack = f => `'${f}','Pretendard',Inter,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif`;
   const defaults = () => ({
     id: uid(),
-    layout:{bg:'#191716', padT:R(120,64), padB:R(120,64), maxW:1600, side:R(48,16), gap:R(40,36)},
-    title:{text:'FAQ', tag:'h2', font:'Pretendard Variable', color:'#FAFAF9', d:40, m:24, align:'left', ox:R(0,0), oy:R(0,0)},
-    tabs:{show:true, list:NY_TABS, color:'#767270', active:'#FAFAF9'},
+    layout:{bg:'#171717', padT:R(120,64), padB:R(120,64), maxW:1600, side:R(48,16), gap:R(40,36)},
+    title:{text:'FAQ', tag:'h2', font:'Pretendard Variable', color:'#FAFAFA', d:40, m:24, align:'left', ox:R(0,0), oy:R(0,0)},
+    tabs:{show:true, list:NY_TABS, color:'#737373', active:'#FAFAFA'},
     items:JSON.parse(JSON.stringify(NY_ITEMS)),
-    style:{line:'#FFFFFF', lineA:.25, q:'#FAFAF9', a:'#A6A3A0', link:'#2E90FA', plus:'#FAFAF9', minus:'#F22717', qd:20, qm:16, ad:20, am:14, ellipsis:true},
-    btn:{show:true, text:'FAQ 바로가기', href:'#', bg:'#FAFAF9', fg:'#191716'},
+    style:{line:'#FFFFFF', lineA:.25, q:'#FAFAFA', a:'#A3A3A3', link:'#FFFFFF', plus:'#FAFAFA', minus:'#FAFAFA', qd:20, qm:16, ad:20, am:14, ellipsis:true},
+    btn:{show:true, text:'FAQ 바로가기', href:'#', bg:'#FAFAFA', fg:'#171717'},
     behave:{single:true}
   });
   const tabNames = st => st.tabs.list.split('\n').map(s => s.trim()).filter(Boolean);
@@ -2053,7 +2053,7 @@ ${st.btn.show ? `    <a class="tf-btn" href="${esc(st.btn.href)}"${ed('btn.text'
 
   return {
     key:'tabfaq', cat:'content', no:'C05', title:'Tabbed FAQ', sub:'카테고리 탭 + 구분선 아코디언 (다크)', source:'new.nypc.co.kr',
-    swatch:'linear-gradient(180deg,#191716 0 22%,#FAFAF9 22% 25%,#191716 25% 40%,#5A5856 40% 41%,#191716 41% 58%,#5A5856 58% 59%,#191716 59% 76%,#5A5856 76% 77%,#191716 77%)',
+    swatch:'linear-gradient(180deg,#171717 0 22%,#FAFAFA 22% 25%,#171717 25% 40%,#585858 40% 41%,#171717 41% 58%,#585858 58% 59%,#171717 59% 76%,#585858 76% 77%,#171717 77%)',
     defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
     header:()=>0, bp:()=>767,
     drag:{title:['title.ox','title.oy',1,1]},
@@ -2081,9 +2081,9 @@ const STICKY = (() => {
     id: uid(),
     layout:{bg:'#FFFFFF', maxW:1314, padT:R(100,40), padB:R(120,50), side:R(0,20), gap:142, left:376, sticky:100, bp:1023},
     title:{text:'섹션 제목을\n두 줄로 입력하세요', font:'Pretendard Variable', color:'#000000', d:34, m:26},
-    nav:{size:18, color:'#818897', accent:'#0AC290', mt:40},
+    nav:{size:18, color:'#8A8A8A', accent:'#000000', mt:40},
     items:JSON.parse(JSON.stringify(ITEMS)),
-    post:{space:R(120,50), radius:R(0,8), title:'#2E3138', info:'#515662', tsize:22, isize:R(18,14)}
+    post:{space:R(120,50), radius:R(0,8), title:'#313131', info:'#565656', tsize:22, isize:R(18,14)}
   });
   const groups = [
     {id:'layout', title:'섹션', fields:[
@@ -2213,7 +2213,7 @@ ${C} .sf-step{font-size:${P.isize.m}px;line-height:24px;color:${P.info};letter-s
   const cfg = st => ({sticky:st.layout.sticky});
   return {
     key:'sticky', cat:'content', group:'feature', no:'C06', title:'Sticky Feature List', sub:'왼쪽 고정 제목·메뉴 + 오른쪽 이미지 설명 목록',
-    swatch:'linear-gradient(90deg,#fff 0 6%,#2E3138 6% 30%,#fff 30% 42%,#C9CDD4 42% 94%,#fff 94%)',
+    swatch:'linear-gradient(90deg,#fff 0 6%,#313131 6% 30%,#fff 30% 42%,#CDCDCD 42% 94%,#fff 94%)',
     defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
     header:()=>0, bp:st => st.layout.bp,
     drag:{},
@@ -2235,10 +2235,10 @@ const STATS = (() => {
   ];
   const defaults = () => ({
     id: uid(),
-    layout:{bg:'#FFFFFF', maxW:1600, line:'#D0CDC8'},
-    title:{text:'숫자로 증명하는\n**브랜드 이름**의\n핵심 성과', font:'Geist', color:'#0B0B0B', accent:'#EB5D2B', w:402},
+    layout:{bg:'#FFFFFF', maxW:1600, line:'#CDCDCD'},
+    title:{text:'숫자로 증명하는\n**브랜드 이름**의\n핵심 성과', font:'Geist', color:'#0B0B0B', accent:'#0B0B0B', w:402},
     items:JSON.parse(JSON.stringify(ITEMS)),
-    style:{num:'#0B0B0B', label:'#0B0B0B', desc:'#68655E', numW:460},
+    style:{num:'#0B0B0B', label:'#0B0B0B', desc:'#656565', numW:460},
     anim:{reveal:true, count:true, dur:1400}
   });
   const groups = [
@@ -2347,7 +2347,7 @@ ${C} .st-num{width:${Y.numW}px}}
   const cfg = st => ({reveal:st.anim.reveal, count:st.anim.count, dur:st.anim.dur});
   return {
     key:'stats', cat:'content', group:'stats', no:'C07', title:'Stat Counter', sub:'큰 숫자 지표 + 카운트업 + 구분선 목록',
-    swatch:'linear-gradient(180deg,#fff 0 20%,#0B0B0B 20% 34%,#fff 34% 40%,#D0CDC8 40% 42%,#fff 42% 52%,#0B0B0B 52% 66%,#fff 66% 72%,#D0CDC8 72% 74%,#fff 74%)',
+    swatch:'linear-gradient(180deg,#fff 0 20%,#0B0B0B 20% 34%,#fff 34% 40%,#CDCDCD 40% 42%,#fff 42% 52%,#0B0B0B 52% 66%,#fff 66% 72%,#CDCDCD 72% 74%,#fff 74%)',
     defaults, groups, fonts, css, html, run, cfg,
     header:()=>0, bp:()=>1279,
     drag:{}, selectGroup:{section:'items', title:'title', items:'items'},
@@ -2364,11 +2364,11 @@ const LOGOS = (() => {
   const ITEMS = [1,2,3,4,5,6,7,8,9,10,11,12].map(i => ({img:PH('logo', `LOGO ${String(i).padStart(2,'0')}`, 400, 120), alt:`파트너 ${String(i).padStart(2,'0')}`}));
   const defaults = () => ({
     id: uid(),
-    layout:{bg:'#0B0B0B', glow:'#B4461E', glowA:.55},
-    title:{text:'함께하는 **파트너 네트워크**', sub:'파트너십을 소개하는 한 줄 설명 문구를 입력하세요.', font:'Geist', color:'#FFFFFF', accent:'#EA5521', subColor:'#ACACAC'},
+    layout:{bg:'#0B0B0B', glow:'#5A5A5A', glowA:.55},
+    title:{text:'함께하는 **파트너 네트워크**', sub:'파트너십을 소개하는 한 줄 설명 문구를 입력하세요.', font:'Geist', color:'#FFFFFF', accent:'#FFFFFF', subColor:'#ACACAC'},
     logos:JSON.parse(JSON.stringify(ITEMS)),
     track:{speed:67, fade:true, hover:true},
-    cta:{show:true, text:'문의하기', href:'#', color:'#FFFFFF', fill:'#EA5623', glow:'#FF8A55'}
+    cta:{show:true, text:'문의하기', href:'#', color:'#FFFFFF', fill:'#3A3A3A', glow:'#6A6A6A'}
   });
   const groups = [
     {id:'layout', title:'섹션', fields:[
@@ -2482,7 +2482,7 @@ ${st.cta.show ? `  <div class="lg-cta-row rv" style="--ry:16px"><a class="lg-cta
   const cfg = st => ({speed:st.track.speed, reveal:true});
   return {
     key:'logos', cat:'content', group:'partners', no:'C08', title:'Logo Marquee', sub:'흐르는 파트너 로고 줄 + 채워지는 버튼 (다크)',
-    swatch:'radial-gradient(120% 70% at 50% 120%,rgba(180,70,30,.7) 0%,#0b0b0b 58%)',
+    swatch:'radial-gradient(120% 70% at 50% 120%,rgba(90,90,90,.7) 0%,#0b0b0b 58%)',
     defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
     header:()=>0, bp:()=>767,
     drag:{}, selectGroup:{section:'logos', title:'title', logos:'logos'},
@@ -2502,11 +2502,11 @@ const IMGMSG = (() => {
   const defaults = () => ({
     id: uid(),
     layout:{vh:80, minH:560, padY:R(140,96), maxW:960, align:'center'},
-    bg:{src:BGDEF, px:50, py:50, color:'#0B0C10', a1:.35, a2:.65, zoom:true},
+    bg:{src:BGDEF, px:50, py:50, color:'#0C0C0C', a1:.35, a2:.65, zoom:true},
     eyebrow:{show:true, text:'BRAND MESSAGE', color:'#FFFFFF', alpha:.7, size:14, ls:.2},
     msg:{lines:'브랜드가 전하고 싶은 메시지를\n**한 문장**으로 담아 보세요.\n세 번째 줄로 마무리합니다.', font:'Pretendard Variable', weight:'700',
-         color:'#FFFFFF', accent:'#FFD25A', min:28, vw:3.6, max:60, lh:1.4, ls:-.02},
-    btn:{show:true, text:'자세히 보기', href:'#', style:'fill', bg:'#FFFFFF', fg:'#0B0C10', gap:R(48,32)},
+         color:'#FFFFFF', accent:'#FFFFFF', min:28, vw:3.6, max:60, lh:1.4, ls:-.02},
+    btn:{show:true, text:'자세히 보기', href:'#', style:'fill', bg:'#FFFFFF', fg:'#0C0C0C', gap:R(48,32)},
     anim:{on:true, unit:'line', start:.2, dur:1.1, blur:8, rise:24, stagger:0, btnDelay:.2}
   });
   const groups = [
@@ -2624,7 +2624,7 @@ ${st.btn.show ? `    <div class="im-btn-row" style="--d:${n(u.end + AN.btnDelay,
   const cfg = st => ({on:st.anim.on});
   return {
     key:'imgmsg', cat:'content', group:'text', no:'C09', title:'Image Message', sub:'배경 이미지 + 스르르 나타나는 메시지 + 올라오는 버튼',
-    swatch:'linear-gradient(180deg,rgba(11,12,16,.35),rgba(11,12,16,.85)),radial-gradient(circle at 30% 30%,#6B7280,#1F2329)',
+    swatch:'linear-gradient(180deg,rgba(12,12,12,.35),rgba(12,12,12,.85)),radial-gradient(circle at 30% 30%,#727272,#232323)',
     defaults, groups, fonts, css, html, run, cfg,
     header:()=>0, bp:()=>767,
     drag:{}, selectGroup:{section:'bg', msg:'msg'},
@@ -2644,12 +2644,12 @@ const LENS = (() => {
   const defaults = () => ({
     id: uid(),
     layout:{vh:100, minH:640, side:R(96,24), maxW:1280, align:'left'},
-    base:{src:BASE, px:50, py:50, color:'#0B0C10', a:.35, text:'#FFFFFF', accent:'#FFD25A'},
-    reveal:{src:REVEAL, px:50, py:50, color:'#FFD25A', imgA:.45, text:'#111111', accent:'#111111'},
+    base:{src:BASE, px:50, py:50, color:'#0B0B0B', a:.35, text:'#FFFFFF', accent:'#FFFFFF'},
+    reveal:{src:REVEAL, px:50, py:50, color:'#FFFFFF', imgA:.35, text:'#111111', accent:'#111111'},
     eyebrow:{show:true, text:'INTERACTIVE HERO', size:14, ls:.2},
     head:{tag:'h1', text:'보이는 것 너머의\n**이야기**를 만듭니다.', alt:'커서를 움직이면\n**숨은 장면**이 보여요.', font:'Pretendard Variable', weight:'800', min:40, vw:6, max:104, lh:1.12, ls:-.03},
     sub:{show:true, text:'히어로 문구를 설명하는 한 줄을 입력하세요. 두 번째 장면의 이미지와 문구는 렌즈 안에서만 보여요.', size:R(19,15), maxW:560},
-    btn:{show:true, text:'자세히 보기', href:'#', bg:'#FFFFFF', fg:'#0B0C10'},
+    btn:{show:true, text:'자세히 보기', href:'#', bg:'#FFFFFF', fg:'#0C0C0C'},
     lens:{size:R(200,130), press:1.6, soft:2, ease:.16, ring:true, ringColor:'#FFFFFF', idle:true}
   });
   const groups = [
@@ -2790,7 +2790,7 @@ ${st.sub.show ? `      <p class="ln-sub"${alt ? '' : ed('sub.text')}>${esc(st.su
   const cfg = st => ({rd:st.lens.size.d, rm:st.lens.size.m, press:st.lens.press, ease:st.lens.ease, idle:st.lens.idle});
   return {
     key:'lens', cat:'hero', group:'hover', no:'H04', title:'Reveal Lens', sub:'커서를 따라오는 렌즈 속에 숨은 두 번째 장면',
-    swatch:'radial-gradient(circle at 62% 50%,#FFD25A 0 26%,transparent 27%),linear-gradient(135deg,#2A2D35,#0B0C10)',
+    swatch:'radial-gradient(circle at 62% 50%,#D3D3D3 0 26%,transparent 27%),linear-gradient(135deg,#2D2D2D,#0C0C0C)',
     defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
     header:()=>0, bp:()=>767,
     drag:{}, selectGroup:{section:'base', text:'head'},
@@ -2800,150 +2800,138 @@ ${st.sub.show ? `      <p class="ln-sub"${alt ? '' : ed('sub.text')}>${esc(st.su
 })();
 
 /* =====================================================================
-   Content 10 · Expand Panels (original design)
-   a row of image panels; the hovered one widens and shows its text (vertical accordion on small screens)
+   Content 10 · Image Trail (original design)
+   moving the cursor leaves a trail of images that pop in and fade away
    ===================================================================== */
-const PANELS = (() => {
+const TRAIL = (() => {
   const stack = f => `'${f}','Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif`;
-  const KINDS = ['photo', 'dark', 'art', 'photo', 'dark'];
-  const ITEMS = [1,2,3,4,5].map(i => ({img:PH(KINDS[i-1], `PANEL 0${i}`, 1200, 1400), title:`패널 제목 0${i}`, desc:'패널을 설명하는 짧은 문장을 입력하세요.\n두 번째 줄 설명입니다.', link:'자세히 보기', href:'#'}));
+  const KINDS = ['photo', 'dark', 'art', 'photo', 'dark', 'art'];
+  const ITEMS = KINDS.map((k, i) => ({img:PH(k, `TRAIL 0${i + 1}`, 600, 750)}));
   const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<em>$1</em>').replace(/\n/g, '<br>');
   const defaults = () => ({
     id: uid(),
-    layout:{bg:'#0E0F13', padT:R(120,72), padB:R(120,72), maxW:1440, side:R(40,20)},
-    head:{show:true, eyebrow:'EXPAND PANELS', text:'마우스를 올리면\n**펼쳐지는** 갤러리', font:'Pretendard Variable', color:'#FFFFFF', accent:'#7CF2C6', min:28, vw:3.2, max:56, mb:R(56,32), align:'left'},
-    panel:{h:R(600,380), closed:76, gap:12, radius:20, grow:4.5, speed:.7, dim:.5, start:0, keep:true, numbers:true},
+    layout:{bg:'#F2F2F2', vh:90, minH:620, padY:R(120,80), maxW:1000, align:'center'},
+    head:{eyebrow:'IMAGE TRAIL', text:'커서를 움직이면\n이미지가 따라 남아요', font:'Pretendard Variable', color:'#111111', em:'#111111', min:36, vw:5.2, max:104, lh:1.1, ls:-.03},
+    sub:{show:true, text:'마우스를 움직이는 길을 따라 이미지가 하나씩 나타났다가 사라져요.', color:'#555555', size:R(18,15)},
     items:JSON.parse(JSON.stringify(ITEMS)),
-    text:{title:'#FFFFFF', desc:'#D7DAE0', num:'#7CF2C6', tsize:R(32,24), dsize:R(16,14)}
+    trail:{w:R(220,130), ratio:'4/5', radius:6, gap:90, life:1100, rotate:8, gray:true, front:false}
   });
   const groups = [
     {id:'layout', title:'섹션', fields:[
       {k:'layout.bg', l:'배경색', t:'color'},
-      A('layout.padT','위 여백',0,300,1,'px',{r:1}), A('layout.padB','아래 여백',0,300,1,'px',{r:1}),
-      A('layout.maxW','최대 너비',600,2000,10,'px'), A('layout.side','좌우 여백',0,120,1,'px',{r:1})
+      A('layout.vh','높이 (화면 높이 대비)',30,100,1,'vh'), A('layout.minH','최소 높이',0,1200,10,'px'),
+      A('layout.padY','위아래 여백',0,300,1,'px',{r:1}), A('layout.maxW','문구 최대 너비',320,1600,10,'px'),
+      {k:'layout.align', l:'정렬', t:'align'}
     ]},
-    {id:'head', title:'제목', fields:[
-      {k:'head.show', l:'제목 표시', t:'toggle'}, {k:'head.eyebrow', l:'작은 제목', t:'text'},
+    {id:'head', title:'제목 · 설명', fields:[
+      {k:'head.eyebrow', l:'작은 제목 (비우면 숨김)', t:'text'},
       {k:'head.text', l:'제목 (줄바꿈 · **강조**)', t:'textarea'},
       {k:'head.font', l:'글꼴', t:'select', opts:fontOpts},
-      {k:'head.color', l:'글자색', t:'color'}, {k:'head.accent', l:'강조색', t:'color'},
-      ...sizeFields('head'), A('head.mb','제목과 패널 간격',0,160,1,'px',{r:1}), {k:'head.align', l:'정렬', t:'align'}
+      {k:'head.color', l:'글자색', t:'color'}, {k:'head.em', l:'강조색', t:'color'},
+      ...sizeFields('head'), A('head.lh','줄 간격',.8,2,.01,'×'), A('head.ls','자간',-.1,.2,.005,'em'),
+      {k:'sub.show', l:'설명 표시', t:'toggle'}, {k:'sub.text', l:'설명 (줄바꿈)', t:'textarea'},
+      {k:'sub.color', l:'설명 색', t:'color'}, A('sub.size','설명 크기',11,32,1,'px',{r:1})
     ]},
-    {id:'items', title:'패널 목록', fields:[
-      {k:'items', l:'패널', t:'list', item:'패널', orig:ITEMS,
-       cols:[{k:'img', l:'이미지', t:'img'}, {k:'title', l:'제목', t:'text'}, {k:'desc', l:'설명 (줄바꿈 · **굵게**)', t:'textarea'},
-             {k:'link', l:'링크 문구 (비우면 숨김)', t:'text'}, {k:'href', l:'연결 주소', t:'text'}],
-       blank:{img:'', title:'새 패널', desc:'설명을 입력하세요.', link:'자세히 보기', href:'#'}}
+    {id:'items', title:'이미지 목록', fields:[
+      {k:'items', l:'이미지', t:'list', item:'이미지', orig:ITEMS,
+       cols:[{k:'img', l:'이미지', t:'img'}],
+       blank:{img:''}}
     ]},
-    {id:'panel', title:'패널 동작', fields:[
-      A('panel.h','패널 높이 (좁은 화면은 펼친 높이)',200,900,10,'px',{r:1}), A('panel.closed','좁은 화면 · 접힌 패널 높이',44,160,1,'px'),
-      A('panel.gap','패널 간격',0,40,1,'px'), A('panel.radius','모서리',0,48,1,'px'),
-      A('panel.grow','펼친 패널 너비 (접힌 패널의 몇 배)',1.5,10,.1,'×'),
-      A('panel.speed','펼쳐지는 시간',.2,2,.05,'s'), A('panel.dim','접힌 패널 어둡게',0,.9,.01,''),
-      A('panel.start','처음 펼쳐 둘 패널 번호',1,10,1,'',{hint:'페이지를 열었을 때 펼쳐져 있는 패널이에요.'}),
-      {k:'panel.keep', l:'마우스가 나가도 마지막 패널을 펼쳐 두기', t:'toggle'},
-      {k:'panel.numbers', l:'번호 표시', t:'toggle'}
-    ]},
-    {id:'text', title:'패널 글자', fields:[
-      {k:'text.title', l:'제목 색', t:'color'}, {k:'text.desc', l:'설명 색', t:'color'}, {k:'text.num', l:'번호 색', t:'color'},
-      A('text.tsize','제목 크기',14,64,1,'px',{r:1}), A('text.dsize','설명 크기',11,24,1,'px',{r:1})
+    {id:'trail', title:'따라오는 이미지', fields:[
+      A('trail.w','이미지 너비',60,500,1,'px',{r:1}),
+      {k:'trail.ratio', l:'이미지 비율', t:'select', opts:[['4/5','4:5'],['3/4','3:4'],['1/1','1:1'],['4/3','4:3'],['16/9','16:9']]},
+      A('trail.radius','모서리',0,40,1,'px'),
+      A('trail.gap','이미지 사이 거리',20,300,1,'px',{hint:'커서가 이만큼 움직일 때마다 이미지가 하나씩 나타나요.'}),
+      A('trail.life','머무는 시간',300,3000,50,'ms'), A('trail.rotate','무작위 기울기',0,30,1,'°'),
+      {k:'trail.gray', l:'이미지를 흑백으로', t:'toggle'},
+      {k:'trail.front', l:'이미지가 글자 위로 지나가기', t:'toggle'}
     ]}
   ];
   const fonts = st => [st.head.font, 'Pretendard Variable'];
   function css(st){
-    const C = '.hw-'+st.id, L = st.layout, H = st.head, P = st.panel, X = st.text;
-    const ease = 'cubic-bezier(.65,.05,.25,1)';
-    return `${C}{background:${L.bg};margin:0;padding:${L.padT.d}px 0 ${L.padB.d}px;font-family:${stack(H.font)};-webkit-font-smoothing:antialiased}
+    const C = '.hw-'+st.id, L = st.layout, H = st.head, S = st.sub, TR = st.trail;
+    const items = {left:'flex-start', center:'center', right:'flex-end'}[L.align];
+    const img = w => `width:${w}px;aspect-ratio:${TR.ratio}`;
+    return `${C}{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:max(${L.minH}px, ${L.vh}svh);margin:0;padding:${L.padY.d}px 24px;background:${L.bg};font-family:${stack(H.font)};-webkit-font-smoothing:antialiased;touch-action:pan-y}
 ${C} *{box-sizing:border-box;margin:0;padding:0}
-${C} .xp-inner{max-width:${L.maxW}px;margin:0 auto;padding:0 ${L.side.d}px}
-${C} .xp-head{margin-bottom:${H.mb.d}px;text-align:${H.align};color:${H.color}}
-${C} .xp-eyebrow{margin-bottom:14px;font-size:13px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
-${C} .xp-title{font-family:${stack(H.font)};font-size:${clampF(H)};font-weight:800;line-height:1.2;letter-spacing:-.02em;word-break:keep-all}
-${C} .xp-title em{font-style:normal;color:${H.accent}}
-${C} .xp-row{display:flex;gap:${P.gap}px;height:${P.h.d}px}
-${C} .xp-p{position:relative;flex:1 1 0;min-width:0;border-radius:${P.radius}px;overflow:hidden;cursor:pointer;background:#1C1E24;outline:none;transition:flex-grow ${P.speed}s ${ease}}
-${C} .xp-p:focus-visible{box-shadow:0 0 0 3px ${H.accent}}
-${C} .xp-p.is-on{flex-grow:${P.grow}}
-${C} .xp-img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;transform:scale(1.12);transition:transform ${(P.speed * 1.8).toFixed(2)}s ${ease}}
-${C} .xp-p.is-on .xp-img{transform:scale(1)}
-${C} .xp-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,${(P.dim * .4).toFixed(2)}),rgba(0,0,0,${P.dim}));transition:background ${P.speed}s}
-${C} .xp-p.is-on .xp-shade{background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(0,0,0,.72))}
-${C} .xp-label{position:absolute;left:50%;bottom:28px;writing-mode:vertical-rl;transform:translateX(-50%) rotate(180deg);white-space:nowrap;font-size:16px;font-weight:700;letter-spacing:.02em;color:${X.title};transition:opacity .3s}
-${C} .xp-label b{display:inline-block;margin-bottom:12px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:12px;font-weight:500;color:${X.num}}
-${C} .xp-p.is-on .xp-label{opacity:0}
-${C} .xp-body{position:absolute;left:32px;right:32px;bottom:32px;min-width:280px;opacity:0;transform:translateY(18px);transition:opacity .35s,transform .35s}
-${C} .xp-p.is-on .xp-body{opacity:1;transform:none;transition:opacity .5s ${(P.speed * .5).toFixed(2)}s,transform .6s ${ease} ${(P.speed * .5).toFixed(2)}s}
-${C} .xp-num{display:block;margin-bottom:10px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:13px;color:${X.num}}
-${C} .xp-ptitle{font-size:${X.tsize.d}px;font-weight:800;line-height:1.2;letter-spacing:-.02em;color:${X.title}}
-${C} .xp-desc{margin-top:12px;max-width:420px;font-size:${X.dsize.d}px;line-height:1.6;color:${X.desc};word-break:keep-all}
-${C} .xp-desc em{font-style:normal;font-weight:700;color:${X.title}}
-${C} .xp-link{display:inline-flex;align-items:center;gap:8px;margin-top:20px;font-size:14px;font-weight:700;color:${X.title};text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:3px}
-${C} .xp-link:hover{color:${X.num}}
-@media (max-width:767px){
-${C}{padding:${L.padT.m}px 0 ${L.padB.m}px}
-${C} .xp-inner{padding:0 ${L.side.m}px}
-${C} .xp-head{margin-bottom:${H.mb.m}px}
-${C} .xp-row{flex-direction:column;height:auto}
-${C} .xp-p{flex:none;height:${P.closed}px;transition:height ${P.speed}s ${ease}}
-${C} .xp-p.is-on{height:${P.h.m}px}
-${C} .xp-label{left:20px;top:50%;bottom:auto;writing-mode:horizontal-tb;transform:translateY(-50%)}
-${C} .xp-label b{margin:0 10px 0 0}
-${C} .xp-body{left:20px;right:20px;bottom:22px;min-width:0}
-${C} .xp-ptitle{font-size:${X.tsize.m}px}
-${C} .xp-desc{font-size:${X.dsize.m}px}
-}
-@media (prefers-reduced-motion:reduce){${C} .xp-p,${C} .xp-img,${C} .xp-body,${C} .xp-shade{transition:none}}`;
+${C} .tr-stage{position:absolute;inset:0;z-index:${TR.front ? 3 : 0};pointer-events:none}
+${C} .tr-stage img{position:absolute;left:0;top:0;${img(TR.w.d)};max-width:none;height:auto;object-fit:cover;border-radius:${TR.radius}px;opacity:0;will-change:transform,opacity;${TR.gray ? 'filter:grayscale(1);' : ''}}
+${C} .tr-pool{display:none}
+${C} .tr-inner{position:relative;z-index:2;width:100%;max-width:${L.maxW}px;display:flex;flex-direction:column;align-items:${items};text-align:${L.align};pointer-events:none}
+${C} .tr-inner a,${C} .tr-inner [data-edit]{pointer-events:auto}
+${C} .tr-eyebrow{margin-bottom:20px;font-size:13px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:${H.color};opacity:.6}
+${C} .tr-title{font-family:${stack(H.font)};font-size:${clampF(H)};font-weight:800;line-height:${H.lh};letter-spacing:${H.ls}em;color:${H.color};word-break:keep-all}
+${C} .tr-title em{font-style:normal;color:${H.em}}
+${C} .tr-sub{margin-top:24px;font-size:${S.size.d}px;line-height:1.65;color:${S.color};word-break:keep-all}
+@media (max-width:767px){${C}{padding:${L.padY.m}px 20px}${C} .tr-stage img{${img(TR.w.m)}}${C} .tr-eyebrow{margin-bottom:14px}${C} .tr-sub{margin-top:16px;font-size:${S.size.m}px}}`;
   }
-  function html(st, {preview=false, slide}={}){
+  function html(st, {preview=false}={}){
     const a = k => preview ? ` data-el="${k}"` : '', ed = p => preview ? ` data-edit="${p}"` : '';
-    const src = s => preview ? pv(s) : s, H = st.head, P = st.panel;
-    const on = Math.min(st.items.length - 1, Math.max(0, preview && slide > 0 ? slide : P.start - 1));
-    const num = i => String(i + 1).padStart(2, '0');
-    const panels = st.items.map((it, i) => `<div class="xp-p${i === on ? ' is-on' : ''}" tabindex="0" role="button" aria-expanded="${i === on}" aria-label="${esc(it.title)}">
-      ${it.img ? `<img class="xp-img" src="${esc(src(it.img))}" alt=""${preview ? ` data-img="items.${i}.img"` : ''}>` : ''}
-      <div class="xp-shade"></div>
-      <div class="xp-label" aria-hidden="true">${P.numbers ? `<b>${num(i)}</b>` : ''}${esc(it.title)}</div>
-      <div class="xp-body">
-        ${P.numbers ? `<span class="xp-num">${num(i)}</span>` : ''}<h3 class="xp-ptitle"${ed('items.'+i+'.title')}>${esc(it.title)}</h3>
-        <p class="xp-desc"${ed('items.'+i+'.desc')}>${rich(it.desc)}</p>
-        ${it.link ? `<a class="xp-link" href="${esc(it.href)}"><span${ed('items.'+i+'.link')}>${esc(it.link)}</span> →</a>` : ''}
-      </div>
-    </div>`).join('\n    ');
+    const src = s => preview ? pv(s) : s, H = st.head;
+    const pool = st.items.filter(it => it.img).map(it => `<img src="${esc(src(it.img))}" alt="">`).join('');
     return `<section class="hw-hero hw-${st.id}"${a('section')}>
-  <div class="xp-inner">
-${H.show ? `    <div class="xp-head"${a('head')}>${H.eyebrow ? `<p class="xp-eyebrow"${ed('head.eyebrow')}>${esc(H.eyebrow)}</p>` : ''}<h2 class="xp-title"${ed('head.text')}>${rich(H.text)}</h2></div>\n` : ''}    <div class="xp-row"${a('items')}>
-    ${panels}
-    </div>
-  </div>
+  <div class="tr-stage" aria-hidden="true"></div>
+  <div class="tr-pool" aria-hidden="true">${pool}</div>
+  <div class="tr-inner"${a('text')}>
+${H.eyebrow ? `    <p class="tr-eyebrow"${ed('head.eyebrow')}>${esc(H.eyebrow)}</p>\n` : ''}    <h2 class="tr-title"${ed('head.text')}>${rich(H.text)}</h2>
+${st.sub.show ? `    <p class="tr-sub"${ed('sub.text')}>${rich(st.sub.text)}</p>\n` : ''}  </div>
 </section>`;
   }
-  // mouse: hover opens a panel · touch / keyboard: tap or focus opens it
+  // a small pool of <img> is reused round-robin; each spawn plays a short pop-in / fade-out
   function run(root, o){
-    var W = root.ownerDocument.defaultView, row = root.querySelector('.xp-row');
-    var ps = Array.prototype.slice.call(root.querySelectorAll('.xp-p'));
-    if (!row || !ps.length) return function(){};
-    var first = Math.max(0, ps.findIndex(function(p){ return p.classList.contains('is-on'); })), offs = [];
-    function open(i){ ps.forEach(function(p, k){ p.classList.toggle('is-on', k === i); p.setAttribute('aria-expanded', String(k === i)); }); }
-    ps.forEach(function(p, i){
-      var enter = function(e){ if (e.pointerType === 'mouse' || e.pointerType === 'pen') open(i); };
-      var tap = function(e){ if (!p.classList.contains('is-on') && !e.target.closest('a')){ open(i); } };
-      var focus = function(){ open(i); };
-      var key = function(e){ if (e.key === 'Enter' || e.key === ' '){ if (e.target === p){ e.preventDefault(); open(i); } } };
-      p.addEventListener('pointerenter', enter); p.addEventListener('click', tap); p.addEventListener('focus', focus); p.addEventListener('keydown', key);
-      offs.push(function(){ p.removeEventListener('pointerenter', enter); p.removeEventListener('click', tap); p.removeEventListener('focus', focus); p.removeEventListener('keydown', key); });
-    });
-    var leave = function(e){ if (!o.keep && (e.pointerType === 'mouse' || e.pointerType === 'pen')) open(first); };
-    row.addEventListener('pointerleave', leave); offs.push(function(){ row.removeEventListener('pointerleave', leave); });
-    return function(){ offs.forEach(function(f){ f(); }); };
+    var W = root.ownerDocument.defaultView, stage = root.querySelector('.tr-stage');
+    var srcs = Array.prototype.slice.call(root.querySelectorAll('.tr-pool img')).map(function(i){ return i.getAttribute('src'); });
+    if (!stage || !srcs.length) return function(){};
+    var reduce = W.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var N = Math.max(12, srcs.length * 2), els = [], k = 0, s = 0, z = 1, lx = null, ly = null;
+    for (var i = 0; i < N; i++){ var im = root.ownerDocument.createElement('img'); im.alt = ''; stage.appendChild(im); els.push(im); }
+    function place(el, x, y, rot){ el.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0) translate(-50%,-50%) rotate(' + rot.toFixed(1) + 'deg)'; }
+    // static trail (animation off · gallery thumbnails)
+    if (o.on === false){
+      var w = root.clientWidth, h = root.clientHeight, m = Math.min(5, N);
+      for (var j = 0; j < m; j++){
+        var el = els[j]; el.src = srcs[j % srcs.length]; el.style.zIndex = j + 1; el.style.opacity = String(.35 + .65 * (j + 1) / m);
+        place(el, w * (.14 + .17 * j), h * (.72 - .1 * j - .04 * Math.sin(j)), (j % 2 ? -1 : 1) * o.rotate * .6);
+      }
+      return function(){ els.forEach(function(e){ e.remove(); }); };
+    }
+    function spawn(x, y){
+      var el = els[k], base; k = (k + 1) % N;
+      el.src = srcs[s]; s = (s + 1) % srcs.length;
+      el.style.zIndex = String(z++);
+      var rot = (Math.random() * 2 - 1) * o.rotate;
+      place(el, x, y, rot); base = el.style.transform;
+      if (el.getAnimations) el.getAnimations().forEach(function(a){ a.cancel(); });
+      if (!el.animate){ el.style.opacity = '1'; return; }
+      el.animate(reduce ? [{opacity:0}, {opacity:1, offset:.15}, {opacity:1, offset:.7}, {opacity:0}] : [
+        {opacity:0, transform:base + ' scale(.55)'},
+        {opacity:1, transform:base + ' scale(1)', offset:.18},
+        {opacity:1, transform:base + ' scale(1)', offset:.68},
+        {opacity:0, transform:base + ' translateY(24px) scale(.9)'}
+      ], {duration:o.life, easing:'cubic-bezier(.22,.61,.36,1)', fill:'forwards'});
+    }
+    var move = function(e){
+      var b = root.getBoundingClientRect(), x = e.clientX - b.left, y = e.clientY - b.top;
+      if (lx === null){ lx = x; ly = y; spawn(x, y); return; }
+      var dx = x - lx, dy = y - ly, d = Math.sqrt(dx * dx + dy * dy);
+      if (d >= o.gap){ lx = x; ly = y; spawn(x, y); }
+    };
+    var down = function(e){ var b = root.getBoundingClientRect(); lx = e.clientX - b.left; ly = e.clientY - b.top; spawn(lx, ly); };
+    var leave = function(){ lx = ly = null; };
+    root.addEventListener('pointermove', move); root.addEventListener('pointerdown', down); root.addEventListener('pointerleave', leave);
+    return function(){
+      root.removeEventListener('pointermove', move); root.removeEventListener('pointerdown', down); root.removeEventListener('pointerleave', leave);
+      els.forEach(function(e){ e.remove(); });
+    };
   }
-  const cfg = st => ({keep:st.panel.keep});
+  const cfg = st => ({gap:st.trail.gap, life:st.trail.life, rotate:st.trail.rotate});
   return {
-    key:'panels', cat:'content', group:'hover', no:'C10', title:'Expand Panels', sub:'마우스를 올린 패널이 넓게 펼쳐지는 이미지 갤러리',
-    swatch:'linear-gradient(90deg,#3A3F4B 0 12%,#0E0F13 12% 14%,#7CF2C6 14% 62%,#0E0F13 62% 64%,#3A3F4B 64% 76%,#0E0F13 76% 78%,#3A3F4B 78%)',
+    key:'trail', cat:'content', group:'hover', no:'C10', title:'Image Trail', sub:'커서가 지나간 길을 따라 이미지가 나타났다 사라지는 섹션',
+    swatch:'linear-gradient(135deg,#F2F2F2 0 30%,#BDBDBD 30% 46%,#F2F2F2 46% 54%,#7A7A7A 54% 70%,#F2F2F2 70%)',
     defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
     header:()=>0, bp:()=>767,
-    drag:{}, selectGroup:{section:'layout', head:'head', items:'items'},
-    multiline:/^(head\.text|items\.\d+\.desc)$/, rich:/^(head\.text|items\.\d+\.desc)$/,
+    drag:{}, selectGroup:{section:'trail', text:'head'},
+    multiline:/^(head\.text|sub\.text)$/, rich:/^(head\.text|sub\.text)$/,
     note:''
   };
 })();
@@ -2958,11 +2946,11 @@ const TILT = (() => {
   const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<em>$1</em>').replace(/\n/g, '<br>');
   const defaults = () => ({
     id: uid(),
-    layout:{bg:'#F3F4F7', padT:R(120,72), padB:R(120,72), maxW:1280, side:R(40,20)},
-    head:{show:true, eyebrow:'TILT CARDS', text:'움직임에 반응하는\n**입체 카드**', font:'Pretendard Variable', color:'#111318', accent:'#3D5AFE', min:28, vw:3, max:52, mb:R(64,36), align:'center'},
+    layout:{bg:'#F2F2F2', padT:R(120,72), padB:R(120,72), maxW:1280, side:R(40,20)},
+    head:{show:true, eyebrow:'TILT CARDS', text:'움직임에 반응하는\n**입체 카드**', font:'Pretendard Variable', color:'#111111', accent:'#111111', min:28, vw:3, max:52, mb:R(64,36), align:'center'},
     items:JSON.parse(JSON.stringify(ITEMS)),
-    card:{cols:3, gap:R(28,16), radius:24, bg:'#FFFFFF', title:'#111318', desc:'#5B6170', tagBg:'#EEF1FF', tagFg:'#3D5AFE', ratio:'4/3', pad:28},
-    tilt:{max:12, scale:1.04, depth:36, glare:true, glareA:.45, dim:true, ease:.14}
+    card:{cols:3, gap:R(28,16), radius:24, bg:'#FFFFFF', title:'#111111', desc:'#555555', tagBg:'#EDEDED', tagFg:'#111111', ratio:'4/3', pad:28},
+    tilt:{max:10, scale:1.03, depth:12, glare:true, glareA:.35, dim:true, ease:.14}
   });
   const groups = [
     {id:'layout', title:'섹션', fields:[
@@ -2992,7 +2980,7 @@ const TILT = (() => {
     ]},
     {id:'tilt', title:'기울기 효과', fields:[
       A('tilt.max','최대 기울기',0,30,1,'°'), A('tilt.scale','올렸을 때 크기',1,1.15,.005,'×'),
-      A('tilt.depth','이미지 · 글자 떠오름 (입체감)',0,100,1,'px'),
+      A('tilt.depth','이미지 안쪽 움직임',0,40,1,'px',{hint:'카드가 기울 때 이미지가 프레임 안에서 반대쪽으로 살짝 움직여요.'}),
       {k:'tilt.glare', l:'빛 반사', t:'toggle'}, A('tilt.glareA','빛 반사 세기',0,1,.01,''),
       {k:'tilt.dim', l:'다른 카드 흐리게', t:'toggle'},
       A('tilt.ease','따라오는 속도',.04,1,.01,'')
@@ -3005,21 +2993,21 @@ const TILT = (() => {
 ${C} *{box-sizing:border-box;margin:0;padding:0}
 ${C} .tc-inner{max-width:${L.maxW}px;margin:0 auto;padding:0 ${L.side.d}px}
 ${C} .tc-head{margin-bottom:${H.mb.d}px;text-align:${H.align};color:${H.color}}
-${C} .tc-eyebrow{margin-bottom:14px;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:${H.accent}}
+${C} .tc-eyebrow{margin-bottom:14px;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:${H.color};opacity:.6}
 ${C} .tc-title{font-family:${stack(H.font)};font-size:${clampF(H)};font-weight:800;line-height:1.2;letter-spacing:-.02em;word-break:keep-all}
 ${C} .tc-title em{font-style:normal;color:${H.accent}}
 ${C} .tc-grid{display:grid;grid-template-columns:repeat(${K.cols},minmax(0,1fr));gap:${K.gap.d}px;perspective:1200px}
-${C} .tc-card{position:relative;display:block;border-radius:${K.radius}px;background:${K.bg};color:inherit;text-decoration:none;transform-style:preserve-3d;will-change:transform;
+${C} .tc-card{position:relative;display:block;border-radius:${K.radius}px;background:${K.bg};color:inherit;text-decoration:none;will-change:transform;backface-visibility:hidden;
   transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) scale(var(--s,1));
-  box-shadow:calc(var(--sx,0) * 1px) calc(18px + var(--sy,0) * 1px) 40px -18px rgba(17,19,24,.28);transition:opacity .4s,filter .4s}
-${C} .tc-media{display:block;margin:${K.pad * .5}px ${K.pad * .5}px 0;border-radius:${Math.max(0, K.radius - K.pad * .5)}px;overflow:hidden;aspect-ratio:${K.ratio};background:#E4E7EE;transform:translateZ(${T_.depth}px)}
-${C} .tc-media img{display:block;width:100%;height:100%;max-width:none;object-fit:cover}
-${C} .tc-body{padding:${K.pad * .8}px ${K.pad}px ${K.pad}px;transform:translateZ(${(T_.depth * .6).toFixed(1)}px)}
+  box-shadow:calc(var(--sx,0) * 1px) calc(18px + var(--sy,0) * 1px) 40px -18px rgba(19,19,19,.28);transition:opacity .4s,filter .4s}
+${C} .tc-media{position:relative;display:block;margin:${K.pad * .5}px ${K.pad * .5}px 0;border-radius:${Math.max(0, K.radius - K.pad * .5)}px;overflow:hidden;aspect-ratio:${K.ratio};background:#E5E5E5;isolation:isolate}
+${C} .tc-media img{display:block;width:100%;height:100%;max-width:none;object-fit:cover;transform:translate3d(var(--ix,0px),var(--iy,0px),0) scale(${T_.depth ? (1 + T_.depth / 110).toFixed(3) : 1})}
+${C} .tc-body{padding:${K.pad * .8}px ${K.pad}px ${K.pad}px}
 ${C} .tc-tag{display:inline-block;margin-bottom:12px;padding:5px 10px;border-radius:999px;background:${K.tagBg};color:${K.tagFg};font-size:12px;font-weight:700}
 ${C} .tc-ctitle{font-size:22px;font-weight:800;line-height:1.3;letter-spacing:-.01em;color:${K.title}}
 ${C} .tc-desc{margin-top:8px;font-size:15px;line-height:1.6;color:${K.desc};word-break:keep-all}
 ${C} .tc-desc em{font-style:normal;font-weight:700;color:${K.title}}
-${C} .tc-glare{position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:var(--go,0);background:radial-gradient(circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,${T_.glareA}),rgba(255,255,255,0) 60%);transform:translateZ(${T_.depth + 1}px);${T_.glare ? '' : 'display:none;'}}
+${C} .tc-glare{position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:var(--go,0);background:radial-gradient(circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,${T_.glareA}),rgba(255,255,255,0) 60%);${T_.glare ? '' : 'display:none;'}}
 ${T_.dim ? `${C} .tc-grid.is-hover .tc-card:not(.is-on){opacity:.55;filter:saturate(.6)}` : ''}
 @media (max-width:1023px){${C} .tc-grid{grid-template-columns:repeat(${Math.min(K.cols, 2)},minmax(0,1fr))}}
 @media (max-width:767px){${C}{padding:${L.padT.m}px 0 ${L.padB.m}px}${C} .tc-inner{padding:0 ${L.side.m}px}${C} .tc-head{margin-bottom:${H.mb.m}px}${C} .tc-grid{grid-template-columns:1fr;gap:${K.gap.m}px}}`;
@@ -3052,18 +3040,20 @@ ${H.show ? `    <div class="tc-head"${a('head')}>${H.eyebrow ? `<p class="tc-eye
     var W = root.ownerDocument.defaultView, grid = root.querySelector('.tc-grid');
     var cards = Array.prototype.slice.call(root.querySelectorAll('.tc-card'));
     if (!grid || !cards.length || W.matchMedia('(prefers-reduced-motion: reduce)').matches) return function(){};
-    var st = cards.map(function(){ return {rx:0, ry:0, s:1, g:0, tx:0, ty:0, ts:1, tg:0, gx:50, gy:50}; });
+    var st = cards.map(function(){ return {rx:0, ry:0, s:1, g:0, ix:0, iy:0, tx:0, ty:0, ts:1, tg:0, tix:0, tiy:0, gx:50, gy:50}; });
     var raf = 0, offs = [];
     function frame(){
       raf = 0; var busy = false;
       cards.forEach(function(c, i){
         var q = st[i], k = o.ease;
         q.rx += (q.tx - q.rx) * k; q.ry += (q.ty - q.ry) * k; q.s += (q.ts - q.s) * k; q.g += (q.tg - q.g) * k;
+        q.ix += (q.tix - q.ix) * k; q.iy += (q.tiy - q.iy) * k;
         if (Math.abs(q.tx - q.rx) + Math.abs(q.ty - q.ry) + Math.abs(q.ts - q.s) * 50 + Math.abs(q.tg - q.g) > .02) busy = true;
         c.style.setProperty('--rx', q.rx.toFixed(2) + 'deg'); c.style.setProperty('--ry', q.ry.toFixed(2) + 'deg');
         c.style.setProperty('--s', q.s.toFixed(4)); c.style.setProperty('--go', q.g.toFixed(3));
         c.style.setProperty('--gx', q.gx.toFixed(1) + '%'); c.style.setProperty('--gy', q.gy.toFixed(1) + '%');
         c.style.setProperty('--sx', (-q.ry * 1.4).toFixed(1)); c.style.setProperty('--sy', (q.rx * 1.4).toFixed(1));
+        c.style.setProperty('--ix', q.ix.toFixed(2) + 'px'); c.style.setProperty('--iy', q.iy.toFixed(2) + 'px');
       });
       if (busy) raf = W.requestAnimationFrame(frame);
     }
@@ -3074,9 +3064,10 @@ ${H.show ? `    <div class="tc-head"${a('head')}>${H.eyebrow ? `<p class="tc-eye
         if (e.pointerType === 'touch') return;
         var b = c.getBoundingClientRect(), px = (e.clientX - b.left) / b.width, py = (e.clientY - b.top) / b.height;
         q.tx = (.5 - py) * 2 * o.max; q.ty = (px - .5) * 2 * o.max; q.ts = o.scale; q.tg = 1; q.gx = px * 100; q.gy = py * 100;
+        q.tix = -(px - .5) * 2 * o.depth; q.tiy = -(py - .5) * 2 * o.depth;
         c.classList.add('is-on'); grid.classList.add('is-hover'); kick();
       };
-      var leave = function(){ q.tx = 0; q.ty = 0; q.ts = 1; q.tg = 0; c.classList.remove('is-on'); kick(); };
+      var leave = function(){ q.tx = 0; q.ty = 0; q.ts = 1; q.tg = 0; q.tix = 0; q.tiy = 0; c.classList.remove('is-on'); kick(); };
       c.addEventListener('pointermove', move); c.addEventListener('pointerleave', leave);
       offs.push(function(){ c.removeEventListener('pointermove', move); c.removeEventListener('pointerleave', leave); });
     });
@@ -3084,10 +3075,10 @@ ${H.show ? `    <div class="tc-head"${a('head')}>${H.eyebrow ? `<p class="tc-eye
     grid.addEventListener('pointerleave', out); offs.push(function(){ grid.removeEventListener('pointerleave', out); });
     return function(){ if (raf) W.cancelAnimationFrame(raf); offs.forEach(function(f){ f(); }); };
   }
-  const cfg = st => ({max:st.tilt.max, scale:st.tilt.scale, ease:st.tilt.ease});
+  const cfg = st => ({max:st.tilt.max, scale:st.tilt.scale, ease:st.tilt.ease, depth:st.tilt.depth});
   return {
     key:'tilt', cat:'content', group:'hover', no:'C11', title:'Tilt Cards', sub:'커서 쪽으로 기울어지는 입체 카드 + 빛 반사',
-    swatch:'linear-gradient(160deg,#F3F4F7 0 30%,#FFFFFF 30% 70%,#3D5AFE 70%)',
+    swatch:'linear-gradient(160deg,#F4F4F4 0 30%,#FFFFFF 30% 70%,#606060 70%)',
     defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
     header:()=>0, bp:()=>767,
     drag:{}, selectGroup:{section:'layout', head:'head', items:'items'},
@@ -3107,10 +3098,10 @@ const HLIST = (() => {
   const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<em>$1</em>').replace(/\n/g, '<br>');
   const defaults = () => ({
     id: uid(),
-    layout:{bg:'#F4F1EA', padT:R(120,72), padB:R(120,72), maxW:1440, side:R(40,20)},
-    head:{show:true, eyebrow:'SELECTED WORKS', text:'호버하면 미리보기가\n**따라오는** 리스트', font:'Pretendard Variable', color:'#141414', accent:'#FF5A36', min:28, vw:3, max:52, mb:R(56,32)},
+    layout:{bg:'#F2F2F2', padT:R(120,72), padB:R(120,72), maxW:1440, side:R(40,20)},
+    head:{show:true, eyebrow:'SELECTED WORKS', text:'호버하면 미리보기가\n**따라오는** 리스트', font:'Pretendard Variable', color:'#141414', accent:'#141414', min:28, vw:3, max:52, mb:R(56,32)},
     items:JSON.parse(JSON.stringify(ITEMS)),
-    row:{size:R(56,26), weight:'700', color:'#141414', meta:'#77736B', line:'#141414', lineA:.2, padY:R(26,18), fill:'#141414', fillFg:'#F4F1EA', shift:28, numbers:true},
+    row:{size:R(56,26), weight:'700', color:'#141414', meta:'#757575', line:'#141414', lineA:.2, padY:R(26,18), fill:'#141414', fillFg:'#F2F2F2', shift:28, numbers:true},
     preview:{show:true, w:300, h:380, radius:14, ease:.15, tilt:true}
   });
   const groups = [
@@ -3155,7 +3146,7 @@ const HLIST = (() => {
 ${C} *{box-sizing:border-box;margin:0;padding:0}
 ${C} .hl-inner{max-width:${L.maxW}px;margin:0 auto;padding:0 ${L.side.d}px}
 ${C} .hl-head{margin-bottom:${H.mb.d}px;color:${H.color}}
-${C} .hl-eyebrow{margin-bottom:14px;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:${H.accent}}
+${C} .hl-eyebrow{margin-bottom:14px;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:${H.color};opacity:.6}
 ${C} .hl-title{font-family:${stack(H.font)};font-size:${clampF(H)};font-weight:800;line-height:1.2;letter-spacing:-.02em;word-break:keep-all}
 ${C} .hl-title em{font-style:normal;color:${H.accent}}
 ${C} .hl-list{list-style:none;border-bottom:1px solid ${rgba(RW.line, RW.lineA)}}
@@ -3244,7 +3235,7 @@ ${H.show ? `    <div class="hl-head"${a('head')}>${H.eyebrow ? `<p class="hl-eye
   const cfg = st => ({w:st.preview.w, h:st.preview.h, ease:st.preview.ease, tilt:st.preview.tilt});
   return {
     key:'hlist', cat:'content', group:'hover', no:'C12', title:'Hover List', sub:'줄이 채워지고 미리보기 이미지가 커서를 따라오는 목록',
-    swatch:'linear-gradient(180deg,#F4F1EA 0 20%,#141414 20% 22%,#F4F1EA 22% 40%,#141414 40% 62%,#F4F1EA 62% 80%,#141414 80% 82%,#F4F1EA 82%)',
+    swatch:'linear-gradient(180deg,#F1F1F1 0 20%,#141414 20% 22%,#F1F1F1 22% 40%,#141414 40% 62%,#F1F1F1 62% 80%,#141414 80% 82%,#F1F1F1 82%)',
     defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
     header:()=>0, bp:()=>767,
     drag:{}, selectGroup:{section:'layout', head:'head', items:'items'},
@@ -3262,11 +3253,11 @@ const DOTS = (() => {
   const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<em>$1</em>').replace(/\n/g, '<br>');
   const defaults = () => ({
     id: uid(),
-    layout:{bg:'#07080B', vh:80, minH:560, padY:R(120,80), maxW:900, align:'center'},
-    dots:{color:'#2E323C', accent:'#8B6CFF', gap:26, size:1.6, grow:4.5, radius:170, push:16, wave:true},
-    head:{eyebrow:'DOT FIELD', text:'커서가 지나가면\n**점들이 반응**해요', font:'Pretendard Variable', color:'#FFFFFF', accent:'#B9A8FF', min:32, vw:4.2, max:72, lh:1.18},
-    sub:{show:true, text:'배경의 점들이 마우스 위치에 따라 커지고 색이 바뀌어요.\n설명 문구를 입력하세요.', color:'#A3A8B5', size:R(18,15)},
-    btn:{show:true, text:'시작하기', href:'#', bg:'#FFFFFF', fg:'#07080B', magnet:true, strength:.35}
+    layout:{bg:'#080808', vh:80, minH:560, padY:R(120,80), maxW:900, align:'center'},
+    dots:{color:'#333333', accent:'#FFFFFF', gap:26, size:1.6, grow:4.5, radius:170, push:16, wave:true},
+    head:{eyebrow:'DOT FIELD', text:'커서가 지나가면\n**점들이 반응**해요', font:'Pretendard Variable', color:'#FFFFFF', accent:'#FFFFFF', min:32, vw:4.2, max:72, lh:1.18},
+    sub:{show:true, text:'배경의 점들이 마우스 위치에 따라 커지고 색이 바뀌어요.\n설명 문구를 입력하세요.', color:'#A6A6A6', size:R(18,15)},
+    btn:{show:true, text:'시작하기', href:'#', bg:'#FFFFFF', fg:'#080808', magnet:true, strength:.35}
   });
   const groups = [
     {id:'layout', title:'섹션', fields:[
@@ -3304,7 +3295,7 @@ const DOTS = (() => {
 ${C} *{box-sizing:border-box;margin:0;padding:0}
 ${C} .df-canvas{position:absolute;inset:0;z-index:-1;width:100%;height:100%;display:block}
 ${C} .df-inner{width:100%;max-width:${L.maxW}px;display:flex;flex-direction:column;align-items:${items};text-align:${L.align}}
-${C} .df-eyebrow{margin-bottom:20px;font-size:13px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:${H.accent}}
+${C} .df-eyebrow{margin-bottom:20px;font-size:13px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:${H.color};opacity:.6}
 ${C} .df-title{font-family:${stack(H.font)};font-size:${clampF(H)};font-weight:800;line-height:${H.lh};letter-spacing:-.03em;color:${H.color};word-break:keep-all}
 ${C} .df-title em{font-style:normal;color:${H.accent}}
 ${C} .df-sub{margin-top:24px;font-size:${S.size.d}px;line-height:1.65;color:${S.color};word-break:keep-all}
@@ -3385,7 +3376,7 @@ ${st.sub.show ? `    <p class="df-sub"${ed('sub.text')}>${rich(st.sub.text)}</p>
   const cfg = st => ({color:st.dots.color, accent:st.dots.accent, gap:st.dots.gap, size:st.dots.size, grow:st.dots.grow, radius:st.dots.radius, push:st.dots.push, wave:st.dots.wave, magnet:st.btn.magnet, strength:st.btn.strength});
   return {
     key:'dots', cat:'content', group:'hover', no:'C13', title:'Dot Field', sub:'커서 주변 점들이 커지고 밀려나는 배경 + 끌려오는 버튼',
-    swatch:'radial-gradient(circle at 65% 45%,#8B6CFF 0 3px,transparent 4px) 0 0/14px 14px,radial-gradient(circle,#2E323C 0 1.5px,transparent 2px) 0 0/10px 10px,#07080B',
+    swatch:'radial-gradient(circle at 65% 45%,#7D7D7D 0 3px,transparent 4px) 0 0/14px 14px,radial-gradient(circle,#323232 0 1.5px,transparent 2px) 0 0/10px 10px,#080808',
     defaults, groups, fonts, css, html, run, cfg, alwaysRun:true,
     header:()=>0, bp:()=>767,
     drag:{}, selectGroup:{section:'dots', text:'head'},
@@ -3395,7 +3386,7 @@ ${st.sub.show ? `    <p class="df-sub"${ed('sub.text')}>${rich(st.sub.text)}</p>
 })();
 
 /* ================= widget registry ================= */
-const WIDGETS = [DASOT, MLAB, DONGNAM, LENS, QUOTE, IMGMSG, POTS, CHOICE, FAQ, TABFAQ, STICKY, STATS, LOGOS, PANELS, TILT, HLIST, DOTS];
+const WIDGETS = [DASOT, MLAB, DONGNAM, LENS, QUOTE, IMGMSG, POTS, CHOICE, FAQ, TABFAQ, STICKY, STATS, LOGOS, TRAIL, TILT, HLIST, DOTS];
 // widgets of the same nature are listed together in the picker
 const GROUP_OF = {dasot:'split', mlab:'typo', dongnam:'video', quote:'text', pots:'gallery', choice:'cards', faq:'faq', tabfaq:'faq', sticky:'feature'};
 WIDGETS.forEach(w => { w.group = w.group || GROUP_OF[w.key] || 'etc'; w.source = ''; });
