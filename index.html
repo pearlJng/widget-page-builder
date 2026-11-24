@@ -3406,7 +3406,7 @@ const BENTO = (() => {
     layout:{bg:'#F2F2F2', padT:R(120,72), padB:R(120,72), maxW:1280, side:R(40,20)},
     head:{show:true, eyebrow:'BENTO GRID', text:'여러 가지 콘텐츠를\n한 화면에 담는 타일', font:'Pretendard Variable', color:'#111111', min:28, vw:3, max:52, mb:R(56,32), align:'left'},
     items:JSON.parse(JSON.stringify(ITEMS)),
-    tile:{cols:4, rowH:R(240,200), gap:R(16,12), radius:20, light:'#FFFFFF', lightFg:'#111111', dark:'#111111', darkFg:'#FFFFFF', pad:28, tsize:R(24,20), nsize:R(64,48), hover:true}
+    tile:{auto:true, cols:4, rowH:R(240,200), gap:R(16,12), radius:20, light:'#FFFFFF', lightFg:'#111111', dark:'#111111', darkFg:'#FFFFFF', pad:28, tsize:R(24,20), nsize:R(64,48), hover:true}
   });
   const groups = [
     {id:'layout', title:'섹션', fields:[
@@ -3421,16 +3421,17 @@ const BENTO = (() => {
       A('head.mb','제목과 타일 간격',0,160,1,'px',{r:1}), {k:'head.align', l:'정렬', t:'align'}
     ]},
     {id:'items', title:'타일 목록', fields:[
-      {k:'items', l:'타일', t:'list', item:'타일', orig:ITEMS,
+      {k:'items', l:'타일', t:'list', item:'타일', orig:ITEMS, min:4, max:7,
        cols:[{k:'kind', l:'종류', t:'select', opts:[['image','이미지'],['text','글'],['number','숫자']]},
-             {k:'size', l:'크기 (가로×세로 칸)', t:'select', opts:[['1x1','1×1'],['2x1','2×1 (가로로 길게)'],['1x2','1×2 (세로로 길게)'],['2x2','2×2 (크게)']]},
+             {k:'size', l:'크기 (자동 배치를 끄면 적용)', t:'select', opts:[['1x1','1×1'],['2x1','2×1 (가로로 길게)'],['1x2','1×2 (세로로 길게)'],['2x2','2×2 (크게)']]},
              {k:'dark', l:'어두운 타일', t:'toggle'}, {k:'img', l:'이미지 (종류가 이미지일 때)', t:'img'},
              {k:'title', l:'제목 (숫자 타일은 숫자)', t:'text'}, {k:'text', l:'설명 (줄바꿈 · **굵게**)', t:'textarea'},
              {k:'href', l:'연결 주소 (비우면 링크 없음)', t:'text'}],
        blank:{kind:'text', size:'1x1', dark:false, img:'', title:'새 타일', text:'설명을 입력하세요.', href:''}}
     ]},
     {id:'tile', title:'타일 디자인', fields:[
-      A('tile.cols','넓은 화면의 칸 수',2,6,1,'칸'), A('tile.rowH','한 칸 높이',100,480,1,'px',{r:1}),
+      {k:'tile.auto', l:'타일 개수에 맞춰 크기 자동 배치', t:'toggle', hint:'4~7개 어느 개수든 빈칸 없이 꽉 차게 배치돼요. 첫 번째 타일이 가장 크게 보여요. 끄면 타일마다 고른 크기를 써요.'},
+      A('tile.cols','넓은 화면의 칸 수',2,6,1,'칸',{hint:'자동 배치는 4칸 기준이에요.'}), A('tile.rowH','한 칸 높이',100,480,1,'px',{r:1}),
       A('tile.gap','타일 간격',0,48,1,'px',{r:1}), A('tile.radius','모서리',0,48,1,'px'), A('tile.pad','안쪽 여백',12,60,1,'px'),
       {k:'tile.light', l:'밝은 타일 색', t:'color'}, {k:'tile.lightFg', l:'밝은 타일 글자색', t:'color'},
       {k:'tile.dark', l:'어두운 타일 색', t:'color'}, {k:'tile.darkFg', l:'어두운 타일 글자색', t:'color'},
@@ -3469,9 +3470,12 @@ ${T_.hover ? `@media (hover:hover){${C} .bn-t:hover{transform:translateY(-4px);b
     const a = k => preview ? ` data-el="${k}"` : '', ed = p => preview ? ` data-edit="${p}"` : '';
     const src = s => preview ? pv(s) : s, H = st.head;
     const ARROW = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`;
-    const tiles = st.items.map((it, i) => {
+    // automatic sizes per tile count: every layout fills whole rows of a 4-column grid
+    const AUTO = {4:['2x2','2x1','1x1','1x1'], 5:['2x2','1x1','1x1','1x1','1x1'], 6:['2x2','2x1','1x1','1x1','2x1','2x1'], 7:['2x2','1x1','1x1','1x2','2x1','1x1','1x1']};
+    const list = st.items.slice(0, 7), auto = st.tile.auto && AUTO[list.length];
+    const tiles = list.map((it, i) => {
       const tag = it.href ? `a href="${esc(it.href)}"` : 'div', end = it.href ? 'a' : 'div';
-      const cls = `bn-t bn-${it.size} bn-${it.kind}${it.dark ? ' is-dark' : ''}`;
+      const cls = `bn-t bn-${auto ? auto[i] : it.size} bn-${it.kind}${it.dark ? ' is-dark' : ''}`;
       const arrow = it.href ? `<span class="bn-arrow">${ARROW}</span>` : '';
       if (it.kind === 'image') return `<${tag} class="${cls}">${it.img ? `<img class="bn-img" src="${esc(src(it.img))}" alt=""${preview ? ` data-img="items.${i}.img"` : ''}>` : ''}${arrow}
         <div class="bn-copy">${it.title ? `<h3 class="bn-tt"${ed('items.'+i+'.title')}>${esc(it.title)}</h3>` : ''}${it.text ? `<p class="bn-tx"${ed('items.'+i+'.text')}>${rich(it.text)}</p>` : ''}</div></${end}>`;
@@ -3935,13 +3939,14 @@ const REVIEWS = (() => {
     layout:{bg:'#F2F2F2', padT:R(120,72), padB:R(120,72), maxW:1280, side:R(40,20)},
     head:{show:true, eyebrow:'TESTIMONIALS', text:'고객이 직접 전하는\n이야기', font:'Pretendard Variable', color:'#111111', min:28, vw:3, max:52, mb:R(56,32), align:'center'},
     items:JSON.parse(JSON.stringify(ITEMS)),
-    card:{cols:3, gap:R(20,12), radius:20, bg:'#FFFFFF', color:'#111111', sub:'#757575', pad:28, qsize:R(17,15), mark:true, stars:true, avatar:true}
+    card:{w:R(380,290), gap:R(20,12), radius:20, bg:'#FFFFFF', color:'#111111', sub:'#757575', pad:28, qsize:R(17,15), mark:true, stars:true, avatar:true},
+    move:{speed:R(40,32), pause:true, fade:true}
   });
   const groups = [
     {id:'layout', title:'섹션', fields:[
       {k:'layout.bg', l:'배경색', t:'color'},
       A('layout.padT','위 여백',0,300,1,'px',{r:1}), A('layout.padB','아래 여백',0,300,1,'px',{r:1}),
-      A('layout.maxW','최대 너비',600,2000,10,'px'), A('layout.side','좌우 여백',0,120,1,'px',{r:1})
+      A('layout.maxW','제목 최대 너비',600,2000,10,'px'), A('layout.side','좌우 여백',0,120,1,'px',{r:1})
     ]},
     {id:'head', title:'제목', fields:[
       {k:'head.show', l:'제목 표시', t:'toggle'}, {k:'head.eyebrow', l:'작은 제목', t:'text'},
@@ -3955,8 +3960,13 @@ const REVIEWS = (() => {
              {k:'avatar', l:'사진', t:'img'}, {k:'rating', l:'별점 (0~5, 0이면 숨김)', t:'num', step:1}],
        blank:{quote:'후기를 입력하세요.', name:'이름', role:'직함', avatar:'', rating:5}}
     ]},
+    {id:'move', title:'흐르는 움직임', fields:[
+      A('move.speed','흐르는 속도 (1초에 움직이는 거리)',5,200,1,'px',{r:1}),
+      {k:'move.pause', l:'마우스를 올리면 멈추기', t:'toggle'},
+      {k:'move.fade', l:'양쪽 끝을 흐리게', t:'toggle'}
+    ]},
     {id:'card', title:'카드 디자인', fields:[
-      A('card.cols','넓은 화면의 열 수',1,4,1,'열'), A('card.gap','카드 간격',0,48,1,'px',{r:1}),
+      A('card.w','카드 너비',200,640,1,'px',{r:1}), A('card.gap','카드 간격',0,64,1,'px',{r:1}),
       A('card.radius','모서리',0,40,1,'px'), A('card.pad','안쪽 여백',12,60,1,'px'),
       {k:'card.bg', l:'카드 색', t:'color'}, {k:'card.color', l:'글자색', t:'color'}, {k:'card.sub', l:'직함 색', t:'color'},
       A('card.qsize','후기 글자 크기',12,28,1,'px',{r:1}),
@@ -3964,46 +3974,63 @@ const REVIEWS = (() => {
     ]}
   ];
   const fonts = st => [st.head.font, 'Pretendard Variable'];
-  function css(st){
-    const C = '.hw-'+st.id, L = st.layout, H = st.head, K = st.card;
-    return `${C}{background:${L.bg};margin:0;padding:${L.padT.d}px 0 ${L.padB.d}px;font-family:${stack(H.font)};-webkit-font-smoothing:antialiased}
+  // each half of the track repeats the cards until it is wider than a large screen, so the loop never shows a gap
+  const reps = (st, w, g) => Math.max(1, Math.ceil(2400 / Math.max(1, st.items.length * (w + g))));
+  function css(st, {anim}={}){
+    const C = '.hw-'+st.id, L = st.layout, H = st.head, K = st.card, M = st.move, n = Math.max(1, st.items.length);
+    const r = Math.max(reps(st, K.w.d, K.gap.d), reps(st, K.w.m, K.gap.m)); // same repeat count as the markup
+    const dur = (w, g, v) => (n * r * (w + g) / Math.max(1, v)).toFixed(2);
+    const fade = M.fade ? '-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);' : '';
+    return `${C}{background:${L.bg};margin:0;padding:${L.padT.d}px 0 ${L.padB.d}px;font-family:${stack(H.font)};-webkit-font-smoothing:antialiased;overflow:hidden}
 ${C} *{box-sizing:border-box;margin:0;padding:0}
 ${C} .rv-inner{max-width:${L.maxW}px;margin:0 auto;padding:0 ${L.side.d}px}
 ${C} .rv-head{margin-bottom:${H.mb.d}px;text-align:${H.align};color:${H.color}}
 ${C} .rv-eyebrow{margin-bottom:14px;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
 ${C} .rv-title{font-size:${clampF(H)};font-weight:800;line-height:1.2;letter-spacing:-.02em;white-space:pre-line;word-break:keep-all}
-${C} .rv-grid{columns:${K.cols};column-gap:${K.gap.d}px;list-style:none}
-${C} .rv-card{break-inside:avoid;margin-bottom:${K.gap.d}px;padding:${K.pad}px;border-radius:${K.radius}px;background:${K.bg};color:${K.color};display:flex;flex-direction:column;gap:18px}
+${C} .rv-marquee{position:relative;overflow:hidden;${fade}}
+${C} .rv-track{display:flex;width:max-content;animation:rvMarquee-${st.id} ${dur(K.w.d, K.gap.d, M.speed.d)}s linear infinite;${anim === false ? 'animation-play-state:paused;' : ''}will-change:transform}
+${M.pause ? `${C} .rv-marquee:hover .rv-track,${C} .rv-marquee:focus-within .rv-track{animation-play-state:paused}` : ''}
+@keyframes rvMarquee-${st.id}{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+${C} .rv-set{display:flex;flex:none;gap:${K.gap.d}px;padding-right:${K.gap.d}px;list-style:none}
+${C} .rv-card{flex:none;width:${K.w.d}px;padding:${K.pad}px;border-radius:${K.radius}px;background:${K.bg};color:${K.color};display:flex;flex-direction:column;gap:18px}
 ${C} .rv-mark{display:block;height:28px;font-family:Georgia,'Times New Roman',serif;font-size:64px;line-height:.9;opacity:.18}
 ${C} .rv-stars{font-size:14px;letter-spacing:3px}
 ${C} .rv-stars i{font-style:normal;opacity:.2}
 ${C} .rv-q{font-size:${K.qsize.d}px;line-height:1.7;word-break:keep-all}
-${C} .rv-who{display:flex;align-items:center;gap:12px;margin-top:4px}
+${C} .rv-who{display:flex;align-items:center;gap:12px;margin-top:auto;padding-top:4px}
 ${C} .rv-who img{width:44px;height:44px;border-radius:50%;object-fit:cover;max-width:none;background:#E5E5E5}
 ${C} .rv-name{font-size:15px;font-weight:700}
 ${C} .rv-role{font-size:13px;color:${K.sub};margin-top:2px}
-@media (max-width:1023px){${C} .rv-grid{columns:${Math.min(K.cols, 2)}}}
-@media (max-width:767px){${C}{padding:${L.padT.m}px 0 ${L.padB.m}px}${C} .rv-inner{padding:0 ${L.side.m}px}${C} .rv-head{margin-bottom:${H.mb.m}px}${C} .rv-grid{columns:1;column-gap:0}${C} .rv-card{margin-bottom:${K.gap.m}px;padding:${Math.round(K.pad * .8)}px}${C} .rv-q{font-size:${K.qsize.m}px}}`;
+@media (max-width:767px){${C}{padding:${L.padT.m}px 0 ${L.padB.m}px}${C} .rv-inner{padding:0 ${L.side.m}px}${C} .rv-head{margin-bottom:${H.mb.m}px}
+${C} .rv-track{animation-duration:${dur(K.w.m, K.gap.m, M.speed.m)}s}${C} .rv-set{gap:${K.gap.m}px;padding-right:${K.gap.m}px}${C} .rv-card{width:${K.w.m}px;padding:${Math.round(K.pad * .8)}px}${C} .rv-q{font-size:${K.qsize.m}px}}
+@media (prefers-reduced-motion:reduce){${C} .rv-track{animation:none}${C} .rv-marquee{overflow-x:auto}${C} .rv-set[aria-hidden]{display:none}}`;
   }
   function html(st, {preview=false}={}){
     const a = k => preview ? ` data-el="${k}"` : '', ed = p => preview ? ` data-edit="${p}"` : '';
     const src = s => preview ? pv(s) : s, H = st.head, K = st.card;
     const stars = r => { r = Math.max(0, Math.min(5, Math.round(+r || 0))); return r ? `<p class="rv-stars" aria-label="별점 ${r}점">${'★'.repeat(r)}${r < 5 ? `<i>${'★'.repeat(5 - r)}</i>` : ''}</p>` : ''; };
-    const cards = st.items.map((it, i) => `<li class="rv-card">
-      ${K.mark ? '<span class="rv-mark" aria-hidden="true">“</span>' : ''}${K.stars ? stars(it.rating) : ''}
-      <blockquote class="rv-q"${ed('items.'+i+'.quote')}>${rich(it.quote)}</blockquote>
-      <div class="rv-who">${K.avatar && it.avatar ? `<img src="${esc(src(it.avatar))}" alt=""${preview ? ` data-img="items.${i}.avatar"` : ''}>` : ''}<div><p class="rv-name"${ed('items.'+i+'.name')}>${esc(it.name)}</p><p class="rv-role"${ed('items.'+i+'.role')}>${esc(it.role)}</p></div></div>
-    </li>`).join('\n    ');
+    // only the first copy is editable / read by screen readers; the repeats are decoration for the loop
+    const card = (it, i, live) => {
+      const e = p => live ? ed(p) : '';
+      return `<li class="rv-card">
+        ${K.mark ? '<span class="rv-mark" aria-hidden="true">“</span>' : ''}${K.stars ? stars(it.rating) : ''}
+        <blockquote class="rv-q"${e('items.'+i+'.quote')}>${rich(it.quote)}</blockquote>
+        <div class="rv-who">${K.avatar && it.avatar ? `<img src="${esc(src(it.avatar))}" alt=""${live && preview ? ` data-img="items.${i}.avatar"` : ''}>` : ''}<div><p class="rv-name"${e('items.'+i+'.name')}>${esc(it.name)}</p><p class="rv-role"${e('items.'+i+'.role')}>${esc(it.role)}</p></div></div>
+      </li>`;
+    };
+    const r = Math.max(reps(st, K.w.d, K.gap.d), reps(st, K.w.m, K.gap.m));
+    const run = first => Array.from({length:r}, (_, k) => st.items.map((it, i) => card(it, i, first && k === 0)).join('')).join('');
     return `<section class="hw-hero hw-${st.id}"${a('section')}>
-  <div class="rv-inner">
-${H.show ? `    <div class="rv-head"${a('head')}>${H.eyebrow ? `<p class="rv-eyebrow"${ed('head.eyebrow')}>${esc(H.eyebrow)}</p>` : ''}<h2 class="rv-title"${ed('head.text')}>${esc(H.text)}</h2></div>\n` : ''}    <ul class="rv-grid"${a('items')}>
-    ${cards}
-    </ul>
+${H.show ? `  <div class="rv-inner"><div class="rv-head"${a('head')}>${H.eyebrow ? `<p class="rv-eyebrow"${ed('head.eyebrow')}>${esc(H.eyebrow)}</p>` : ''}<h2 class="rv-title"${ed('head.text')}>${esc(H.text)}</h2></div></div>\n` : ''}  <div class="rv-marquee"${a('items')}>
+    <div class="rv-track">
+      <ul class="rv-set">${run(true)}</ul>
+      <ul class="rv-set" aria-hidden="true">${run(false)}</ul>
+    </div>
   </div>
 </section>`;
   }
   return {
-    key:'reviews', cat:'content', group:'review', no:'C18', title:'Testimonials', sub:'길이가 다른 후기를 엇갈린 카드로 담는 추천사 모음',
+    key:'reviews', cat:'content', group:'review', no:'C18', title:'Testimonials', sub:'후기 카드가 오른쪽에서 왼쪽으로 끊김 없이 흐르는 추천사',
     swatch:'linear-gradient(90deg,#FFFFFF 0 31%,#F2F2F2 31% 34%,#FFFFFF 34% 65%,#F2F2F2 65% 68%,#FFFFFF 68%)',
     defaults, groups, fonts, css, html, run:null, cfg:()=>({}),
     header:()=>0, bp:()=>767,
@@ -4343,6 +4370,15 @@ function refreshLists(){
   if ($('dnslides')) $('dnslides').innerHTML = dnSlidesHTML();
   if ($('slides')) $('slides').innerHTML = slidesHTML();
   rail.querySelectorAll('[data-list]').forEach(el => el.innerHTML = listHTML(FIELD[el.dataset.list]));
+  listLimits();
+}
+// lists with a min / max item count: show the count and lock the add button at the maximum
+function listLimits(){
+  rail.querySelectorAll('[data-lcount]').forEach(el => {
+    const f = FIELD[el.dataset.lcount], n = (getRaw(f.k) || []).length;
+    el.textContent = `${f.item} ${n}개 · ${f.min || 1}~${f.max || '∞'}개까지 넣을 수 있어요.`;
+    const add = rail.querySelector(`[data-lact="add"][data-lk="${f.k}"]`); if (add) add.disabled = !!f.max && n >= f.max;
+  });
 }
 function rawFor(path){
   const m = path.match(/^(.*)#(\d+)$/);
@@ -4619,7 +4655,7 @@ function fieldHTML(f){
         <button type="button" class="btn sm ghost" data-default="${f.k}">기본 이미지</button></div>
       </div></div><div class="hint" data-imghint="${f.k}"></div></div>`;
     case 'list': return `<div class="f"><div class="slides" data-list="${f.k}">${listHTML(f)}</div>
-      <div class="row"><button type="button" class="btn sm" data-lact="add" data-lk="${f.k}">${f.item} 추가</button>
+      ${f.min || f.max ? `<div class="hint" data-lcount="${f.k}"></div>` : ''}<div class="row"><button type="button" class="btn sm" data-lact="add" data-lk="${f.k}">${f.item} 추가</button>
       <button type="button" class="btn sm ghost" data-lact="orig" data-lk="${f.k}">기본 목록으로</button></div>
       <div class="hint">카드의 "보기"를 누르면 그 ${f.item}을 가운데에 띄워 멈춘 상태로 보여줘요. 미리보기에서 이미지를 더블클릭해도 바꿀 수 있어요.</div></div>`;
     case 'dnslides': return `<div class="f"><div class="slides" id="dnslides"></div>
@@ -4654,7 +4690,7 @@ function listHTML(f){
       <button type="button" class="btn sm ghost" data-lact="show">보기</button>
       <button type="button" class="btn sm ghost" data-lact="up" ${i?'':'disabled'} aria-label="앞으로">↑</button>
       <button type="button" class="btn sm ghost" data-lact="down" ${i<L.length-1?'':'disabled'} aria-label="뒤로">↓</button>
-      <button type="button" class="btn sm ghost" data-lact="del" ${L.length>1?'':'disabled'}>삭제</button></div>
+      <button type="button" class="btn sm ghost" data-lact="del" ${L.length>(f.min||1)?'':'disabled'}>삭제</button></div>
     ${f.cols.map(c => {
       const v = it[c.k] ?? '';
       if (c.t === 'img') return `<div class="img-f"><img class="thumb" src="${esc(pv(v))}" alt="">
@@ -4694,7 +4730,7 @@ function buildRail(fresh=false){
   rail.innerHTML = head + T.groups.map((g,i) => `<details data-g="${g.id}" ${open.includes(g.id)||(!open.length&&i===0)?'open':''}>
     <summary><span class="dot"></span>${g.title}</summary><div class="fields">${g.fields.map(fieldHTML).join('')}</div></details>`).join('');
   if (fresh) rail.scrollTop = 0;
-  sync();
+  sync(); listLimits();
   select(selected, false);
 }
 function sync(except){
@@ -4760,8 +4796,8 @@ rail.addEventListener('click', e => {
     if (a==='show'){ showSlide = i; if (moving) setMoving(false); else render(); refreshLists(); return; }
     if (a==='up'){ [L[i-1], L[i]] = [L[i], L[i-1]]; showSlide = i-1; }
     if (a==='down'){ [L[i+1], L[i]] = [L[i], L[i+1]]; showSlide = i+1; }
-    if (a==='del'){ L.splice(i,1); showSlide = Math.min(showSlide, L.length-1); }
-    if (a==='add'){ L.push(JSON.parse(JSON.stringify(f.blank))); showSlide = L.length-1; }
+    if (a==='del'){ if (L.length <= (f.min || 1)) return; L.splice(i,1); showSlide = Math.min(showSlide, L.length-1); }
+    if (a==='add'){ if (f.max && L.length >= f.max){ toast(`${f.item}는 최대 ${f.max}개까지예요`); return; } L.push(JSON.parse(JSON.stringify(f.blank))); showSlide = L.length-1; }
     if (a==='orig'){ setPath(k, JSON.parse(JSON.stringify(f.orig))); showSlide = 0; }
     refreshLists(); render(); save(); return;
   }
