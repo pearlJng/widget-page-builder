@@ -459,22 +459,12 @@ const pv = u => PREVIEW[u] || u;
 
 /* ================= dummy images (placeholders instead of the reference sites' assets) ================= */
 const svgURI = svg => 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+// every image area starts with the same light-gray placeholder (mountains + sun + name · size); `kind` is kept for older calls
 function PH(kind, label, w, h){
   const t = `<text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" letter-spacing="2"`;
   const size = Math.round(Math.min(w, h) * .07);
   const sub = `<text x="50%" y="${50 + Math.round(size * 1.4 / h * 100)}%" text-anchor="middle" dominant-baseline="middle" font-family="Arial,Helvetica,sans-serif" font-size="${Math.round(size * .55)}"`;
-  if (kind === 'photo') return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="#E7E7E7"/><path d="M0 ${h} L${w*.32} ${h*.52} L${w*.5} ${h*.74} L${w*.68} ${h*.42} L${w} ${h} Z" fill="#D6D6D6"/><circle cx="${w*.8}" cy="${h*.24}" r="${Math.min(w,h)*.07}" fill="#D6D6D6"/>${t} font-size="${size}" fill="#909090">${label}</text>${sub} fill="#A7A7A7">${w} × ${h}</text></svg>`);
-  if (kind === 'dark') return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><defs><radialGradient id="g" cx=".35" cy=".25" r="1"><stop offset="0" stop-color="#4F4F4F"/><stop offset=".55" stop-color="#252525"/><stop offset="1" stop-color="#101010"/></radialGradient></defs><rect width="${w}" height="${h}" fill="url(#g)"/>${t} font-size="${size}" fill="rgba(255,255,255,.28)">${label}</text>${sub} fill="rgba(255,255,255,.2)">${w} × ${h}</text></svg>`);
-  if (kind === 'cutout') return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect x="${w*.14}" y="${h*.12}" width="${w*.72}" height="${h*.76}" rx="${Math.min(w,h)*.12}" fill="rgba(255,255,255,.16)" stroke="rgba(255,255,255,.7)" stroke-width="3" stroke-dasharray="14 10"/>${t} font-size="${size}" fill="rgba(255,255,255,.9)">${label}</text>${sub} fill="rgba(255,255,255,.65)">PNG · ${w} × ${h}</text></svg>`);
-  if (kind === 'art') return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="3">${[.42,.32,.22,.12].map((r,i) => `<ellipse cx="${w/2}" cy="${h/2}" rx="${w*r}" ry="${h*r*.8}" stroke-dasharray="${i % 2 ? '10 12' : '0'}"/>`).join('')}<text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="${Math.round(w*.05)}" fill="rgba(255,255,255,.85)" stroke="none">${label}</text></svg>`);
-  if (kind === 'logo') return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect x="4" y="${h*.22}" width="${h*.56}" height="${h*.56}" rx="${h*.14}" fill="none" stroke="#FFFFFF" stroke-width="6"/><circle cx="${4+h*.28}" cy="${h/2}" r="${h*.1}" fill="#FFFFFF"/><text x="${h*.56+24}" y="50%" dominant-baseline="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="${h*.36}" letter-spacing="3" fill="#FFFFFF">${label}</text></svg>`);
-  if (kind === 'stars'){
-    let seed = 7, dots = '';
-    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-    for (let i = 0; i < 260; i++) dots += `<circle cx="${(rnd()*w).toFixed(1)}" cy="${(rnd()*h).toFixed(1)}" r="${(rnd()*1.3+.3).toFixed(2)}" fill="rgba(255,255,255,${(rnd()*.6+.2).toFixed(2)})"/>`;
-    return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="#050505"/>${dots}</svg>`);
-  }
-  return '';
+  return svgURI(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="#E7E7E7"/><path d="M0 ${h} L${w*.32} ${h*.52} L${w*.5} ${h*.74} L${w*.68} ${h*.42} L${w} ${h} Z" fill="#D6D6D6"/><circle cx="${w*.8}" cy="${h*.24}" r="${Math.min(w,h)*.07}" fill="#D6D6D6"/>${t} font-size="${size}" fill="#909090">${label}</text>${sub} fill="#A7A7A7">${w} × ${h}</text></svg>`);
 }
 const sizeFields = (p, title='글자 크기 · clamp(최소, 화면폭 비례, 최대)') => [
   {sub:title}, A(p+'.min','최소',8,160,1,'px'), A(p+'.vw','화면 너비 비례',.5,25,.1,'vw'), A(p+'.max','최대',10,320,1,'px')
@@ -873,7 +863,7 @@ const DONGNAM = (() => {
       {video:'', poster:PH('dark', 'VIDEO 02', 1920, 1080), filter:false, title:'Headline Text\nFor Slide 02', desc:'두 번째 슬라이드의 **설명 문구**를 입력하세요'}
     ],
     play:{speed:1000, auto:8000, useVideo:true},
-    filter:{color:'#1E1E1E', a1:.45, a2:.25},
+    filter:{color:'#1E1E1E', a1:.6, a2:.45},
     title:{font:'Pretendard Variable', weight:'700', color:'#FFFFFF', d:90, m:50, lh:1.1, ls:-.025, mb:30, ox:R(0,0), oy:R(0,0)},
     desc:{size:32, weight:'400', strong:'600', color:'#FFFFFF', ox:R(0,0), oy:R(0,0)},
     pos:{maxW:1680, side:15, padB:50, ox:R(0,0), oy:R(0,0)},
@@ -1356,15 +1346,15 @@ const CHOICE = (() => {
     {title:'서비스 A 제목', desc:'서비스 A를 소개하는 첫 번째 줄\n두 번째 줄 설명을 입력하세요',
      tags:'태그 문구 01\n태그 문구 02\n조금 더 긴 태그 문구 03\n태그 문구 04\n태그 05\n태그 문구 06',
      href:'#', hover:'자세히 보기', bg:'#000000', bga:.4, accent:'#000000',
-     video:'', poster:PH('art', 'ART 01', 1080, 1080), left:59, top:-1, width:57, rot:0, flip:true, gray:false, opacity:.5, blend:'screen', rate:1.2, tTop:9, mRight:-46.6, mTop:3, mW:190},
+     video:'', poster:PH('art', 'ART 01', 1080, 1080), left:59, top:-1, width:57, rot:0, flip:true, gray:false, opacity:.35, blend:'screen', rate:1.2, tTop:9, mRight:-46.6, mTop:3, mW:190},
     {title:'서비스 B 제목', desc:'서비스 B를 소개하는 첫 번째 줄\n두 번째 줄 설명을 입력하세요',
      tags:'태그 문구 01\n태그 02\n조금 더 긴 태그 문구 03\n태그 문구 04\n태그 문구 05\n태그 06',
      href:'#', hover:'자세히 보기', bg:'#3A3A3A', bga:1, accent:'#3A3A3A',
-     video:'', poster:PH('art', 'ART 02', 702, 720), left:40.8, top:-17.4, width:85, rot:-30, flip:false, gray:true, opacity:1, blend:'screen', rate:2, tTop:1, mRight:-92.5, mTop:-25, mW:277}
+     video:'', poster:PH('art', 'ART 02', 702, 720), left:40.8, top:-17.4, width:85, rot:-30, flip:false, gray:true, opacity:.35, blend:'screen', rate:2, tTop:1, mRight:-92.5, mTop:-25, mW:277}
   ];
   const defaults = () => ({
     id: uid(),
-    layout:{vh:100, minH:800, bg:'#000000', bgImg:BG, mMinH:700},
+    layout:{vh:100, minH:800, bg:'#000000', bgImg:BG, dim:.6, mMinH:700},
     title:{lines:'섹션 제목의 첫 번째 줄\n두 번째 줄을 입력하세요.', font:'Pretendard Variable', weight:'700', color:'#FFFFFF', min:42, vw:3.333, max:64, lh:1.2, ls:-.025, top:14.1, ox:R(0,0), oy:R(0,0)},
     cards:JSON.parse(JSON.stringify(CARDS)),
     grid:{top:36.25, gap:24, maxW:1280},
@@ -1374,7 +1364,7 @@ const CHOICE = (() => {
     {id:'layout', title:'섹션', fields:[
       A('layout.vh','높이 (화면 높이 대비)',40,100,1,'vh'), A('layout.minH','최소 높이',0,1400,10,'px'), A('layout.mMinH','모바일 최소 높이',0,1200,10,'px'),
       {k:'layout.bg', l:'바탕색', t:'color'},
-      {k:'layout.bgImg', l:'배경 이미지 (별 하늘)', t:'image', def:BG}
+      {k:'layout.bgImg', l:'배경 이미지', t:'image', def:BG}, A('layout.dim','배경 이미지 어둡게',0,1,.01,'',{hint:'흰 글자가 잘 보이도록 배경 이미지 위를 검게 덮어요.'})
     ]},
     {id:'title', title:'제목', fields:[
       {k:'title.lines', l:'제목 (줄바꿈 그대로)', t:'textarea'},
@@ -1431,7 +1421,7 @@ ${n} .cc-hover-text{color:${c.accent}}`;
     return `${C}{--mpx:1px;position:relative;height:${L.vh}svh;min-height:${L.minH}px;padding:0;margin:0;overflow:hidden;background:${L.bg};color:#fff;box-sizing:border-box;font-family:${stack(Ti.font)}}
 ${C} *{margin:0;padding:0;box-sizing:border-box}
 ${C} ul{list-style:none}
-${C} .cc-bg{position:absolute;inset:0;background:${L.bg}${L.bgImg ? ` url("${preview ? pv(L.bgImg) : L.bgImg}") center top / cover no-repeat` : ''};pointer-events:none}
+${C} .cc-bg{position:absolute;inset:0;background:${L.bgImg && L.dim ? `linear-gradient(rgba(0,0,0,${L.dim}),rgba(0,0,0,${L.dim})),` : ''}${L.bg}${L.bgImg ? ` url("${preview ? pv(L.bgImg) : L.bgImg}") center top / cover no-repeat` : ''};pointer-events:none}
 ${C} .cc-result{position:absolute;left:0;right:0;top:50%;height:min(100%,1080px);z-index:3;transform:translateY(-50%)}
 ${C} .cc-title{position:absolute;left:50%;top:${Ti.top}%;width:min(1840px,95%);transform:translateX(-50%);font-family:${stack(Ti.font)};font-size:${clampF(Ti)};font-weight:${Ti.weight};line-height:${Ti.lh};letter-spacing:${Ti.ls}em;text-align:center;color:${Ti.color};white-space:pre-line;translate:${Ti.ox.d}px ${Ti.oy.d}px}
 ${C} .cc-cards{--card-w:calc((min(${G.maxW}px, 86vw) - ${G.gap}px) / 2);position:absolute;left:50%;top:${G.top}%;display:flex;gap:${G.gap}px;width:min(${G.maxW}px,86%);height:min(52.43%, calc(var(--card-w) * 0.4335 + 256px));transform:translateX(-50%)}
@@ -2502,7 +2492,7 @@ const IMGMSG = (() => {
   const defaults = () => ({
     id: uid(),
     layout:{vh:80, minH:560, padY:R(140,96), maxW:960, align:'center'},
-    bg:{src:BGDEF, px:50, py:50, color:'#0C0C0C', a1:.35, a2:.65, zoom:true},
+    bg:{src:BGDEF, px:50, py:50, color:'#0C0C0C', a1:.5, a2:.75, zoom:true},
     eyebrow:{show:true, text:'BRAND MESSAGE', color:'#FFFFFF', alpha:.7, size:14, ls:.2},
     msg:{lines:'브랜드가 전하고 싶은 메시지를\n**한 문장**으로 담아 보세요.\n세 번째 줄로 마무리합니다.', font:'Pretendard Variable', weight:'700',
          color:'#FFFFFF', accent:'#FFFFFF', min:28, vw:3.6, max:60, lh:1.4, ls:-.02},
@@ -2644,7 +2634,7 @@ const LENS = (() => {
   const defaults = () => ({
     id: uid(),
     layout:{vh:100, minH:640, side:R(96,24), maxW:1280, align:'left'},
-    base:{src:BASE, px:50, py:50, color:'#0B0B0B', a:.35, text:'#FFFFFF', accent:'#FFFFFF'},
+    base:{src:BASE, px:50, py:50, color:'#0B0B0B', a:.6, text:'#FFFFFF', accent:'#FFFFFF'},
     reveal:{src:REVEAL, px:50, py:50, color:'#FFFFFF', imgA:.35, text:'#111111', accent:'#111111'},
     eyebrow:{show:true, text:'INTERACTIVE HERO', size:14, ls:.2},
     head:{tag:'h1', text:'보이는 것 너머의\n**이야기**를 만듭니다.', alt:'커서를 움직이면\n**숨은 장면**이 보여요.', font:'Pretendard Variable', weight:'800', min:40, vw:6, max:104, lh:1.12, ls:-.03},
@@ -3645,7 +3635,7 @@ const TABS = (() => {
     layout:{bg:'#FFFFFF', padT:R(120,72), padB:R(120,72), maxW:1200, side:R(40,20)},
     head:{show:true, eyebrow:'TABBED CONTENT', text:'탭을 눌러\n내용을 바꿔 보세요', font:'Pretendard Variable', color:'#111111', min:28, vw:3, max:52, mb:R(48,28), align:'left'},
     items:JSON.parse(JSON.stringify(ITEMS)),
-    tab:{style:'line', pos:'top', color:'#111111', sub:'#8A8A8A', line:'#E0E0E0', auto:false, interval:6000},
+    tab:{style:'line', pos:'top', align:'left', size:16, color:'#111111', sub:'#8A8A8A', line:'#E0E0E0', track:'#F0F0F0', auto:false, interval:6000},
     panel:{ratio:'4/3', radius:16, gap:R(64,24), split:55, tsize:R(32,24), text:'#555555', btn:'#111111'}
   });
   const groups = [
@@ -3669,8 +3659,10 @@ const TABS = (() => {
     ]},
     {id:'tab', title:'탭 디자인 · 동작', fields:[
       {k:'tab.pos', l:'탭 위치', t:'select', opts:[['top','위쪽 (가로)'],['left','왼쪽 (세로)']]},
-      {k:'tab.style', l:'탭 모양', t:'select', opts:[['line','밑줄'],['pill','둥근 버튼']]},
-      {k:'tab.color', l:'선택한 탭 색', t:'color'}, {k:'tab.sub', l:'다른 탭 글자색', t:'color'}, {k:'tab.line', l:'구분선 색', t:'color'},
+      {k:'tab.style', l:'탭 모양', t:'select', opts:[['line','밑줄'],['pill','알약'],['segment','세그먼트 (회색 바탕 위 흰 알약)'],['fill','채움 (사각 버튼)'],['outline','테두리 알약'],['text','글자만']]},
+      {k:'tab.align', l:'탭 정렬 (위쪽 탭일 때)', t:'select', opts:[['left','왼쪽'],['center','가운데']]},
+      A('tab.size','탭 글자 크기',12,22,1,'px'),
+      {k:'tab.color', l:'선택한 탭 색', t:'color'}, {k:'tab.sub', l:'다른 탭 글자색', t:'color'}, {k:'tab.line', l:'구분선 · 테두리 색', t:'color'}, {k:'tab.track', l:'알약 · 채움 · 세그먼트 바탕색', t:'color'},
       {k:'tab.auto', l:'자동으로 다음 탭 넘기기', t:'toggle', hint:'마우스를 올리거나 탭을 누르면 멈춰요.'}, A('tab.interval','넘기는 간격',2000,15000,500,'ms')
     ]},
     {id:'panel', title:'내용 디자인', fields:[
@@ -3684,7 +3676,28 @@ const TABS = (() => {
   function css(st){
     const C = '.hw-'+st.id, L = st.layout, H = st.head, TB = st.tab, P = st.panel, left = TB.pos === 'left';
     const ease = 'cubic-bezier(.22,.61,.36,1)';
-    const tabOn = TB.style === 'pill' ? `background:${TB.color};color:${L.bg}` : `color:${TB.color};box-shadow:inset ${left ? '2px 0 0' : '0 -2px 0'} ${TB.color}`;
+    // tab look per style; v = vertical list (tabs on the left)
+    const filled = ['pill', 'fill', 'outline'].includes(TB.style);
+    const tabRules = v => {
+      const S_ = TB.style;
+      const list = {
+        line: v ? `flex-direction:column;border-left:1px solid ${TB.line}` : `gap:4px;border-bottom:1px solid ${TB.line}`,
+        segment: `${v ? 'flex-direction:column;border-radius:22px' : 'border-radius:999px;width:fit-content;max-width:100%'};gap:2px;padding:4px;background:${TB.track}`,
+        text: v ? 'flex-direction:column;gap:2px' : 'gap:10px'
+      }[S_] || (v ? 'flex-direction:column;gap:8px' : 'gap:8px');
+      const pad = {line: v ? '14px 20px' : '14px 18px', text: v ? '10px 0' : '12px 4px', segment:'10px 20px'}[S_] || '11px 22px';
+      const radius = {pill:'999px', outline:'999px', segment:'999px', fill:'8px'}[S_] || '0';
+      const idle = {pill:`background:${TB.track}`, fill:`background:${TB.track}`, outline:`box-shadow:inset 0 0 0 1px ${TB.line}`}[S_] || '';
+      const on = {
+        line:`color:${TB.color};box-shadow:inset ${v ? '2px 0 0' : '0 -2px 0'} ${TB.color}`,
+        segment:`background:#FFFFFF;color:${TB.color};box-shadow:0 1px 3px rgba(0,0,0,.14)`,
+        text:`color:${TB.color};font-weight:800`
+      }[S_] || `background:${TB.color};color:${L.bg};box-shadow:none`;
+      const center = !v && TB.align === 'center';
+      return `${C} .tb-list{display:flex;${list};overflow-x:auto;scrollbar-width:none;${center ? (TB.style === 'segment' ? 'margin-left:auto;margin-right:auto;' : 'justify-content:safe center;') : ''}}
+${C} .tb-tab{padding:${pad};border-radius:${radius};${idle}}
+${C} .tb-tab[aria-selected="true"]{${on}}`;
+    };
     return `${C}{background:${L.bg};margin:0;padding:${L.padT.d}px 0 ${L.padB.d}px;font-family:${stack(H.font)};-webkit-font-smoothing:antialiased}
 ${C} *{box-sizing:border-box;margin:0;padding:0}
 ${C} .tb-inner{max-width:${L.maxW}px;margin:0 auto;padding:0 ${L.side.d}px}
@@ -3692,14 +3705,13 @@ ${C} .tb-head{margin-bottom:${H.mb.d}px;text-align:${H.align};color:${H.color}}
 ${C} .tb-eyebrow{margin-bottom:14px;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
 ${C} .tb-title{font-size:${clampF(H)};font-weight:800;line-height:1.2;letter-spacing:-.02em;white-space:pre-line;word-break:keep-all}
 ${C} .tb-wrap{${left ? 'display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px;align-items:start' : ''}}
-${C} .tb-list{display:flex;${left ? 'flex-direction:column;border-left' : 'gap:4px;overflow-x:auto;scrollbar-width:none;border-bottom'}:${TB.style === 'pill' ? '0' : `1px solid ${TB.line}`};${left ? '' : 'margin-bottom:40px'}}
 ${C} .tb-list::-webkit-scrollbar{display:none}
-${C} .tb-tab{position:relative;flex:none;border:0;background:transparent;font:inherit;font-size:16px;font-weight:600;color:${TB.sub};cursor:pointer;white-space:nowrap;text-align:left;
-  padding:${left ? '14px 20px' : '14px 18px'};${TB.style === 'pill' ? 'border-radius:999px;' : ''}transition:color .25s,background .25s}
+${C} .tb-tab{position:relative;flex:none;overflow:hidden;border:0;background:transparent;font:inherit;font-size:${TB.size}px;font-weight:600;color:${TB.sub};cursor:pointer;white-space:nowrap;text-align:${left && TB.style !== 'segment' ? 'left' : 'center'};transition:color .25s,background .25s,box-shadow .25s}
 ${C} .tb-tab:hover{color:${TB.color}}
-${C} .tb-tab[aria-selected="true"]{${tabOn}}
+${tabRules(left)}
+${left ? '' : `${C} .tb-list{margin-bottom:40px}`}
 ${C} .tb-tab:focus-visible{outline:2px solid ${TB.color};outline-offset:2px}
-${C} .tb-bar{position:absolute;left:0;bottom:0;height:2px;width:100%;background:${TB.color};transform:scaleX(0);transform-origin:0 50%;opacity:.35}
+${C} .tb-bar{position:absolute;left:0;bottom:0;height:2px;width:100%;background:${filled ? L.bg : TB.color};transform:scaleX(0);transform-origin:0 50%;opacity:.35}
 ${C}.is-auto .tb-tab[aria-selected="true"] .tb-bar{animation:tbBar-${st.id} var(--iv) linear forwards}
 ${C}.is-paused .tb-tab[aria-selected="true"] .tb-bar{animation-play-state:paused}
 @keyframes tbBar-${st.id}{to{transform:scaleX(1)}}
@@ -3720,8 +3732,9 @@ ${C} .tb-body strong{color:${H.color}}
 ${C} .tb-btn{display:inline-flex;align-items:center;gap:8px;margin-top:28px;height:48px;padding:0 24px;border-radius:999px;background:${P.btn};color:${L.bg};font-size:15px;font-weight:700;text-decoration:none}
 @media (prefers-reduced-motion:reduce){${C} .tb-panel:not([hidden]){animation:none}}
 @media (max-width:767px){${C}{padding:${L.padT.m}px 0 ${L.padB.m}px}${C} .tb-inner{padding:0 ${L.side.m}px}${C} .tb-head{margin-bottom:${H.mb.m}px}
-${C} .tb-wrap{display:block}${C} .tb-list{flex-direction:row;gap:4px;overflow-x:auto;border-left:0;${TB.style === 'pill' ? '' : `border-bottom:1px solid ${TB.line};`}margin-bottom:28px}
-${C} .tb-tab{padding:12px 14px;font-size:15px}${TB.style === 'pill' ? '' : `${C} .tb-tab[aria-selected="true"]{box-shadow:inset 0 -2px 0 ${TB.color}}`}
+${C} .tb-wrap{display:block}
+${tabRules(false)}
+${C} .tb-list{margin-bottom:28px}${C} .tb-tab{font-size:${Math.max(12, TB.size - 1)}px}
 ${C} .tb-panel{grid-template-columns:1fr;gap:${P.gap.m}px}${C} .tb-pt{font-size:${P.tsize.m}px}${C} .tb-body{font-size:15px}}`;
   }
   function html(st, {preview=false, slide}={}){
