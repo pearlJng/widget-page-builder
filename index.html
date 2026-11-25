@@ -217,6 +217,7 @@ input[type=color]{width:36px;height:36px;padding:3px;border:1px solid var(--line
 
 /* ---------- widget gallery ---------- */
 .w-only{display:none}
+.app.solo #w-save{display:none!important}
 .app.mode-widget .w-only{display:inline-flex}
 .app.mode-gallery .page-head .actions,.app.mode-gallery .body{display:none}
 .crumb-back{display:inline-flex;align-items:center;gap:4px;border:0;background:transparent;padding:2px 6px 2px 2px;margin-left:-2px;border-radius:4px;font-size:12px;font-weight:600;color:var(--accent)}
@@ -419,6 +420,7 @@ input[type=color]{width:36px;height:36px;padding:3px;border:1px solid var(--line
 <script>
 (() => {
 /* ================= shared helpers ================= */
+const ASSETS = (typeof window !== 'undefined' && window.WB_ASSETS) || '';
 const uid = () => Math.random().toString(36).slice(2,8);
 const R = (d,m) => ({d,m});
 const A = (k,l,min,max,step,u,extra={}) => ({k,l,t:'range',min,max,step,u,...extra});
@@ -4119,7 +4121,9 @@ function set(k, v){
 let saveT;
 // mode: 'gallery' (widget cards) · 'widget' (one widget or one of my styles in the editor)
 let mode = 'gallery', wStyle = null, wType = null, baseSnap = '';
-const LIBKEY = 'page-builder-lib-v1';
+// single-widget editor (exported per widget): opens one widget with its controls, no gallery
+const SOLO = typeof window !== 'undefined' && window.WB_SOLO && TPL[window.WB_SOLO] ? window.WB_SOLO : null;
+const LIBKEY = SOLO ? 'widget-editor-' + SOLO : 'page-builder-lib-v1';
 const clone = o => JSON.parse(JSON.stringify(o));
 let lib = {styles:[]};
 try { const l = JSON.parse(localStorage.getItem(LIBKEY)); if (l && Array.isArray(l.styles)) lib = l; } catch(e) {}
@@ -4297,7 +4301,7 @@ function loadFonts(win, d){
     try {
       if (!fontBufs[name]) fontBufs[name] = (async () => {
         // bundled preview copy first, then the public font URL (works where the page is allowed to fetch it)
-        let res = await fetch(f.preview).catch(() => null);
+        let res = await fetch(ASSETS + f.preview).catch(() => null);
         if ((!res || !res.ok) && f.custom) res = await fetch(f.custom);
         if (!res || !res.ok) throw new Error('font file not found');
         return res.arrayBuffer();
@@ -4746,7 +4750,7 @@ function buildRail(fresh=false){
   const open = fresh ? [] : [...rail.querySelectorAll('details[open]')].map(d=>d.dataset.g);
   const head = store.cur < 0
     ? `<div class="rail-head"><small>페이지</small><b>페이지 설정</b><div class="chips"><span class="chip">제목 · 설명 · 바탕색 · 기본 글꼴</span></div></div>`
-    : `<div class="rail-head"><small>${mode === 'widget' ? (wStyle ? '내 스타일 편집 · 자동 저장' : '기본형 편집') : `섹션 ${String(store.cur+1).padStart(2,'0')} 설정`}</small><b>${T.title}</b><div class="chips"><span class="chip blue">${catName(T.cat)}</span><span class="chip">${groupName(T.cat, T.group)}</span><span class="chip">${T.no}</span></div></div>`;
+    : `<div class="rail-head"><small>${mode === 'widget' ? (SOLO ? '설정 · 자동 저장' : wStyle ? '내 스타일 편집 · 자동 저장' : '기본형 편집') : `섹션 ${String(store.cur+1).padStart(2,'0')} 설정`}</small><b>${T.title}</b><div class="chips"><span class="chip blue">${catName(T.cat)}</span><span class="chip">${groupName(T.cat, T.group)}</span><span class="chip">${T.no}</span></div></div>`;
   rail.innerHTML = head + T.groups.map((g,i) => `<details data-g="${g.id}" ${open.includes(g.id)||(!open.length&&i===0)?'open':''}>
     <summary><span class="dot"></span>${g.title}</summary><div class="fields">${g.fields.map(fieldHTML).join('')}</div></details>`).join('');
   if (fresh) rail.scrollTop = 0;
@@ -5066,6 +5070,13 @@ function setHead(){
     $('brand-sub').textContent = `위젯 ${WIDGETS.length}개 · 내 스타일 ${lib.styles.length}개`;
   } else {
     const w = TPL[wType], st = wStyle && lib.styles.find(x => x.id === wStyle);
+    if (SOLO){
+      $('crumb').innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-grid"/></svg>위젯 편집기';
+      $('page-title').textContent = w.title;
+      $('brand-sub').textContent = `${w.no} · ${w.sub} · 설정은 이 브라우저에 자동 저장돼요`;
+      $('export').className = 'btn primary';
+      return;
+    }
     $('crumb').innerHTML = '<button type="button" class="crumb-back" id="w-back"><svg class="ic"><use href="#i-left"/></svg>위젯 갤러리</button>';
     $('w-back').onclick = () => goGallery();
     const tr = $('page-title');
@@ -5228,13 +5239,20 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('pv').h
 
 /* ================= shell ================= */
 (async () => {
-  try { const buf = await (await fetch('p/pretendard.woff2')).arrayBuffer(); const f = new FontFace('Pretendard UI', buf, {weight:'45 920'}); await f.load(); document.fonts.add(f); } catch(e) {}
+  try { const buf = await (await fetch(ASSETS + 'p/pretendard.woff2')).arrayBuffer(); const f = new FontFace('Pretendard UI', buf, {weight:'45 920'}); await f.load(); document.fonts.add(f); } catch(e) {}
 })();
 
 /* ================= boot ================= */
 $('undo').onclick = undo; $('redo').onclick = redo;
 lastSnap = snap(); updateUndoUI();
-setMode('gallery'); buildGallery(); setHead();
+if (SOLO){
+  // the widget's settings live in one auto-saved style of this editor
+  $('app').classList.add('solo');
+  document.title = `${TPL[SOLO].title} · 위젯 편집기`;
+  const sid = 'solo-' + SOLO;
+  if (!lib.styles.some(x => x.id === sid)){ lib.styles.push({id:sid, type:SOLO, name:TPL[SOLO].title, at:Date.now(), s:TPL[SOLO].defaults()}); saveLib(); }
+  openWidget(SOLO, sid);
+} else { setMode('gallery'); buildGallery(); setHead(); }
 })();
 </script>
 
